@@ -179,7 +179,6 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 					[
 						'title'       => 'We received your message',
 						'preheader'   => sprintf( 'Ticket %s has been opened with Drywall Toolbox support.', $tnum ),
-						'eyebrow'     => 'Support request received',
 						'greeting'    => sprintf( 'Hi %s,', $name ),
 						'intro'       => 'Thanks for reaching out. Your message is in our support queue and a team member will follow up shortly.',
 						'details'     => [
@@ -190,7 +189,6 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 						'cta_label'   => $status_url ? 'Track this ticket' : '',
 						'signoff'     => $site . ' Support Team',
 						'footer_note' => 'You can reply directly to this email to add more information to your ticket.',
-						'theme'       => $theme,
 					]
 				),
 			];
@@ -232,7 +230,6 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 					[
 						'title'       => 'You have a new support reply',
 						'preheader'   => sprintf( 'A Drywall Toolbox team member replied to ticket %s.', $tnum ),
-						'eyebrow'     => 'Support update',
 						'greeting'    => sprintf( 'Hi %s,', $name ),
 						'intro'       => sprintf( 'A member of our support team replied to your ticket %s.', esc_html( $tnum ) ),
 						'details'     => [
@@ -244,7 +241,6 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 						'cta_label'   => $reply_link ? 'Reply to this ticket' : '',
 						'signoff'     => $site . ' Support Team',
 						'footer_note' => 'Reply directly to this email or click the button above to continue the conversation.',
-						'theme'       => $theme,
 					]
 				),
 			];
@@ -274,7 +270,6 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 					[
 						'title'       => 'Your ticket has been resolved',
 						'preheader'   => sprintf( 'Ticket %s has been marked as resolved.', $tnum ),
-						'eyebrow'     => 'Support resolved',
 						'greeting'    => sprintf( 'Hi %s,', $name ),
 						'intro'       => 'Your support ticket has been marked as resolved.',
 						'details'     => [
@@ -286,7 +281,6 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 						'cta_label'   => $status_url ? 'View ticket status' : '',
 						'signoff'     => $site . ' Support Team',
 						'footer_note' => 'Reply directly to this email if you need this ticket reopened.',
-						'theme'       => $theme,
 					]
 				),
 			];
@@ -303,7 +297,6 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 					[
 						'title'       => 'Your ticket has been reopened',
 						'preheader'   => sprintf( 'Ticket %s is open again with Drywall Toolbox support.', $tnum ),
-						'eyebrow'     => 'Support reopened',
 						'greeting'    => sprintf( 'Hi %s,', $name ),
 						'intro'       => 'Your support ticket has been reopened and our team will continue looking into it.',
 						'details'     => [
@@ -314,7 +307,6 @@ function dtb_support_get_email_template( string $template, array $ctx ): array|W
 						'cta_label'   => $status_url ? 'View ticket status' : '',
 						'signoff'     => $site . ' Support Team',
 						'footer_note' => 'Reply directly to this email to add more information to your ticket.',
-						'theme'       => $theme,
 					]
 				),
 			];

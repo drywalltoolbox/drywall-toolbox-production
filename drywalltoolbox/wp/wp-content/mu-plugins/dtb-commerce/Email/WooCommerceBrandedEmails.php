@@ -89,7 +89,6 @@ function dtb_commerce_wc_email_footer_wrap(): void {
 		[
 			'title'       => $email_config['title'],
 			'preheader'   => $email_config['preheader'],
-			'eyebrow'     => $email_config['eyebrow'],
 			'greeting'    => $email_config['greeting'],
 			'intro'       => $email_config['intro'],
 			'body_html'   => $wc_content,
@@ -98,7 +97,6 @@ function dtb_commerce_wc_email_footer_wrap(): void {
 			'cta_label'   => $email_config['cta_label'],
 			'signoff'     => 'The Drywall Toolbox Team',
 			'footer_note' => 'Questions about your order? Reply to this email or contact our support team.',
-			'theme'       => 'auto',
 		]
 	);
 
@@ -265,7 +263,6 @@ function dtb_commerce_get_email_config( string $email_id, $order ): array {
 	$defaults = [
 		'title'      => 'Order Update',
 		'preheader'  => 'Your Drywall Toolbox order has been updated',
-		'eyebrow'    => 'Order Notification',
 		'greeting'   => $greeting,
 		'intro'      => '',
 		'details'    => [],
@@ -280,7 +277,6 @@ function dtb_commerce_get_email_config( string $email_id, $order ): array {
 				[
 					'title'      => 'Order Confirmed',
 					'preheader'  => "Order #{$order_number} confirmed – We're preparing your items",
-					'eyebrow'    => 'Order Confirmation',
 					'intro'      => "Thank you for your order! We've received it and are preparing your items for shipment.",
 					'details'    => $order ? [
 						[ 'label' => 'Order Number', 'value' => $order_number ],
@@ -296,7 +292,6 @@ function dtb_commerce_get_email_config( string $email_id, $order ): array {
 				[
 					'title'      => 'Order Shipped',
 					'preheader'  => "Order #{$order_number} has been shipped and is on its way",
-					'eyebrow'    => 'Order Update',
 					'intro'      => 'Great news! Your order has been shipped and is on its way to you.',
 					'cta_label'  => 'Track Your Order',
 					'details'    => $order ? [
@@ -313,7 +308,6 @@ function dtb_commerce_get_email_config( string $email_id, $order ): array {
 				[
 					'title'      => 'Order On Hold',
 					'preheader'  => "Order #{$order_number} is on hold pending payment",
-					'eyebrow'    => 'Payment Required',
 					'intro'      => 'Your order has been received but is on hold pending payment confirmation.',
 					'cta_label'  => 'View Order',
 					'details'    => $order ? [
@@ -330,7 +324,6 @@ function dtb_commerce_get_email_config( string $email_id, $order ): array {
 				[
 					'title'      => 'Refund Processed',
 					'preheader'  => "Refund processed for order #{$order_number}",
-					'eyebrow'    => 'Refund Notification',
 					'intro'      => 'A refund has been processed for your order. The funds should appear in your account within 5-10 business days.',
 					'cta_label'  => 'View Order',
 					'details'    => $order ? [
@@ -346,7 +339,6 @@ function dtb_commerce_get_email_config( string $email_id, $order ): array {
 				[
 					'title'      => 'Invoice for Your Order',
 					'preheader'  => "Invoice for order #{$order_number}",
-					'eyebrow'    => 'Order Invoice',
 					'intro'      => 'Please find the invoice for your order below.',
 					'cta_label'  => 'View Invoice',
 					'details'    => $order ? [
@@ -363,7 +355,6 @@ function dtb_commerce_get_email_config( string $email_id, $order ): array {
 				[
 					'title'      => 'Note Added to Your Order',
 					'preheader'  => "A note has been added to order #{$order_number}",
-					'eyebrow'    => 'Order Update',
 					'intro'      => 'Our team has added a note to your order.',
 					'cta_label'  => 'View Order',
 					'details'    => $order ? [

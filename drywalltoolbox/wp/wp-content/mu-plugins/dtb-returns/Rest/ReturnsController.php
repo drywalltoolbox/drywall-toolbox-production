@@ -321,11 +321,10 @@ function dtb_returns_rest_public_submit( WP_REST_Request $request ): WP_REST_Res
 	// HTML version with branded template
 	$customer_body_html = '';
 	if ( function_exists( 'dtb_render_branded_email' ) ) {
-		$customer_body_html = dtb_render_branded_email( [
-			'title'       => 'Return Request Received',
-			'preheader'   => "Return request #{ $return_id} received and under review",
-			'eyebrow'     => 'Return Request',
-			'greeting'    => "Hi {$customer_name},",
+			$customer_body_html = dtb_render_branded_email( [
+				'title'       => 'Return Request Received',
+				'preheader'   => "Return request #{ $return_id} received and under review",
+				'greeting'    => "Hi {$customer_name},",
 			'intro'       => "We've received your return request for order {$order_number}. Our team will review it and send you RMA instructions soon.",
 			'details'     => [
 				[ 'label' => 'Return Reference', 'value' => "#{$return_id}" ],
@@ -334,11 +333,10 @@ function dtb_returns_rest_public_submit( WP_REST_Request $request ): WP_REST_Res
 			],
 			'body_html'   => '<p><strong>Important:</strong> Please do not ship items back until our team sends your RMA instructions.</p>',
 			'cta_url'     => $status_url,
-			'cta_label'   => 'Track Return Status',
-			'signoff'     => 'The Drywall Toolbox Team',
-			'footer_note' => 'Questions about your return? Reply to this email and our support team will help.',
-			'theme'       => 'auto',
-		] );
+				'cta_label'   => 'Track Return Status',
+				'signoff'     => 'The Drywall Toolbox Team',
+				'footer_note' => 'Questions about your return? Reply to this email and our support team will help.',
+			] );
 	}
 	
 	$customer_headers = [

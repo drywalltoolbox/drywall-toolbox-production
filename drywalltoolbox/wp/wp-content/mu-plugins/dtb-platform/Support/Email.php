@@ -151,29 +151,29 @@ if ( ! function_exists( 'dtb_email_palette' ) ) {
 
 		if ( 'dark' === $theme ) {
 			return [
-				'shell_bg'       => '#070d1c',
-				'preheader'      => '#070d1c',
-				'header_bg'      => '#050b18',
-				'card_bg'        => '#0f172a',
-				'card_border'    => '#23314d',
+				'shell_bg'       => '#05070d',
+				'preheader'      => '#05070d',
+				'header_bg'      => '#05070d',
+				'card_bg'        => '#0b1020',
+				'card_border'    => '#1d2a44',
 				'accent'         => '#2f6df6',
-				'accent_soft_bg' => '#172554',
+				'accent_soft_bg' => '#111f3d',
 				'accent_soft_tx' => '#bfdbfe',
 				'title'          => '#f8fafc',
 				'greeting'       => '#e5edf7',
-				'intro'          => '#c7d2e2',
-				'text'           => '#94a3b8',
-				'details_bg'     => '#111c31',
-				'details_row'    => '#0c1426',
+				'intro'          => '#c9d4e5',
+				'text'           => '#9aa8bb',
+				'details_bg'     => '#0f172a',
+				'details_row'    => '#0a1222',
 				'details_border' => '#263751',
 				'details_label'  => '#9aa8bb',
 				'details_value'  => '#eef4ff',
 				'button_bg'      => '#2563eb',
 				'button_text'    => '#ffffff',
-				'footer_bg'      => '#0b1222',
+				'footer_bg'      => '#070d1c',
 				'footer_text'    => '#93a1b5',
 				'footer_link'    => '#8bb7ff',
-				'footer_sep'     => '#475569',
+				'footer_sep'     => '#263751',
 				'copyright'      => '#64748b',
 			];
 		}
@@ -215,7 +215,7 @@ if ( ! function_exists( 'dtb_email_section_label' ) ) {
 	 * @return string
 	 */
 	function dtb_email_section_label( string $label ): string {
-		return '<p class="dtb-rich-label" style="margin:0 0 10px;color:#738196;font-size:12px;font-weight:760;line-height:18px;letter-spacing:0.12em;text-transform:uppercase;">' . esc_html( dtb_email_clean_text( $label ) ) . '</p>';
+		return '<p class="dtb-rich-label" style="margin:0 0 10px;color:#9aa8bb;font-size:12px;font-weight:760;line-height:18px;letter-spacing:0.12em;text-transform:uppercase;">' . esc_html( dtb_email_clean_text( $label ) ) . '</p>';
 	}
 }
 
@@ -236,7 +236,7 @@ if ( ! function_exists( 'dtb_email_note_box' ) ) {
 			return '';
 		}
 
-		return '<div class="dtb-rich-box dtb-quote-note" style="padding:18px 20px;border:1px solid #dce6f3;border-radius:14px;background:#f8fbff;color:#475569;font-size:15px;line-height:24px;">' . $content . '</div>';
+		return '<table class="dtb-rich-box dtb-quote-note" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" bgcolor="#0a1222" style="border-collapse:separate;margin:0;border:1px solid #263751;border-radius:14px;background:#0a1222;background-color:#0a1222;color:#eef4ff;"><tr><td style="padding:18px 20px;color:#eef4ff;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;font-size:15px;line-height:24px;">' . $content . '</td></tr></table>';
 	}
 }
 
@@ -276,11 +276,11 @@ if ( ! function_exists( 'dtb_email_details_table' ) ) {
 	 */
 	function dtb_email_details_table( array $rows, array $style = [] ): string {
 		$body        = '';
-		$bg          = sanitize_hex_color( (string) ( $style['bg'] ?? '#f8fbff' ) ) ?: '#f8fbff';
-		$row_bg      = sanitize_hex_color( (string) ( $style['row_bg'] ?? '#ffffff' ) ) ?: '#ffffff';
-		$border      = sanitize_hex_color( (string) ( $style['border'] ?? '#dce6f3' ) ) ?: '#dce6f3';
-		$label_color = sanitize_hex_color( (string) ( $style['label'] ?? '#738196' ) ) ?: '#738196';
-		$value_color = sanitize_hex_color( (string) ( $style['value'] ?? '#111827' ) ) ?: '#111827';
+		$bg          = sanitize_hex_color( (string) ( $style['bg'] ?? '#0f172a' ) ) ?: '#0f172a';
+		$row_bg      = sanitize_hex_color( (string) ( $style['row_bg'] ?? '#0a1222' ) ) ?: '#0a1222';
+		$border      = sanitize_hex_color( (string) ( $style['border'] ?? '#263751' ) ) ?: '#263751';
+		$label_color = sanitize_hex_color( (string) ( $style['label'] ?? '#9aa8bb' ) ) ?: '#9aa8bb';
+		$value_color = sanitize_hex_color( (string) ( $style['value'] ?? '#eef4ff' ) ) ?: '#eef4ff';
 
 		foreach ( $rows as $row ) {
 			$label = dtb_email_clean_text( $row['label'] ?? '' );
@@ -291,8 +291,8 @@ if ( ! function_exists( 'dtb_email_details_table' ) ) {
 			}
 
 			$body .= '<tr>'
-				. '<td class="dtb-detail-label" width="34%" valign="top" style="padding:15px 18px;background:' . esc_attr( $row_bg ) . ';color:' . esc_attr( $label_color ) . ';font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Arial,sans-serif;font-size:12px;line-height:18px;font-weight:760;text-transform:uppercase;letter-spacing:0.12em;border-bottom:1px solid ' . esc_attr( $border ) . ';">' . esc_html( $label ) . '</td>'
-				. '<td class="dtb-detail-value" width="66%" valign="top" style="padding:15px 18px;background:' . esc_attr( $row_bg ) . ';color:' . esc_attr( $value_color ) . ';font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Arial,sans-serif;font-size:15px;font-weight:700;line-height:22px;border-bottom:1px solid ' . esc_attr( $border ) . ';text-align:left;">' . wp_kses_post( nl2br( esc_html( $value ) ) ) . '</td>'
+				. '<td class="dtb-detail-label" width="34%" valign="top" style="padding:15px 18px;background:' . esc_attr( $row_bg ) . ';background-color:' . esc_attr( $row_bg ) . ';background-image:linear-gradient(' . esc_attr( $row_bg ) . ',' . esc_attr( $row_bg ) . ');color:' . esc_attr( $label_color ) . ';font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Arial,sans-serif;font-size:12px;line-height:18px;font-weight:760;text-transform:uppercase;letter-spacing:0.12em;border-bottom:1px solid ' . esc_attr( $border ) . ';">' . esc_html( $label ) . '</td>'
+				. '<td class="dtb-detail-value" width="66%" valign="top" style="padding:15px 18px;background:' . esc_attr( $row_bg ) . ';background-color:' . esc_attr( $row_bg ) . ';background-image:linear-gradient(' . esc_attr( $row_bg ) . ',' . esc_attr( $row_bg ) . ');color:' . esc_attr( $value_color ) . ';font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Arial,sans-serif;font-size:15px;font-weight:700;line-height:22px;border-bottom:1px solid ' . esc_attr( $border ) . ';text-align:left;">' . wp_kses_post( nl2br( esc_html( $value ) ) ) . '</td>'
 				. '</tr>';
 		}
 
@@ -300,7 +300,7 @@ if ( ! function_exists( 'dtb_email_details_table' ) ) {
 			return '';
 		}
 
-		return '<table class="dtb-details-table" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:24px 0;border-collapse:separate;border-spacing:0;background:' . esc_attr( $bg ) . ';border:1px solid ' . esc_attr( $border ) . ';border-radius:16px;overflow:hidden;">' . $body . '</table>';
+		return '<table class="dtb-details-table" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:24px 0;border-collapse:separate;border-spacing:0;background:' . esc_attr( $bg ) . ';background-color:' . esc_attr( $bg ) . ';background-image:linear-gradient(' . esc_attr( $bg ) . ',' . esc_attr( $bg ) . ');border:1px solid ' . esc_attr( $border ) . ';border-radius:16px;overflow:hidden;">' . $body . '</table>';
 	}
 }
 
@@ -310,7 +310,11 @@ if ( ! function_exists( 'dtb_email_details_table' ) ) {
 
 if ( ! function_exists( 'dtb_render_branded_email' ) ) {
 	/**
-	 * Render the shared Drywall Toolbox customer email layout.
+	 * Render the official shared Drywall Toolbox email layout.
+	 *
+	 * The static HTML template is the single source of truth for email UI. Callers
+	 * provide content only; this renderer owns layout, colors, responsiveness, and
+	 * email-client compatibility.
 	 *
 	 * @param array<string,mixed> $args Template args.
 	 * @return string
@@ -319,7 +323,6 @@ if ( ! function_exists( 'dtb_render_branded_email' ) ) {
 		$site        = dtb_email_clean_text( get_bloginfo( 'name' ) );
 		$title       = dtb_email_clean_text( $args['title'] ?? $site );
 		$preheader   = dtb_email_clean_text( $args['preheader'] ?? '' );
-		$eyebrow     = dtb_email_clean_text( $args['eyebrow'] ?? 'Drywall Toolbox' );
 		$greeting    = dtb_email_clean_text( $args['greeting'] ?? 'Hi there,' );
 		$intro       = dtb_email_clean_html( (string) ( $args['intro'] ?? '' ) );
 		$body_html   = dtb_email_clean_html( (string) ( $args['body_html'] ?? '' ) );
@@ -331,9 +334,8 @@ if ( ! function_exists( 'dtb_render_branded_email' ) ) {
 		$logo_url    = esc_url( dtb_email_logo_url() );
 		$home_url    = esc_url( home_url( '/' ) );
 		$support_url = esc_url( dtb_email_support_url() );
-		$theme_raw   = strtolower( sanitize_key( (string) ( $args['theme'] ?? apply_filters( 'dtb_email_theme', 'auto', $args ) ) ) );
-		$theme       = in_array( $theme_raw, [ 'light', 'dark', 'auto' ], true ) ? $theme_raw : 'auto';
-		$palette     = dtb_email_palette( 'dark' === $theme ? 'dark' : 'light' );
+		$palette     = dtb_email_palette( 'dark' );
+		$template_id = 'dtb-email-template-v20260708-table-inline';
 
 		$details_html = dtb_email_details_table(
 			$details,
@@ -355,136 +357,58 @@ if ( ! function_exists( 'dtb_render_branded_email' ) ) {
 			]
 		);
 
-		$auto_dark_css = '';
-		if ( 'auto' === $theme ) {
-			$dark = dtb_email_palette( 'dark' );
-			$auto_dark_css = '@media (prefers-color-scheme: dark){'
-				. '.dtb-shell{background:' . esc_attr( $dark['shell_bg'] ) . '!important}'
-				. '.dtb-card,.dtb-body{background:' . esc_attr( $dark['card_bg'] ) . '!important;border-color:' . esc_attr( $dark['card_border'] ) . '!important}'
-				. '.dtb-title{color:' . esc_attr( $dark['title'] ) . '!important}'
-				. '.dtb-greeting{color:' . esc_attr( $dark['greeting'] ) . '!important}'
-				. '.dtb-intro,.dtb-signoff{color:' . esc_attr( $dark['intro'] ) . '!important}'
-				. '.dtb-signoff-name{color:' . esc_attr( $dark['title'] ) . '!important}'
-				. '.dtb-eyebrow-td{background:' . esc_attr( $dark['accent_soft_bg'] ) . '!important}'
-				. '.dtb-eyebrow-lbl{color:' . esc_attr( $dark['accent_soft_tx'] ) . '!important}'
-				. '.dtb-details-table{background:' . esc_attr( $dark['details_bg'] ) . '!important;border-color:' . esc_attr( $dark['details_border'] ) . '!important}'
-				. '.dtb-detail-label,.dtb-detail-value,.dtb-rich-box{background:' . esc_attr( $dark['details_row'] ) . '!important;border-color:' . esc_attr( $dark['details_border'] ) . '!important}'
-				. '.dtb-detail-label,.dtb-rich-label{color:' . esc_attr( $dark['details_label'] ) . '!important}'
-				. '.dtb-detail-value,.dtb-rich-box,.dtb-rich-box p,.dtb-rich-box div,.dtb-rich-box td{color:' . esc_attr( $dark['details_value'] ) . '!important}'
-				. '.dtb-footer{background:' . esc_attr( $dark['footer_bg'] ) . '!important;border-top-color:' . esc_attr( $dark['details_border'] ) . '!important}'
-				. '.dtb-footer-note{color:' . esc_attr( $dark['footer_text'] ) . '!important}'
-				. '.dtb-footer-link{color:' . esc_attr( $dark['footer_link'] ) . '!important}'
-				. '.dtb-copyright{color:' . esc_attr( $dark['copyright'] ) . '!important}'
-				. '.dtb-rich .dtb-quote-table,.dtb-rich .dtb-quote-note{border-color:' . esc_attr( $dark['details_border'] ) . '!important;background:' . esc_attr( $dark['details_row'] ) . '!important}'
-				. '.dtb-rich .dtb-quote-table th{background:' . esc_attr( $dark['details_bg'] ) . '!important;color:' . esc_attr( $dark['details_label'] ) . '!important}'
-				. '.dtb-rich .dtb-quote-table td{border-top-color:' . esc_attr( $dark['details_border'] ) . '!important;color:' . esc_attr( $dark['details_value'] ) . '!important}'
-				. '}';
+		$template_path = __DIR__ . '/Templates/branded-email.html';
+		$template_html = is_readable( $template_path ) ? file_get_contents( $template_path ) : false;
+
+		if ( false !== $template_html ) {
+			$greeting_block = '' !== $greeting
+				? '<p class="dtb-greeting" style="margin:0 0 10px;color:' . esc_attr( $palette['greeting'] ) . ';font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;font-size:20px;line-height:28px;font-weight:760;">' . esc_html( $greeting ) . '</p>'
+				: '';
+			$intro_block    = '' !== $intro
+				? '<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:0;border-collapse:collapse;"><tr><td class="dtb-intro dtb-rich" style="padding:0;color:' . esc_attr( $palette['intro'] ) . ';font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;font-size:16px;line-height:26px;">' . $intro . '</td></tr></table>'
+				: '';
+			$body_block     = '' !== $body_html
+				? '<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:24px 0 0;border-collapse:separate;"><tr><td class="dtb-rich-box dtb-rich" bgcolor="' . esc_attr( $palette['details_row'] ) . '" style="padding:18px 20px;border:1px solid ' . esc_attr( $palette['details_border'] ) . ';border-radius:16px;background:' . esc_attr( $palette['details_row'] ) . ';background-color:' . esc_attr( $palette['details_row'] ) . ';color:' . esc_attr( $palette['intro'] ) . ';font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;font-size:15px;line-height:24px;">' . $body_html . '</td></tr></table>'
+				: '';
+			$footer_note_block = '' !== $footer_note
+				? '<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:0 0 12px;border-collapse:collapse;"><tr><td style="padding:0;text-align:center;color:' . esc_attr( $palette['footer_text'] ) . ';font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;font-size:13px;line-height:20px;">' . $footer_note . '</td></tr></table>'
+				: '';
+
+			$replacements = [
+				'{{template_id}}'       => esc_html( $template_id ),
+				'{{title}}'             => esc_html( $title ),
+				'{{heading}}'           => esc_html( $title ),
+				'{{preheader}}'         => esc_html( $preheader ),
+				'{{site_name}}'         => esc_attr( $site ),
+				'{{logo_url}}'          => $logo_url,
+				'{{home_url}}'          => $home_url,
+				'{{support_url}}'       => $support_url,
+				'{{shell_bg}}'          => esc_attr( $palette['shell_bg'] ),
+				'{{header_bg}}'         => esc_attr( $palette['header_bg'] ),
+				'{{card_bg}}'           => esc_attr( $palette['card_bg'] ),
+				'{{footer_bg}}'         => esc_attr( $palette['footer_bg'] ),
+				'{{accent}}'            => esc_attr( $palette['accent'] ),
+				'{{title_color}}'       => esc_attr( $palette['title'] ),
+				'{{intro_color}}'       => esc_attr( $palette['intro'] ),
+				'{{details_border}}'    => esc_attr( $palette['details_border'] ),
+				'{{footer_link}}'       => esc_attr( $palette['footer_link'] ),
+				'{{footer_sep}}'        => esc_attr( $palette['footer_sep'] ),
+				'{{copyright}}'         => esc_attr( $palette['copyright'] ),
+				'{{greeting_block}}'    => $greeting_block,
+				'{{intro_block}}'       => $intro_block,
+				'{{details_html}}'      => $details_html,
+				'{{body_block}}'        => $body_block,
+				'{{button_html}}'       => $button_html,
+				'{{signoff}}'           => esc_html( $signoff ),
+				'{{footer_note_block}}' => $footer_note_block,
+				'{{year}}'              => esc_html( gmdate( 'Y' ) ),
+			];
+
+			return strtr( $template_html, $replacements );
 		}
 
-		ob_start();
-		?>
-<!doctype html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="color-scheme" content="light dark">
-	<meta name="supported-color-schemes" content="light dark">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title><?php echo esc_html( $title ); ?></title>
-	<style type="text/css">
-		body, table, td, a { -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
-		table, td { mso-table-lspace:0pt; mso-table-rspace:0pt; }
-		img { -ms-interpolation-mode:bicubic; border:0; outline:0; text-decoration:none; }
-		a { text-decoration:none; }
-		.dtb-rich p { margin:0 0 12px; }
-		.dtb-rich p:last-child { margin-bottom:0; }
-		.dtb-rich .dtb-quote-table { border-collapse:collapse; width:100%; border:1px solid <?php echo esc_attr( $palette['details_border'] ); ?>; border-radius:14px; overflow:hidden; }
-		.dtb-rich .dtb-quote-table th { background:<?php echo esc_attr( $palette['details_bg'] ); ?>; color:<?php echo esc_attr( $palette['details_label'] ); ?>; font-weight:760; font-size:12px; letter-spacing:.04em; }
-		.dtb-rich .dtb-quote-table td { color:<?php echo esc_attr( $palette['details_value'] ); ?>; border-top:1px solid <?php echo esc_attr( $palette['details_border'] ); ?>; }
-		@media only screen and (max-width:620px) {
-			.dtb-shell { padding:0 !important; }
-			.dtb-card { width:100% !important; max-width:100% !important; border-radius:0 !important; border-left:0 !important; border-right:0 !important; }
-			.dtb-header { padding:26px 20px 22px !important; }
-			.dtb-body { padding:28px 22px 30px !important; }
-			.dtb-footer { padding:22px !important; }
-			.dtb-title { font-size:28px !important; line-height:34px !important; }
-			.dtb-greeting { font-size:18px !important; line-height:26px !important; }
-			.dtb-logo { width:176px !important; max-width:176px !important; }
-			.dtb-detail-label, .dtb-detail-value { display:block !important; width:auto !important; text-align:left !important; }
-			.dtb-detail-label { padding:14px 18px 4px !important; border-bottom:0 !important; }
-			.dtb-detail-value { padding:0 18px 14px !important; }
-			.dtb-btn { display:block !important; width:auto !important; min-width:0 !important; }
-		}
-		<?php echo $auto_dark_css; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-	</style>
-</head>
-<body style="margin:0;padding:0;background:<?php echo esc_attr( $palette['shell_bg'] ); ?>;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%;text-size-adjust:100%;">
-	<div class="dtb-preheader" style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:<?php echo esc_attr( $palette['preheader'] ); ?>;"><?php echo esc_html( $preheader ); ?>&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>
-	<table class="dtb-shell" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:<?php echo esc_attr( $palette['shell_bg'] ); ?>;padding:36px 16px;">
-		<tr>
-			<td align="center" valign="top">
-				<table class="dtb-card" role="presentation" cellspacing="0" cellpadding="0" border="0" width="640" style="width:640px;max-width:640px;background:<?php echo esc_attr( $palette['card_bg'] ); ?>;border:1px solid <?php echo esc_attr( $palette['card_border'] ); ?>;border-radius:22px;overflow:hidden;box-shadow:0 24px 60px rgba(15,23,42,.12);">
-					<tr>
-						<td class="dtb-header" align="center" style="background:<?php echo esc_attr( $palette['header_bg'] ); ?>;padding:30px 40px 26px;text-align:center;">
-							<a href="<?php echo $home_url; ?>" style="text-decoration:none;display:inline-block;">
-								<img class="dtb-logo" src="<?php echo $logo_url; ?>" alt="<?php echo esc_attr( $site ); ?>" width="206" style="display:block;margin:0 auto;width:206px;max-width:84%;height:auto;">
-							</a>
-						</td>
-					</tr>
-					<tr><td style="background:<?php echo esc_attr( $palette['accent'] ); ?>;height:4px;font-size:4px;line-height:4px;">&nbsp;</td></tr>
-					<tr>
-						<td class="dtb-body" style="padding:38px 44px 36px;background:<?php echo esc_attr( $palette['card_bg'] ); ?>;">
-							<?php if ( '' !== $eyebrow ) : ?>
-							<table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 20px;">
-								<tr>
-									<td class="dtb-eyebrow-td" style="background:<?php echo esc_attr( $palette['accent_soft_bg'] ); ?>;border-radius:999px;padding:7px 14px;">
-										<span class="dtb-eyebrow-lbl" style="color:<?php echo esc_attr( $palette['accent_soft_tx'] ); ?>;font-size:11px;line-height:16px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;"><?php echo esc_html( $eyebrow ); ?></span>
-									</td>
-								</tr>
-							</table>
-							<?php endif; ?>
-							<h1 class="dtb-title" style="margin:0;color:<?php echo esc_attr( $palette['title'] ); ?>;font-size:34px;line-height:41px;font-weight:800;letter-spacing:-.02em;text-align:left;"><?php echo esc_html( $title ); ?></h1>
-							<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="50" style="margin:18px 0 26px;"><tr><td style="height:3px;background:<?php echo esc_attr( $palette['accent'] ); ?>;font-size:3px;line-height:3px;border-radius:999px;">&nbsp;</td></tr></table>
-							<?php if ( '' !== $greeting ) : ?>
-								<p class="dtb-greeting" style="margin:0 0 10px;color:<?php echo esc_attr( $palette['greeting'] ); ?>;font-size:20px;line-height:28px;font-weight:760;"><?php echo esc_html( $greeting ); ?></p>
-							<?php endif; ?>
-							<?php if ( '' !== $intro ) : ?>
-								<div class="dtb-intro dtb-rich" style="margin:0;color:<?php echo esc_attr( $palette['intro'] ); ?>;font-size:16px;line-height:26px;"><?php echo $intro; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
-							<?php endif; ?>
-							<?php echo $details_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-							<?php if ( '' !== $body_html ) : ?>
-								<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:24px 0 0;border-collapse:separate;">
-									<tr>
-										<td class="dtb-rich-box dtb-rich" style="padding:18px 20px;border:1px solid <?php echo esc_attr( $palette['details_border'] ); ?>;border-radius:16px;background:<?php echo esc_attr( $palette['details_row'] ); ?>;color:<?php echo esc_attr( $palette['intro'] ); ?>;font-size:15px;line-height:24px;"><?php echo $body_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
-									</tr>
-								</table>
-							<?php endif; ?>
-							<?php echo $button_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-							<p class="dtb-signoff" style="margin:32px 0 0;color:<?php echo esc_attr( $palette['intro'] ); ?>;font-size:14px;line-height:22px;">Thanks,<br><strong class="dtb-signoff-name" style="color:<?php echo esc_attr( $palette['title'] ); ?>;font-weight:760;"><?php echo esc_html( $signoff ); ?></strong></p>
-						</td>
-					</tr>
-					<tr>
-						<td class="dtb-footer" style="padding:24px 44px;background:<?php echo esc_attr( $palette['footer_bg'] ); ?>;border-top:1px solid <?php echo esc_attr( $palette['details_border'] ); ?>;text-align:center;">
-							<?php if ( '' !== $footer_note ) : ?>
-								<div class="dtb-footer-note" style="margin:0 0 12px;color:<?php echo esc_attr( $palette['footer_text'] ); ?>;font-size:13px;line-height:20px;"><?php echo $footer_note; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
-							<?php endif; ?>
-							<p style="margin:0;font-size:13px;line-height:20px;">
-								<a class="dtb-footer-link" href="<?php echo $home_url; ?>" style="color:<?php echo esc_attr( $palette['footer_link'] ); ?>;font-weight:700;text-decoration:none;">drywalltoolbox.com</a>
-								<span class="dtb-footer-sep" style="color:<?php echo esc_attr( $palette['footer_sep'] ); ?>;">&nbsp;&middot;&nbsp;</span>
-								<a class="dtb-footer-link" href="<?php echo $support_url; ?>" style="color:<?php echo esc_attr( $palette['footer_link'] ); ?>;font-weight:700;text-decoration:none;">Contact support</a>
-							</p>
-						</td>
-					</tr>
-				</table>
-				<p class="dtb-copyright" style="margin:18px 0 0;color:<?php echo esc_attr( $palette['copyright'] ); ?>;font-size:11px;line-height:16px;text-align:center;">&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> Drywall Toolbox. All rights reserved.</p>
-			</td>
-		</tr>
-	</table>
-</body>
-</html>
-		<?php
-		return (string) ob_get_clean();
+		do_action( 'dtb_email_template_missing', $template_path, $args );
+		return '';
 	}
 }
 

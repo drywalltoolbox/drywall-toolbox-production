@@ -450,7 +450,7 @@ body.dtb-payment-runtime {
 
 .dtb-payment-runtime #payment ul.payment_methods {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 	align-items: stretch;
 	gap: 10px;
 	margin: 0;
@@ -720,11 +720,13 @@ body.dtb-payment-runtime {
 }
 
 .dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--affirm,
+.dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--afterpay,
 .dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--klarna {
 	background: #fff;
 }
 
 .dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--affirm > label,
+.dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--afterpay > label,
 .dtb-payment-runtime #payment ul.payment_methods li.dtb-payment-method--klarna > label {
 	min-height: 58px;
 }

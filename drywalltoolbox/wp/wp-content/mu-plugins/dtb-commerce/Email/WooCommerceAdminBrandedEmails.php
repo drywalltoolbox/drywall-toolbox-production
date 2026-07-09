@@ -69,7 +69,6 @@ function dtb_commerce_wc_admin_email_footer_wrap(): void {
 		[
 			'title'       => $heading,
 			'preheader'   => $order_number ? 'Order #' . $order_number . ' requires review.' : $heading,
-			'eyebrow'     => 'Order operations',
 			'greeting'    => '',
 			'intro'       => 'A WooCommerce order notification was generated for the operations team.',
 			'body_html'   => $content,
@@ -78,7 +77,6 @@ function dtb_commerce_wc_admin_email_footer_wrap(): void {
 			'cta_label'   => $admin_url ? 'Open order in WP-Admin' : '',
 			'signoff'     => 'Drywall Toolbox Operations',
 			'footer_note' => 'This message was sent by the Drywall Toolbox operations platform.',
-			'theme'       => 'dark',
 		]
 	); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 

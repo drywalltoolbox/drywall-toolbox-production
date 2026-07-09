@@ -337,7 +337,6 @@ function dtb_repair_render_customer_email_html( string $template, array $ctx ): 
 	$tool         = trim( $brand . ' ' . $model );
 
 	$title     = 'Your repair update';
-	$eyebrow   = 'Repair update';
 	$intro     = 'There is an update on your repair request.';
 	$cta_label = '' !== $tracking_url ? 'Track repair status' : '';
 	$body_html = '';
@@ -345,7 +344,6 @@ function dtb_repair_render_customer_email_html( string $template, array $ctx ): 
 	switch ( $template ) {
 		case 'repair-submitted-customer':
 			$title   = 'We received your repair request';
-			$eyebrow = 'Repair request received';
 			$intro   = 'Thanks for submitting your repair request. Our service team will review the details and follow up with next steps.';
 			if ( '' !== $issue ) {
 				$body_html = '<p style="margin:0 0 10px;font-size:12px;font-weight:700;line-height:18px;letter-spacing:0.04em;text-transform:uppercase;">Issue description</p><div class="dtb-quote-note" style="padding:18px 20px;border:1px solid #dbe5f2;border-radius:8px;background:#f8fafc;">' . nl2br( esc_html( $issue ) ) . '</div>';
@@ -354,25 +352,21 @@ function dtb_repair_render_customer_email_html( string $template, array $ctx ): 
 
 		case 'repair-info-requested':
 			$title   = 'We need more information';
-			$eyebrow = 'Action requested';
 			$intro   = 'Our technicians reviewed your repair request and need a few more details before we can continue.';
 			break;
 
 		case 'repair-reviewed':
 			$title   = 'Your repair is under review';
-			$eyebrow = 'Repair under review';
 			$intro   = 'Our team has reviewed your repair request and it is now under review. We will notify you once a decision has been made.';
 			break;
 
 		case 'repair-approved':
 			$title   = 'Your repair has been approved';
-			$eyebrow = 'Repair approved';
 			$intro   = sprintf( 'Your repair has been approved and we will proceed with your %s service.', esc_html( $tier ) );
 			break;
 
 		case 'repair-quote-created':
 			$title     = 'Your repair quote is ready';
-			$eyebrow   = 'Quote ready';
 			$intro     = 'We prepared a repair quote for your review. Please review it when you have a moment.';
 			$cta_label = '' !== $tracking_url ? 'Review repair quote' : '';
 			$quote_lines = is_array( $ctx['quote_lines'] ?? null ) ? $ctx['quote_lines'] : [];
@@ -441,31 +435,26 @@ function dtb_repair_render_customer_email_html( string $template, array $ctx ): 
 
 		case 'repair-quote-accepted':
 			$title   = 'Quote accepted';
-			$eyebrow = 'Repair will proceed';
 			$intro   = 'Thank you for accepting your repair quote. We will begin ordering the required parts and keep you updated.';
 			break;
 
 		case 'repair-in-progress':
 			$title   = 'Work has started on your repair';
-			$eyebrow = 'Repair in progress';
 			$intro   = 'Our technicians have started work on your repair. We will notify you when it is complete and ready to ship.';
 			break;
 
 		case 'repair-ready-to-ship':
 			$title   = 'Your repair is ready to ship';
-			$eyebrow = 'Ready to ship';
 			$intro   = 'Your repaired tool is packed and ready to ship.';
 			break;
 
 		case 'repair-completed':
 			$title   = 'Your repair is complete';
-			$eyebrow = 'Repair completed';
 			$intro   = 'Your repair has been completed and shipped. Loyalty reward points have been credited to your account as a thank-you.';
 			break;
 
 		case 'repair-cancelled':
 			$title     = 'Your repair request was cancelled';
-			$eyebrow   = 'Repair cancelled';
 			$intro     = 'This is to let you know that your repair request has been cancelled.';
 			$cta_label = '';
 			break;
@@ -489,7 +478,6 @@ function dtb_repair_render_customer_email_html( string $template, array $ctx ): 
 		[
 			'title'       => $title,
 			'preheader'   => sprintf( 'Repair #%d update from Drywall Toolbox.', $rid ),
-			'eyebrow'     => $eyebrow,
 			'greeting'    => sprintf( 'Hi %s,', $name ),
 			'intro'       => $intro,
 			'details'     => $details,
@@ -498,7 +486,35 @@ function dtb_repair_render_customer_email_html( string $template, array $ctx ): 
 			'cta_label'   => $cta_label,
 			'signoff'     => $site . ' Team',
 			'footer_note' => 'You can reply directly to this email if you have questions about your repair.',
-			'theme'       => (string) apply_filters( 'dtb_repair_email_theme', 'auto', $template, $ctx ),
+		]
+	);
+}
+
+/**
+ * Render an operations-facing repair email through the official branded template.
+ *
+ * @param string              $subject Plain-text subject.
+ * @param string              $plain   Plain-text body.
+ * @param array<string,mixed> $ctx     Notification context.
+ * @return string
+ */
+function dtb_repair_render_operations_email_html( string $subject, string $plain, array $ctx ): string {
+	$rid       = (int) ( $ctx['repair_id'] ?? 0 );
+	$admin_url = esc_url_raw( (string) ( $ctx['admin_url'] ?? '' ) );
+	$plain     = trim( wp_strip_all_tags( $plain ) );
+
+	return dtb_render_branded_email(
+		[
+			'title'       => $subject,
+			'preheader'   => preg_replace( '/\s+/', ' ', mb_substr( $plain, 0, 140 ) ),
+			'greeting'    => '',
+			'intro'       => '',
+			'details'     => $rid > 0 ? [ [ 'label' => 'Repair ID', 'value' => '#' . $rid ] ] : [],
+			'body_html'   => function_exists( 'dtb_email_note_box' ) ? dtb_email_note_box( $plain ) : nl2br( esc_html( $plain ) ),
+			'cta_url'     => $admin_url,
+			'cta_label'   => $admin_url ? 'Open repair in WP-Admin' : '',
+			'signoff'     => 'Drywall Toolbox Operations',
+			'footer_note' => 'This message was sent by the Drywall Toolbox operations platform.',
 		]
 	);
 }
@@ -525,8 +541,14 @@ return false;
 }
 
 $from    = dtb_repair_email_from_name() . ' <' . dtb_repair_email_from_address() . '>';
-$is_html = dtb_repair_is_customer_email_template( $template ) && function_exists( 'dtb_render_branded_email' );
-$body    = $is_html ? dtb_repair_render_customer_email_html( $template, $context ) : $rendered['body'];
+$is_html = function_exists( 'dtb_render_branded_email' );
+$body    = $rendered['body'];
+
+if ( $is_html ) {
+	$body = dtb_repair_is_customer_email_template( $template )
+		? dtb_repair_render_customer_email_html( $template, $context )
+		: dtb_repair_render_operations_email_html( (string) $rendered['subject'], (string) $rendered['body'], $context );
+}
 
 if ( function_exists( 'dtb_send_email' ) ) {
 return dtb_send_email(

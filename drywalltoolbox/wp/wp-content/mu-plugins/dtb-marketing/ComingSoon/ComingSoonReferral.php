@@ -79,6 +79,8 @@ function dtb_coming_soon_get_referral_context(): array {
 function dtb_coming_soon_build_referral_context( array $data ): array {
 	$email  = isset( $data['email'] ) ? sanitize_email( (string) $data['email'] ) : '';
 	$email  = '' !== $email ? $email : ( isset( $data['dtb_email'] ) ? sanitize_email( (string) $data['dtb_email'] ) : '' );
+	$name   = sanitize_text_field( (string) ( $data['dtb_name'] ?? $data['name'] ?? '' ) );
+	$name   = trim( preg_replace( '/\s+/', ' ', $name ) );
 	$source = dtb_coming_soon_normalize_referral_source( $data['dtb_referral_source'] ?? $data['referral_source'] ?? '' );
 	$labels = dtb_coming_soon_referral_source_labels();
 
@@ -101,6 +103,7 @@ function dtb_coming_soon_build_referral_context( array $data ): array {
 
 	return [
 		'email'          => $email,
+		'name'           => $name,
 		'source'         => $source,
 		'label'          => '' !== $source ? $labels[ $source ] : 'Not provided',
 		'detail'         => $detail,
@@ -180,6 +183,7 @@ function dtb_coming_soon_attach_referral_to_subscriber( mixed $new_value, mixed 
 		$new_value[ $index ]['referral_source'] = sanitize_key( (string) ( $context['source'] ?? '' ) );
 		$new_value[ $index ]['referral_label']  = sanitize_text_field( (string) ( $context['label'] ?? 'Not provided' ) );
 		$new_value[ $index ]['referral_detail'] = sanitize_text_field( (string) ( $context['detail'] ?? '' ) );
+		$new_value[ $index ]['name']            = sanitize_text_field( (string) ( $context['name'] ?? '' ) );
 		$new_value[ $index ]['page_referrer']   = esc_url_raw( (string) ( $context['page_referrer'] ?? '' ) );
 		$new_value[ $index ]['landing_url']     = esc_url_raw( (string) ( $context['landing_url'] ?? '' ) );
 		break;
@@ -208,15 +212,22 @@ function dtb_coming_soon_append_referral_to_admin_email( array $mail_args ): arr
 		return $mail_args;
 	}
 
+	$name          = sanitize_text_field( (string) ( $context['name'] ?? '' ) );
 	$label         = sanitize_text_field( (string) ( $context['label'] ?? 'Not provided' ) );
 	$detail        = sanitize_text_field( (string) ( $context['detail'] ?? '' ) );
 	$page_referrer = esc_url_raw( (string) ( $context['page_referrer'] ?? '' ) );
 	$landing_url   = esc_url_raw( (string) ( $context['landing_url'] ?? '' ) );
 
-	$referral_lines = [
+	$referral_lines = [];
+
+	if ( '' !== $name ) {
+		$referral_lines[] = 'Name: ' . $name;
+	}
+
+	$referral_lines = array_merge( $referral_lines, [
 		'How they heard about us:',
 		'Referral source: ' . $label,
-	];
+	] );
 
 	if ( '' !== $detail ) {
 		$referral_lines[] = 'Referral detail: ' . $detail;
