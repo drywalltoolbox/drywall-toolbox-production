@@ -18,12 +18,13 @@ import {
   CreditCard,
   ExternalLink,
   Loader2,
+  ShieldCheck,
   ShoppingCart,
   Truck,
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
 
-import LogoBlack from '/logo-black.svg';
+import LogoWhite from '/logo-white.svg';
 import { getCheckoutCapabilities, previewCheckoutTax } from '../api/checkout.js';
 import { buildCheckoutLineItems, syncAndPlace } from '../api/cart.js';
 import { useAuthContext } from '../auth/AuthContext.js';
@@ -760,6 +761,27 @@ export default function Checkout() {
     <div className="dtb-checkout">
       <SEOHead noindex title="Checkout" />
 
+      {/* Header */}
+      <header className="dtb-co-header">
+        <div className="dtb-co-header__brand">
+          <Link to="/" aria-label="Drywall Toolbox home">
+            <img src={LogoWhite} alt="Drywall Toolbox" className="dtb-co-header__logo" />
+          </Link>
+        </div>
+
+        <StepProgress activeStep={activeStep} />
+
+        <div className="dtb-co-header__actions">
+          {!isAuthenticated && (
+            <Link to="/login" className="dtb-co-header__signin">Sign in</Link>
+          )}
+          <span className="dtb-co-header__secure">
+            <ShieldCheck size={14} aria-hidden="true" />
+            Secure checkout
+          </span>
+        </div>
+      </header>
+
       {/* Trust bar */}
       <div className="dtb-co-trustbar">
         <span className="dtb-co-trustbar__item">
@@ -774,24 +796,6 @@ export default function Checkout() {
           Easy returns
         </span>
       </div>
-
-      {/* Header */}
-      <header className="dtb-co-header">
-        <div className="dtb-co-header__brand">
-          <Link to="/" aria-label="Drywall Toolbox home">
-            <img src={LogoBlack} alt="Drywall Toolbox" className="dtb-co-header__logo" />
-          </Link>
-        </div>
-
-        <StepProgress activeStep={activeStep} />
-
-        <div className="dtb-co-header__actions">
-          {!isAuthenticated && (
-            <Link to="/login" className="dtb-co-header__signin">Sign in</Link>
-          )}
-          <span className="dtb-co-header__secure">Secure checkout</span>
-        </div>
-      </header>
 
       {/* Two-column layout */}
       <div className="dtb-co-grid">

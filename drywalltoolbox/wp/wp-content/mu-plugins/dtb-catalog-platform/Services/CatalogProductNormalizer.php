@@ -200,13 +200,9 @@ final class DTB_CatalogProductNormalizer {
 		}
 
 		if ( '' !== $label ) {
-			$normalized = DTB_BrandNormalizer::normalize( $label );
-			// Prefer existing key over derived one.
-			if ( '' !== $key ) {
-				$normalized['key']  = $key;
-				$normalized['slug'] = $key;
-			}
-			return $normalized;
+			// Brand labels are the import-facing source; legacy meta keys such as
+			// `columbia-tools` must not override their canonical identity.
+			return DTB_BrandNormalizer::normalize( $label );
 		}
 
 		return [ 'key' => $key, 'label' => '', 'slug' => $key ];

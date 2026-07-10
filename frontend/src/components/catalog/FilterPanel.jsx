@@ -2,22 +2,11 @@ import { useState, useEffect, useMemo } from 'react';
 import { X, ChevronDown, Sliders, RefreshCw, Check } from 'lucide-react';
 import '../../styles/filter-panel.css';
 
-const LAUNCH_FILTER_BRANDS = [
-  'TapeTech',
-  'Columbia Tools',
-  'Level 5',
-  'SurPro',
-  'Dura-Stilts',
-  'Platinum Drywall Tools',
-  'Asgard',
-  'Graco',
-];
-
 function normalizeFilterBrands(brands = []) {
-  const source = Array.isArray(brands) && brands.length > 0 ? brands : LAUNCH_FILTER_BRANDS;
+  if (!Array.isArray(brands) || brands.length === 0) return [];
   const seen = new Set();
 
-  return source
+  return brands
     .map((brand) => String(brand || '').trim())
     .filter((brand) => {
       if (!brand) return false;

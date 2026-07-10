@@ -1,0 +1,48 @@
+.dtb-global-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+}
+
+.dtb-global-loading-spinner {
+  width: 3.25em;
+  transform-origin: center;
+  animation: dtb-global-loading-rotate 2s linear infinite;
+}
+
+.dtb-global-loading-spinner circle {
+  fill: none;
+  stroke: hsl(214, 97%, 59%);
+  stroke-width: 2;
+  stroke-dasharray: 1, 200;
+  stroke-dashoffset: 0;
+  stroke-linecap: round;
+  animation: dtb-global-loading-dash 1.5s ease-in-out infinite;
+}
+
+@keyframes dtb-global-loading-rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dtb-global-loading-dash {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+
+  50% {
+    stroke-dasharray: 90, 200;
+    stroke-dashoffset: -35px;
+  }
+
+  100% {
+    stroke-dashoffset: -125px;
+  }
+}

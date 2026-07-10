@@ -19,7 +19,7 @@ defined( 'ABSPATH' ) || exit;
 
 final class DTB_CatalogFacetService {
 
-	const CACHE_KEY = 'dtb_catalog_facets_v2';
+	const CACHE_KEY = 'dtb_catalog_facets_v4';
 	const CACHE_TTL = 600; // 10 minutes
 
 	/**
@@ -69,6 +69,10 @@ final class DTB_CatalogFacetService {
 
 		foreach ( [ 'brand', 'category', 'display_category', 'product_kind' ] as $key ) {
 			$value = isset( $scope[ $key ] ) ? sanitize_text_field( (string) $scope[ $key ] ) : '';
+			if ( 'brand' === $key && '' !== $value && class_exists( 'DTB_BrandNormalizer' ) ) {
+				$brand = DTB_BrandNormalizer::normalize( $value );
+				$value = (string) ( $brand['slug'] ?? $value );
+			}
 			if ( '' !== $value ) {
 				$normalized[ $key ] = $value;
 			}
@@ -228,6 +232,17 @@ final class DTB_CatalogFacetService {
 		return [ 'key' => '', 'label' => '', 'slug' => '' ];
 	}
 
+	/** Resolve legacy and canonical brand values to one comparable slug. */
+	private static function canonical_brand_slug( string $value ): string {
+		$value = sanitize_title( $value );
+		if ( '' === $value || ! class_exists( 'DTB_BrandNormalizer' ) ) {
+			return $value;
+		}
+
+		$brand = DTB_BrandNormalizer::normalize( $value );
+		return sanitize_title( (string) ( $brand['slug'] ?? $value ) );
+	}
+
 	/**
 	 * @param array<string,mixed>  $dto
 	 * @param array<string,string> $scope
@@ -241,13 +256,16 @@ final class DTB_CatalogFacetService {
 		}
 
 		if ( isset( $scope['brand'] ) && '' !== $scope['brand'] ) {
-			$needle = sanitize_title( $scope['brand'] );
+			$needle = self::canonical_brand_slug( $scope['brand'] );
 			$brand  = $dto['brand'] ?? [];
-			$values = array_filter([
-				sanitize_title( (string) ( $brand['key'] ?? '' ) ),
-				sanitize_title( (string) ( $brand['slug'] ?? '' ) ),
-				sanitize_title( (string) ( $brand['label'] ?? '' ) ),
-			]);
+			$values = array_values( array_unique( array_filter( array_map(
+				[ self::class, 'canonical_brand_slug' ],
+				[
+					(string) ( $brand['key'] ?? '' ),
+					(string) ( $brand['slug'] ?? '' ),
+					(string) ( $brand['label'] ?? '' ),
+				]
+			) ) ) );
 			if ( ! in_array( $needle, $values, true ) ) {
 				return false;
 			}

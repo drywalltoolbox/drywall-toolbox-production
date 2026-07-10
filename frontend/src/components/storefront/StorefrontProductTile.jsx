@@ -185,10 +185,6 @@ export default function StorefrontProductTile({
     onOpenModal?.();
   }, [closeOverlay, onOpenModal]);
 
-  const badgePositionClass = variant === 'list'
-    ? 'dtb-product-card__badge--left'
-    : 'dtb-product-card__badge--right';
-
   return (
     <article
       ref={cardRef}
@@ -213,14 +209,12 @@ export default function StorefrontProductTile({
         }}
         aria-label={isMobile ? `Quick view ${name}` : `View ${name}`}
       >
-        {outOfStock && (
-          <span className={`dtb-product-card__badge dtb-product-card__badge--out ${badgePositionClass}`}>
-            Out of Stock
-          </span>
-        )}
+        <span className={`dtb-product-card__badge dtb-product-card__badge--${outOfStock ? 'out' : 'in'} dtb-product-card__badge--right`}>
+          {outOfStock ? 'Out of Stock' : 'In Stock'}
+        </span>
 
-        {onSale && !outOfStock && (
-          <span className={`dtb-product-card__badge dtb-product-card__badge--sale ${badgePositionClass}`}>
+        {onSale && (
+          <span className="dtb-product-card__badge dtb-product-card__badge--sale dtb-product-card__badge--left">
             Sale
           </span>
         )}
@@ -322,9 +316,6 @@ export default function StorefrontProductTile({
 
         <div className="dtb-product-card__footer">
           <div className="dtb-product-card__price-col">
-            <span className={`dtb-product-card__stock-badge${outOfStock ? ' dtb-product-card__stock-badge--out' : ' dtb-product-card__stock-badge--in'}`}>
-              {outOfStock ? 'Out of Stock' : 'In Stock'}
-            </span>
             <div className="dtb-product-card__price-group">
               <strong
                 className="dtb-product-card__price"

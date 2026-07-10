@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useLayoutEffect, lazy, Suspense, useCallback, useRef } from 'react';
 import PageTransition from './components/routing/PageTransition';
-import LoadingSpinner from './components/shared/LoadingSpinner';
 import { CartProvider } from './context/CartContext';
 import { WooCommerceProvider } from './context/WooCommerceContext';
 import { WorkflowTransitionProvider } from './context/WorkflowTransitionContext.jsx';
@@ -15,8 +14,11 @@ import ProtectedRoute from './components/routing/ProtectedRoute';
 import HomepageSignupCTA from './components/cta/HomepageSignupCTA.jsx';
 import MobileInstallNudge from './components/pwa/MobileInstallNudge.jsx';
 import SmartBackButton from './components/navigation/SmartBackButton.jsx';
+import GlobalLoadingOverlay from './components/shared/GlobalLoadingOverlay.jsx';
 import { isRewardsEnabled } from './utils/featureFlags.js';
 import { initializeWebpackPublicPath } from './setWebpackPublicPath.js';
+import { GlobalLoadingProvider } from './context/GlobalLoadingContext.jsx';
+import { emitGlobalLoadingEnd, emitGlobalLoadingStart } from './utils/globalLoadingEvents.js';
 
 const HOMEPAGE_SIGNUP_CTA_SEEN_KEY = 'dtb:homepage-signup-cta-seen:v1';
 const HOMEPAGE_SIGNUP_CTA_DELAY_MS = 900;
@@ -103,8 +105,15 @@ const ReturnPolicy = lazyWithReload(() => import('./pages/ReturnPolicy'));
 // const ToolsetBuilder = lazy(() => import('./pages/ToolsetBuilder')); // DISABLED: temporarily hide Toolset Builder
 const TechnicalSpecificationsPreview = lazyWithReload(() => import('./pages/TechnicalSpecificationsPreview'));
 
-function PageLoader() {
-  return <LoadingSpinner size="md" label="Loading page…" fullPage />;
+function RouteChunkFallback() {
+  useEffect(() => {
+    emitGlobalLoadingStart();
+    return () => {
+      emitGlobalLoadingEnd();
+    };
+  }, []);
+
+  return null;
 }
 
 function ScrollToTop() {
@@ -223,7 +232,7 @@ function AppRoutes() {
   const productSelectorElement = <Products title="Products" isPartsFilter={0} />;
   return (
     <PageTransition locationKey={`${location.pathname}${location.search}`}>
-      <Suspense fallback={<PageLoader />}>
+      <Suspense fallback={<RouteChunkFallback />}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products forceProductGrid title="Products" isPartsFilter={0} />} />
@@ -293,10 +302,12 @@ function App() {
         <WooCommerceProvider>
           <CartProvider>
             <WorkflowTransitionProvider>
-              <Router basename={basename}>
-                <ScrollToTop />
-                <AppShell cartOpen={cartOpen} toggleCart={toggleCart} closeCart={closeCart} />
-              </Router>
+              <GlobalLoadingProvider>
+                <Router basename={basename}>
+                  <ScrollToTop />
+                  <AppShell cartOpen={cartOpen} toggleCart={toggleCart} closeCart={closeCart} />
+                </Router>
+              </GlobalLoadingProvider>
             </WorkflowTransitionProvider>
           </CartProvider>
         </WooCommerceProvider>
@@ -312,7 +323,9 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
   const previousRouteKeyRef = useRef(routeKey);
 
   const isHome = location.pathname === '/';
-  const minimalChrome = false;
+  // Checkout owns a dedicated, reduced-distraction header. Rendering the full
+  // storefront shell here created two competing headers above the form.
+  const minimalChrome = location.pathname === '/checkout';
 
   useEffect(() => {
     if (previousRouteKeyRef.current === routeKey) return;
@@ -331,6 +344,7 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
       {!minimalChrome && <CartSidebar isOpen={cartOpen} onClose={closeCart} />}
       <MobileInstallNudge />
       {!user && <HomepageSignupCtaController />}
+      <GlobalLoadingOverlay />
     </>
   );
 }

@@ -7,7 +7,7 @@ import gracoLogo from '/brands/Graco/graco_logo.svg';
 import platinumLogo from '/brands/Platinum/platinum_logo.svg';
 import duraStiltsLogo from '/brands/Dura-Stilts/dura-stilts-logo.svg';
 import level5Logo from '/brands/Level5/Level5.svg';
-import { sortBrandsBy } from '../../utils/catalogUrlState.js';
+import { dedupeCatalogBrandEntries } from '../../utils/catalogFacets.js';
 import './products-selector.css';
 
 const PRODUCT_BRAND_LOGOS = {
@@ -25,40 +25,21 @@ const PRODUCT_BRAND_LOGOS = {
   'Level 5': level5Logo,
 };
 
-const LAUNCH_BRAND_FALLBACKS = [
-  { key: 'tapetech', label: 'TapeTech', slug: 'tapetech' },
-  { key: 'columbia-tools', label: 'Columbia Tools', slug: 'columbia-tools' },
-  { key: 'level5', label: 'Level 5', slug: 'level5' },
-  { key: 'surpro', label: 'SurPro', slug: 'surpro' },
-  { key: 'dura-stilts', label: 'Dura-Stilts', slug: 'dura-stilts' },
-  { key: 'platinum-drywall-tools', label: 'Platinum Drywall Tools', slug: 'platinum-drywall-tools' },
-  { key: 'asgard', label: 'Asgard', slug: 'asgard' },
-  { key: 'graco', label: 'Graco', slug: 'graco' },
-];
-
 function resolveLogo(brand) {
   return brand.logo || PRODUCT_BRAND_LOGOS[brand.label] || PRODUCT_BRAND_LOGOS[brand.key] || '';
 }
 
 function normalizeBrandList(brands = []) {
-  const source = Array.isArray(brands) && brands.length > 0 ? brands : LAUNCH_BRAND_FALLBACKS;
-  return source
-    .map((brand) => {
-      const label = brand.label || brand.name || brand.key || '';
-      const slug = brand.slug || brand.key || label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-      return {
-        ...brand,
-        label,
-        slug,
-        key: brand.key || slug,
-        logo: resolveLogo({ ...brand, label, key: brand.key || slug }),
-      };
-    })
-    .filter((brand) => brand.label && brand.slug);
+  if (!Array.isArray(brands) || brands.length === 0) return [];
+  return dedupeCatalogBrandEntries(brands)
+    .map((brand) => ({
+      ...brand,
+      logo: resolveLogo(brand),
+    }));
 }
 
 export default function ProductsBrandSelector({ brands, onSelectBrand }) {
-  const sortedBrands = useMemo(() => sortBrandsBy(normalizeBrandList(brands), 'label'), [brands]);
+  const sortedBrands = useMemo(() => normalizeBrandList(brands), [brands]);
 
   return (
     <div className="products-brand-selector">

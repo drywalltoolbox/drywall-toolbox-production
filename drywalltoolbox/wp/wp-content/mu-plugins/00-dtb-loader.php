@@ -143,10 +143,12 @@ function dtb_security_log( string $event, array $context = [] ): void {
  * @return string[] List of allowed origin strings (scheme + host, no trailing slash).
  */
 function dtb_allowed_origins(): array {
+	// HTTP Origin headers contain only scheme + host (+ port). Paths are never
+	// included. The staging SPA at /staging/2972/ sends Origin: https://drywalltoolbox.com,
+	// which is already covered by the first entry below.
 	$origins = [
 		'https://drywalltoolbox.com',
 		'https://www.drywalltoolbox.com',
-		'https://drywalltoolbox.com/staging/7157', // Staging environment
 		'https://elliotttmiller.github.io', // GitHub Pages dev/preview build
 		'http://localhost:3000',
 		'http://localhost:5173',

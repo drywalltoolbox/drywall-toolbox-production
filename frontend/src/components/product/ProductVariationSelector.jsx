@@ -15,30 +15,19 @@ export default function ProductVariationSelector({
 }) {
   if (!Array.isArray(variationAttributes) || variationAttributes.length === 0) return null;
 
+  const usesGenericOptionsLabel = variationAttributes.length === 1;
+
   return (
     <div className="product-variation-panel" aria-label="Product options">
       {variationAttributes.map((attr) => {
         const selectedValue = selectedAttrs?.[attr.name] || '';
         const options = variantOptionMeta[attr.name] || [];
+        const label = usesGenericOptionsLabel ? 'Options' : attributeLabel(attr);
 
         return (
           <section key={attr.name} className="product-variation-group">
             <div className="product-variation-group__header">
-              <span className="product-variation-group__label">{attributeLabel(attr)}</span>
-              <AnimatePresence mode="wait">
-                {selectedValue && (
-                  <Motion.span
-                    key={String(selectedValue)}
-                    className="product-variation-group__selected"
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 4 }}
-                    transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    Selected: {selectedValue}
-                  </Motion.span>
-                )}
-              </AnimatePresence>
+              <span className="product-variation-group__label">{label}</span>
             </div>
 
             <div className="dtb-variant-rail">
@@ -46,7 +35,10 @@ export default function ProductVariationSelector({
                 const selected = `${selectedValue}` === `${option.value}`;
                 const soldOut = option.status === 'sold-out';
                 const unavailable = option.status === 'unavailable';
-                const disabled = !variationsLoading && (soldOut || unavailable);
+                // Sold-out variations remain selectable so their media, SKU,
+                // price, and availability details can be inspected. Only a
+                // combination that does not exist is disabled.
+                const disabled = !variationsLoading && unavailable;
 
                 // Build aria-label and className independently for clarity.
                 let ariaLabel = option.value;
@@ -57,7 +49,7 @@ export default function ProductVariationSelector({
                 const pillClasses = ['dtb-variant-pill'];
                 if (selected) pillClasses.push('is-selected', 'dtb-variant-pill--selected');
                 if (!variationsLoading) {
-                  if (soldOut) pillClasses.push('is-sold-out', 'dtb-variant-pill--disabled');
+                  if (soldOut) pillClasses.push('is-sold-out');
                   else if (unavailable) pillClasses.push('is-disabled', 'dtb-variant-pill--disabled');
                 } else {
                   pillClasses.push('is-loading');
@@ -70,7 +62,7 @@ export default function ProductVariationSelector({
                     onClick={() => setSelectedAttrs((prev) => ({ ...prev, [attr.name]: option.value }))}
                     disabled={disabled}
                     aria-pressed={selected}
-                    aria-disabled={disabled || soldOut}
+                    aria-disabled={disabled}
                     aria-label={ariaLabel}
                     className={pillClasses.join(' ')}
                     whileTap={disabled ? undefined : { scale: 0.985 }}

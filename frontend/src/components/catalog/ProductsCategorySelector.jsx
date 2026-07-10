@@ -16,6 +16,22 @@ const ALL_PRODUCTS_CATEGORY = {
  * Used when the API returns a non-representative image for a category card.
  */
 const CATEGORY_IMAGE_OVERRIDES = {
+  tapetech: {
+    'automatic_tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_07tt_04.webp',
+    'automatic-tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_07tt_04.webp',
+    'compound_tubes': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_ct42tt_01.webp',
+    'compound-tubes': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_ct42tt_01.webp',
+    'corner_tools': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_ca08tt_01.webp',
+    'corner-tools': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_ca08tt_01.webp',
+    'finishing_boxes': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_ez07tt_01.webp',
+    'finishing-boxes': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_ez07tt_01.webp',
+    'handles': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_88tte_03.webp',
+    'handles_extensions': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_88tte_03.webp',
+    'handles-extensions': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_88tte_03.webp',
+    'pumps': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_76ttca_01.webp',
+    'nail_spotters': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_ns03tt_02.webp',
+    'nail-spotters': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_ns03tt_02.webp',
+  },
   'columbia-tools': {
     'automatic_tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_ptaper_01.webp',
     'automatic-tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_ptaper_01.webp',

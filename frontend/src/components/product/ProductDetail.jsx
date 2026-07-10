@@ -710,7 +710,10 @@ export default function ProductDetail({
 
         if (matrixEntry) {
           const matchedVariation = variations.find((v) => v.id === matrixEntry.variation_id) || null;
-          const status = !matrixEntry.purchasable ? 'unavailable' : (matrixEntry.stock_status === 'outofstock' ? 'sold-out' : 'available');
+          const stockStatus = matrixEntry.stock_status || matchedVariation?.stock_status || '';
+          const status = stockStatus === 'outofstock'
+            ? 'sold-out'
+            : (!matrixEntry.purchasable ? 'unavailable' : 'available');
           return {
             value: option,
             variation: matchedVariation,

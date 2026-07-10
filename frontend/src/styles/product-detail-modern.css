@@ -464,7 +464,7 @@
   cursor: pointer;
 }
 
-.dtb-variant-pill:hover:not(:disabled):not(.is-disabled):not(.is-sold-out) {
+.dtb-variant-pill:hover:not(:disabled):not(.is-disabled) {
   border-color: rgba(37, 99, 235, 0.5);
   background: rgba(239, 246, 255, 0.5);
   transform: translateY(-1px);
@@ -516,7 +516,6 @@
 }
 
 .dtb-variant-pill.is-disabled,
-.dtb-variant-pill.is-sold-out,
 .dtb-variant-pill--disabled {
   border-color: rgba(203, 213, 225, 0.78);
   background: #f8fafc;
@@ -526,8 +525,19 @@
 }
 
 .dtb-variant-pill.is-disabled .dtb-variant-pill__label,
-.dtb-variant-pill.is-sold-out .dtb-variant-pill__label,
 .dtb-variant-pill--disabled .dtb-variant-pill__label {
+  color: #94a3b8;
+}
+
+.dtb-variant-pill.is-sold-out {
+  border-color: rgba(203, 213, 225, 0.78);
+  background: #f8fafc;
+  cursor: pointer;
+  opacity: 0.62;
+  box-shadow: none;
+}
+
+.dtb-variant-pill.is-sold-out .dtb-variant-pill__label {
   color: #94a3b8;
 }
 

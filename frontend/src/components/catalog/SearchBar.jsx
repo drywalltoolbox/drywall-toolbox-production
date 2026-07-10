@@ -1,53 +1,75 @@
-import { Search } from 'lucide-react';
+import { Loader2, Search, X } from 'lucide-react';
+import './product-search-bar.css';
 
-export default function SearchBar({ placeholder = "Search products...", value = "", onChange = () => {} }) {
+function formatPrice(product) {
+  const price = Number(product?.price ?? product?.min_price ?? 0);
+  return Number.isFinite(price) && price > 0 ? `$${price.toFixed(2)}` : 'View product';
+}
+
+export default function SearchBar({
+  placeholder = 'Search products...',
+  value = '',
+  onChange = () => {},
+  suggestions = [],
+  loading = false,
+  onSelectSuggestion,
+  onSubmit,
+  onClear,
+}) {
+  const hasQuery = Boolean(value.trim());
+  const showSuggestions = hasQuery && (loading || suggestions.length > 0);
+
   return (
-    <div style={{ marginBottom: '32px' }}>
-      <div style={{
-        position: 'relative',
-        display: 'flex',
-        alignItems: 'center',
-        maxWidth: '600px'
-      }}>
-        <Search 
-          size={20} 
-          style={{
-            position: 'absolute',
-            left: '12px',
-            color: 'rgba(15,23,42,0.5)',
-            pointerEvents: 'none',
-            flexShrink: 0
-          }}
-        />
+    <div className="dtb-product-search">
+      <div className="dtb-product-search__field">
+        <Search size={20} className="dtb-product-search__icon" aria-hidden="true" />
         <input
           type="text"
           placeholder={placeholder}
           value={value}
           onChange={onChange}
-          style={{
-            width: '100%',
-            padding: 'clamp(10px, 2vw, 14px) clamp(10px, 2vw, 14px) clamp(10px, 2vw, 14px) 40px',
-            fontSize: 'clamp(16px, 2vw, 1rem)',
-            border: '1px solid rgb(229, 231, 235)',
-            borderRadius: '8px',
-            backgroundColor: 'white',
-            transition: 'all 0.2s ease-out',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-            outline: 'none',
-            fontFamily: 'inherit',
-            WebkitAppearance: 'none',
-            appearance: 'none',
-            minHeight: '44px'
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              onSubmit?.(value);
+            }
           }}
-          onFocus={(e) => {
-            e.currentTarget.style.borderColor = 'var(--primary-600)';
-            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.borderColor = 'rgb(229, 231, 235)';
-            e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
-          }}
+          className="dtb-product-search__input"
+          aria-label={placeholder}
+          aria-autocomplete="list"
+          aria-expanded={showSuggestions}
+          autoComplete="off"
         />
+        {hasQuery && (
+          <button type="button" className="dtb-product-search__clear" onClick={onClear} aria-label="Clear product search">
+            <X size={16} aria-hidden="true" />
+          </button>
+        )}
+        {showSuggestions && (
+          <div className="dtb-product-search__suggestions" role="listbox" aria-label="Product search suggestions">
+            {loading ? (
+              <div className="dtb-product-search__state"><Loader2 size={16} className="animate-spin" /> Searching products...</div>
+            ) : suggestions.map((product) => (
+              <button
+                key={product.id || product.slug || product.sku}
+                type="button"
+                className="dtb-product-search__suggestion"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => onSelectSuggestion?.(product)}
+                role="option"
+              >
+                <span className="dtb-product-search__thumb">
+                  {product.image ? <img src={product.image} alt="" /> : null}
+                </span>
+                <span className="dtb-product-search__meta">
+                  <span className="dtb-product-search__name">{product.name}</span>
+                  <span className="dtb-product-search__detail">{[product.brand, product.sku].filter(Boolean).join(' · ')}</span>
+                </span>
+                <span className="dtb-product-search__price">{formatPrice(product)}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

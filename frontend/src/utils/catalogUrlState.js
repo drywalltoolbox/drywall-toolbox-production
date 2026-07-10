@@ -78,10 +78,6 @@ export function isAllProductsCategorySlug(value = '') {
   return ['all-products', 'all-products-category', 'all'].includes(normalized);
 }
 
-// Brand visual assets are owned by frontend/src/utils/brandAssets.js so bundled
-// imports can resolve through Webpack. Keep URL state free of asset imports.
-export const BRAND_LOGOS = {};
-
 // ── DTB category key → display label ─────────────────────────────────────────
 
 export const CATEGORY_LABELS = {

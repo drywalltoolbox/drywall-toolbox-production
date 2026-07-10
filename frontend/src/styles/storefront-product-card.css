@@ -75,6 +75,7 @@
 .dtb-product-card__badge--right { right: 10px; }
 .dtb-product-card__badge--left { left: 10px; }
 .dtb-product-card__badge--sale { background: #dc2626; color: white; }
+.dtb-product-card__badge--in { background: rgba(220, 252, 231, 0.94); color: #15803d; }
 .dtb-product-card__badge--out { background: #e2e8f0; color: #475569; }
 
 .dtb-product-card__meta {
@@ -163,22 +164,6 @@
   flex-direction: column;
   min-width: 0;
 }
-
-.dtb-product-card__stock-badge {
-  display: inline-flex;
-  align-self: flex-start;
-  padding: 1px 5px;
-  border-radius: 3px;
-  font-size: 0.57rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  line-height: 1.5;
-  margin-bottom: 2px;
-}
-
-.dtb-product-card__stock-badge--in { background: rgba(22, 163, 74, 0.1); color: #15803d; }
-.dtb-product-card__stock-badge--out { background: rgba(226, 232, 240, 0.8); color: #64748b; }
 
 .dtb-product-card__price-group {
   display: inline-flex;
@@ -660,14 +645,6 @@
 
   .dtb-product-card--list .dtb-product-card__price-col {
     gap: 3px;
-  }
-
-  .dtb-product-card--list .dtb-product-card__stock-badge {
-    padding: 2px 7px;
-    border-radius: 6px;
-    font-size: clamp(0.64rem, 2.45vw, 0.72rem);
-    line-height: 1.15;
-    margin: 0;
   }
 
   .dtb-product-card--list .dtb-product-card__price-group {

@@ -10,6 +10,7 @@ import {
   Tags,
   Wrench,
 } from 'lucide-react';
+import { dedupeCatalogBrandEntries } from '../../utils/catalogFacets.js';
 import '../../styles/storefront-shop-mega-menu.css';
 
 const FALLBACK_CATEGORIES = [
@@ -76,7 +77,9 @@ export default function StorefrontShopMegaMenu({
   const panelId = useId();
   const triggerId = useId();
   const categories = (Array.isArray(categoryLinks) && categoryLinks.length > 0 ? categoryLinks : FALLBACK_CATEGORIES).slice(0, 8);
-  const brands = Array.isArray(brandLinks) ? brandLinks.slice(0, 6) : [];
+  const brands = dedupeCatalogBrandEntries(brandLinks)
+    .map((brand) => ({ ...brand, to: `/products/brands/${brand.slug}` }))
+    .slice(0, 6);
 
   const closeAndFocusTrigger = () => {
     onClose();

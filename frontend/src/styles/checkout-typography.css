@@ -29,7 +29,8 @@
   --co-radius-sm: 6px;
   --co-radius-md: 10px;
   --co-trustbar-h: 38px;
-  --co-header-h: 64px;
+  --co-header-h: 72px;
+  --co-header-hero: linear-gradient(135deg, #071329 0%, #0f2150 54%, #1d4ed8 100%);
   /* Legacy aliases – referenced by mobile-responsive.css */
   --checkout-font: var(--co-font);
   --checkout-display-font: var(--co-font);
@@ -111,8 +112,9 @@
   align-items: center;
   height: var(--co-header-h);
   padding: 0 clamp(16px, 4vw, 48px);
-  background: var(--co-white);
-  border-bottom: 1px solid var(--co-border);
+  background: var(--co-header-hero);
+  border-bottom: 1px solid rgba(147, 197, 253, 0.32);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 6px 18px rgba(7, 19, 41, 0.2);
 }
 
 .dtb-co-header__brand {
@@ -121,7 +123,7 @@
 }
 
 .dtb-co-header__logo {
-  height: 26px;
+  height: 30px;
   width: auto;
   display: block;
 }
@@ -141,18 +143,20 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: var(--co-text-400);
+  color: rgba(255, 255, 255, 0.82);
 }
+
+.dtb-co-header__secure svg { flex: 0 0 auto; }
 
 .dtb-co-header__signin {
   font-size: 13px;
   font-weight: 600;
-  color: var(--co-primary);
+  color: #ffffff;
   text-decoration: none;
-  transition: color 0.15s;
+  transition: color 0.15s, opacity 0.15s;
 }
 
-.dtb-co-header__signin:hover { color: var(--co-primary-dark); text-decoration: underline; }
+.dtb-co-header__signin:hover { color: #ffffff; opacity: 0.76; text-decoration: underline; }
 
 /* ─── Step Indicator ──────────────────────────────────────── */
 .dtb-co-steps {
@@ -171,53 +175,53 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 2px solid var(--co-border);
-  background: var(--co-white);
+  border: 2px solid rgba(219, 234, 254, 0.42);
+  background: rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 11px;
   font-weight: 800;
-  color: var(--co-text-400);
+  color: rgba(255, 255, 255, 0.82);
   transition: border-color 0.25s ease, background 0.25s ease, color 0.25s ease,
     box-shadow 0.25s ease;
   flex-shrink: 0;
 }
 
 .dtb-co-step--done .dtb-co-step__bubble {
-  border-color: var(--co-primary);
-  background: var(--co-primary);
+  border-color: #60a5fa;
+  background: #2563eb;
   color: #fff;
 }
 
 .dtb-co-step--current .dtb-co-step__bubble {
-  border-color: var(--co-primary);
+  border-color: #ffffff;
   background: var(--co-white);
   color: var(--co-primary);
-  box-shadow: 0 0 0 3px var(--co-primary-light);
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.3);
 }
 
 .dtb-co-step__label {
   font-size: 10.5px;
   font-weight: 600;
-  color: var(--co-text-400);
+  color: rgba(219, 234, 254, 0.76);
   white-space: nowrap;
   transition: color 0.2s;
 }
 
-.dtb-co-step--done .dtb-co-step__label { color: var(--co-primary); }
-.dtb-co-step--current .dtb-co-step__label { color: var(--co-text-900); font-weight: 700; }
+.dtb-co-step--done .dtb-co-step__label { color: #bfdbfe; }
+.dtb-co-step--current .dtb-co-step__label { color: #ffffff; font-weight: 700; }
 
 .dtb-co-step__line {
   height: 1.5px;
-  background: var(--co-border);
+  background: rgba(219, 234, 254, 0.3);
   min-width: 32px;
   flex: 0 0 32px;
   margin-bottom: 22px; /* visually aligns to bubble center */
   transition: background 0.3s ease;
 }
 
-.dtb-co-step__line--done { background: var(--co-primary); }
+.dtb-co-step__line--done { background: #60a5fa; }
 
 /* ─── Two-Column Grid ─────────────────────────────────────── */
 .dtb-co-grid {
@@ -1188,10 +1192,12 @@
   .dtb-co-trustbar__sep { display: none; }
 
   .dtb-co-header {
-    height: 56px;
-    padding: 0 14px;
+    height: 68px;
+    grid-template-columns: minmax(84px, 1fr) auto minmax(84px, 1fr);
+    padding: 0 16px;
   }
-  .dtb-co-header__logo { height: 22px; }
+  .dtb-co-header__logo { height: 26px; }
+  .dtb-co-header__actions { min-width: 84px; gap: 10px; }
 
   /* Compact step bubbles – hide labels */
   .dtb-co-step__label { display: none; }
@@ -1215,6 +1221,12 @@
 
   .dtb-co-section { padding-top: 22px; }
   .dtb-co-actions { padding-top: 22px; margin-top: 18px; }
+}
+
+@media (max-width: 560px) {
+  .dtb-co-header__signin { display: none; }
+  .dtb-co-header__secure { font-size: 0; gap: 0; }
+  .dtb-co-header__secure svg { width: 18px; height: 18px; }
 }
 
 /* Small mobile */

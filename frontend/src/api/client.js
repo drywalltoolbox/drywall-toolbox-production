@@ -18,6 +18,7 @@
 
 import axios from 'axios';
 import { getToken, clearToken } from '../auth/tokenStore.js';
+import { emitGlobalLoadingEnd, emitGlobalLoadingStart } from '../utils/globalLoadingEvents.js';
 
 const inflightGetRequests = new Map();
 const getCooldowns = new Map();
@@ -221,6 +222,9 @@ export const wpClient = axios.create( {
 
 wpClient.interceptors.request.use(
   ( config ) => {
+    emitGlobalLoadingStart();
+    config.__dtbGlobalLoadingTracked = true;
+
     const token = getToken();
     if ( token ) {
       config.headers[ 'Authorization' ] = `Bearer ${ token }`;
@@ -231,8 +235,19 @@ wpClient.interceptors.request.use(
 );
 
 wpClient.interceptors.response.use(
-  ( response ) => response,
+  ( response ) => {
+    if ( response?.config?.__dtbGlobalLoadingTracked ) {
+      emitGlobalLoadingEnd();
+      response.config.__dtbGlobalLoadingTracked = false;
+    }
+    return response;
+  },
   async ( error ) => {
+    if ( error?.config?.__dtbGlobalLoadingTracked ) {
+      emitGlobalLoadingEnd();
+      error.config.__dtbGlobalLoadingTracked = false;
+    }
+
     if ( error.response && error.response.status === 401 ) {
       clearToken();
       const shouldExpireSession = await shouldDispatchAuthExpired();
@@ -256,13 +271,33 @@ export const wcClient = axios.create( {
 } );
 
 wcClient.interceptors.response.use(
-  ( response ) => response,
+  ( response ) => {
+    if ( response?.config?.__dtbGlobalLoadingTracked ) {
+      emitGlobalLoadingEnd();
+      response.config.__dtbGlobalLoadingTracked = false;
+    }
+    return response;
+  },
   ( error ) => {
+    if ( error?.config?.__dtbGlobalLoadingTracked ) {
+      emitGlobalLoadingEnd();
+      error.config.__dtbGlobalLoadingTracked = false;
+    }
+
     if ( error.response && error.response.data && error.response.data.message ) {
       return Promise.reject( new Error( error.response.data.message ) );
     }
     return Promise.reject( error );
   },
+);
+
+wcClient.interceptors.request.use(
+  ( config ) => {
+    emitGlobalLoadingStart();
+    config.__dtbGlobalLoadingTracked = true;
+    return config;
+  },
+  ( error ) => Promise.reject( error ),
 );
 
 // ─── apiClient — fetch wrapper for drywall/v1 proxy routes ───────────────────
@@ -276,6 +311,8 @@ wcClient.interceptors.response.use(
  * @throws {{ code: string, message: string, status: number, retryAfter?: number }}
  */
 export async function apiClient( endpoint, options = {} ) {
+  emitGlobalLoadingStart();
+
   const requestUrls = buildApiRequestUrls( endpoint );
 
   const method = ( options.method || 'GET' ).toUpperCase();
@@ -391,11 +428,14 @@ export async function apiClient( endpoint, options = {} ) {
   };
 
   if ( method !== 'GET' ) {
-    return execute();
+    return execute().finally( () => {
+      emitGlobalLoadingEnd();
+    } );
   }
 
   const promise = execute().finally( () => {
     inflightGetRequests.delete( requestKey );
+    emitGlobalLoadingEnd();
   } );
   inflightGetRequests.set( requestKey, promise );
   return promise;

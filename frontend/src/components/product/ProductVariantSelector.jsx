@@ -12,6 +12,7 @@ import { findMatchingVariation, getVariationSelectionMap } from '../../utils/var
 function getOptionStatus(optionMeta) {
   const status = optionMeta?.stock_status || 'outofstock';
   const purchasable = optionMeta?.purchasable ?? false;
+  if (status === 'outofstock') return status;
   if (!purchasable) return 'unavailable';
   return status;
 }
@@ -98,7 +99,7 @@ export default function ProductVariantSelector({
             value: option,
             isOos,
             isUnavail,
-            disabled: isOos || isUnavail,
+            disabled: isUnavail,
           };
         });
 
@@ -175,7 +176,7 @@ function chipStyle(isSelected, isOos, isUnavail) {
       : isOos || isUnavail ? '#94a3b8' : '#0f172a',
     fontSize: '0.82rem',
     fontWeight: isSelected ? 700 : 500,
-    cursor: isOos || isUnavail ? 'not-allowed' : 'pointer',
+    cursor: isUnavail ? 'not-allowed' : 'pointer',
     opacity: isOos || isUnavail ? 0.62 : 1,
     textAlign: 'center',
     lineHeight: 1.3,

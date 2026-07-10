@@ -12,18 +12,62 @@ export function buildDisplayCategoryUrl(slug) {
   return `/products?display_category=${encodeURIComponent(slug)}`;
 }
 
-export function toCatalogBrand(rawBrand = {}) {
-  const name = canonicalBrandLabel(rawBrand.label || rawBrand.name || rawBrand.key || rawBrand.slug || '');
-  if (!name) return null;
-  const slug = rawBrand.slug || rawBrand.key || brandToSlug(name);
+export function normalizeCatalogBrandEntry(rawBrand = {}) {
+  const label = canonicalBrandLabel(rawBrand.label || rawBrand.name || rawBrand.key || rawBrand.slug || '');
+  if (!label) return null;
+  const slug = brandToSlug(label);
   if (!slug) return null;
-  const count = Number(rawBrand.productCount || rawBrand.count || 0);
-  return { name, slug, count };
+  const productCount = Number(rawBrand.productCount || rawBrand.count || 0);
+
+  return {
+    ...rawBrand,
+    key: slug,
+    label,
+    name: label,
+    slug,
+    productCount,
+    count: productCount,
+  };
+}
+
+export function dedupeCatalogBrandEntries(rawBrands = []) {
+  const bySlug = new Map();
+
+  (Array.isArray(rawBrands) ? rawBrands : []).forEach((rawBrand) => {
+    const brand = normalizeCatalogBrandEntry(rawBrand);
+    if (!brand) return;
+
+    const existing = bySlug.get(brand.slug);
+    if (!existing) {
+      bySlug.set(brand.slug, brand);
+      return;
+    }
+
+    // Alias facets frequently describe the same product set. Preserve the
+    // canonical entry and use the highest reported count, not a summed count.
+    const productCount = Math.max(existing.productCount || 0, brand.productCount || 0);
+    bySlug.set(brand.slug, {
+      ...existing,
+      logo: existing.logo || brand.logo,
+      image: existing.image || brand.image,
+      imageUrl: existing.imageUrl || brand.imageUrl,
+      productCount,
+      count: productCount,
+    });
+  });
+
+  return sortBrandsBy(Array.from(bySlug.values()), 'label');
+}
+
+export function toCatalogBrand(rawBrand = {}) {
+  const brand = normalizeCatalogBrandEntry(rawBrand);
+  if (!brand) return null;
+  return { name: brand.name, slug: brand.slug, count: brand.productCount };
 }
 
 export function mapCatalogBrands(rawBrands = []) {
-  const mapped = Array.isArray(rawBrands) ? rawBrands.map(toCatalogBrand).filter(Boolean) : [];
-  return sortBrandsBy(mapped, 'name');
+  return dedupeCatalogBrandEntries(rawBrands)
+    .map((brand) => ({ name: brand.name, slug: brand.slug, count: brand.productCount }));
 }
 
 export function mergeCatalogDisplayCategories(displayCategoriesByBrand = {}) {

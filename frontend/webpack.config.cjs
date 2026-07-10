@@ -481,18 +481,48 @@ module.exports = (envFlags, argv) => {
 
       splitChunks: {
         chunks: 'all',
-        maxInitialRequests: 4,
-        maxAsyncRequests:   5,
+        maxInitialRequests: 6,
+        maxAsyncRequests:   8,
         minSize: 20_000,
         minRemainingSize: 0,
         cacheGroups: {
+          // React core — must be in the initial bundle for every route.
           reactVendor: {
             test:     /[\\/]node_modules[\\/](react|react-dom|react-router(-dom)?)[\\/]/,
             name:     'vendor-react',
             chunks:   'initial',
-            priority: 40,
+            priority: 50,
             reuseExistingChunk: true,
           },
+          // framer-motion (~280 kB min) — used by PageTransition (sync) and
+          // animated page components (async). 'all' puts it in one named chunk
+          // shared by both initial and async consumers; avoids duplication.
+          framerMotion: {
+            test:     /[\\/]node_modules[\\/]framer-motion[\\/]/,
+            name:     'vendor-framer-motion',
+            chunks:   'all',
+            priority: 45,
+            reuseExistingChunk: true,
+          },
+          // lucide-react is tree-shaken per icon, but its shared runtime is
+          // used by both the initial shell (Header/Footer) and async pages.
+          // 'all' canonicalises it into one chunk.
+          lucide: {
+            test:     /[\\/]node_modules[\\/]lucide-react[\\/]/,
+            name:     'vendor-lucide',
+            chunks:   'all',
+            priority: 45,
+            reuseExistingChunk: true,
+          },
+          // Stripe JS is only needed on the checkout route (lazy-loaded).
+          stripe: {
+            test:     /[\\/]node_modules[\\/]@stripe[\\/]/,
+            name:     'vendor-stripe',
+            chunks:   'async',
+            priority: 45,
+            reuseExistingChunk: true,
+          },
+          // Remaining node_modules share one initial vendor chunk.
           vendor: {
             test:     /[\\/]node_modules[\\/]/,
             name:     'vendor',
@@ -500,6 +530,7 @@ module.exports = (envFlags, argv) => {
             priority: 20,
             reuseExistingChunk: true,
           },
+          // App code shared across ≥2 async chunks (e.g. api/client, utils).
           common: {
             name:               'common',
             minChunks:          2,

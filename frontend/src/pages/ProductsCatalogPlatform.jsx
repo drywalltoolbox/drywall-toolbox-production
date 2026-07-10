@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Filter, LayoutGrid, List, ShoppingCart } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead';
@@ -28,7 +28,9 @@ import {
   canonicalBrandLabel,
   parseCatalogQuery,
 } from '../utils/catalogUrlState.js';
-import { normalizeDisplayCategorySlug } from '../utils/catalogFacets.js';
+import { dedupeCatalogBrandEntries, normalizeDisplayCategorySlug } from '../utils/catalogFacets.js';
+import { searchProducts } from '../services/catalog.js';
+import { fetchCatalogProducts } from '../services/catalogPlatformCache.js';
 
 // Canonical display category labels for the customer-facing filter UI.
 // Mirrors CategoryNormalizer::DISPLAY_CATEGORY_LABELS on the backend.
@@ -226,7 +228,7 @@ function getDisplayCategoriesForBrand(displayCategoriesByBrand = {}, brandFacet 
 
 function toBrandFacet(rawBrand = {}) {
   const label = canonicalBrandLabel(rawBrand.label || rawBrand.name || rawBrand.key || rawBrand.slug || '');
-  const slug = rawBrand.slug || rawBrand.key || brandToSlug(label);
+  const slug = brandToSlug(label);
   return {
     key: rawBrand.key || slug,
     label,
@@ -290,6 +292,11 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const pathParams = useMemo(() => ({ brandSlug, categorySlug }), [brandSlug, categorySlug]);
   const query = useMemo(() => parseCatalogQuery(new URLSearchParams(location.search), pathParams), [location.search, pathParams]);
   const selectedBrand = query.brands?.[0] || '';
+  const [searchInput, setSearchInput] = useState(() => query.search || '');
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [searchSuggestionsLoading, setSearchSuggestionsLoading] = useState(false);
+  const searchRequestIdRef = useRef(0);
+  const committedSearchRef = useRef(query.search || '');
 
   const isBrandSelectorRoute = location.pathname === '/products/brands';
   const isBrandCategorySelectorRoute = Boolean(brandSlug) && !categorySlug && location.pathname.startsWith('/products/brands/');
@@ -304,7 +311,9 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const { items, pagination, loading: itemsLoading, error: productsError } = useCatalogProducts(productQuery, { enabled: productsEnabled });
 
   const brandFacets = useMemo(
-    () => (Array.isArray(facets?.brands) ? facets.brands.map(toBrandFacet).filter((brand) => brand.label) : []),
+    () => dedupeCatalogBrandEntries(
+      Array.isArray(facets?.brands) ? facets.brands.map(toBrandFacet).filter((brand) => brand.label) : []
+    ),
     [facets]
   );
   const brands = useMemo(() => brandFacets.map((brand) => brand.label), [brandFacets]);
@@ -367,6 +376,85 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
     if (options.resetPage !== false) next.page = patch.page ?? 1;
     navigate(buildCatalogUrl(next, pathParams), { replace: options.replace ?? false });
   }, [navigate, pathParams, query]);
+
+  const commitSearch = useCallback((rawValue, { replace = true } = {}) => {
+    const search = String(rawValue || '').trim();
+    committedSearchRef.current = search;
+    setQuery(
+      search
+        ? { search, displayCategory: '', category: '' }
+        : { search: '' },
+      { replace },
+    );
+  }, [setQuery]);
+
+  useEffect(() => {
+    if (query.search === committedSearchRef.current) return;
+    committedSearchRef.current = query.search || '';
+    setSearchInput(query.search || '');
+  }, [query.search]);
+
+  useEffect(() => {
+    const pendingSearch = searchInput.trim();
+    if (pendingSearch === query.search) return undefined;
+
+    // 420 ms debounce — fast enough for responsive feel, slow enough to avoid
+    // hammering the catalog platform with per-keystroke API requests.
+    const timer = window.setTimeout(() => commitSearch(pendingSearch), 420);
+    return () => window.clearTimeout(timer);
+  }, [commitSearch, query.search, searchInput]);
+
+  useEffect(() => {
+    const search = searchInput.trim();
+    const requestId = searchRequestIdRef.current + 1;
+    searchRequestIdRef.current = requestId;
+
+    if (search.length < 2) {
+      setSearchSuggestions([]);
+      setSearchSuggestionsLoading(false);
+      return undefined;
+    }
+
+    // 280 ms debounce for suggestions — slightly faster than the commit debounce
+    // so the dropdown appears before the grid begins loading.
+    const timer = window.setTimeout(async () => {
+      setSearchSuggestionsLoading(true);
+      try {
+        // Primary: catalog platform — same data source as the product grid.
+        // Scoped to the active brand when one is selected.
+        const platformData = await fetchCatalogProducts({
+          search,
+          ...(selectedBrand ? { brands: [selectedBrand] } : {}),
+          perPage: 6,
+          page: 1,
+        });
+        const platformItems = Array.isArray(platformData?.items)
+          ? platformData.items.slice(0, 6)
+          : [];
+        if (searchRequestIdRef.current === requestId) {
+          setSearchSuggestions(platformItems.map(toCardProduct).filter(Boolean));
+        }
+      } catch {
+        // Fallback: legacy catalog cache (works even when the backend is down).
+        try {
+          const legacyResults = await searchProducts(search);
+          const canonicalBrand = canonicalBrandLabel(selectedBrand);
+          const scoped = canonicalBrand
+            ? legacyResults.filter((p) => canonicalBrandLabel(p?.brand || '') === canonicalBrand)
+            : legacyResults;
+          if (searchRequestIdRef.current === requestId) {
+            setSearchSuggestions(scoped.slice(0, 6));
+          }
+        } catch {
+          if (searchRequestIdRef.current === requestId) setSearchSuggestions([]);
+        }
+      } finally {
+        if (searchRequestIdRef.current === requestId) setSearchSuggestionsLoading(false);
+      }
+    }, 280);
+
+    return () => window.clearTimeout(timer);
+  }, [searchInput, selectedBrand]);
 
   const handleAddToCart = async (product, quantity = 1) => {
     try {
@@ -491,18 +579,20 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
         ) : (
           <>
             <div className="dtb-listing-search">
-              <SearchBar placeholder={isPartsPage ? 'Search parts by name, SKU, or brand...' : 'Search products by name, SKU, or brand...'} value={query.search || ''} onChange={(e) => {
-                const val = e.target.value;
-                // Clear active category/display-category filters when the user
-                // starts typing a search — prevents the AND-filter dead-end where
-                // e.g. display_category=pumps + search=Axle returns zero results.
-                setQuery(
-                  val
-                    ? { search: val, displayCategory: '', category: '' }
-                    : { search: '' },
-                  { replace: true },
-                );
-              }} />
+              <SearchBar
+                placeholder={isPartsPage ? 'Search parts by name, SKU, or brand...' : 'Search products by name, SKU, or brand...'}
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+                suggestions={searchSuggestions}
+                loading={searchSuggestionsLoading}
+                onSubmit={(value) => commitSearch(value, { replace: false })}
+                onClear={() => {
+                  setSearchInput('');
+                  setSearchSuggestions([]);
+                  commitSearch('');
+                }}
+                onSelectSuggestion={(product) => navigate(product?.slug ? `/products/${product.slug}` : `/product/${product?.id}`)}
+              />
             </div>
             <div className="flex flex-col lg:flex-row gap-8">
               <FilterPanel
