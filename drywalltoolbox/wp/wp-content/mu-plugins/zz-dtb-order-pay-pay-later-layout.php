@@ -2,7 +2,7 @@
 /**
  * Plugin Name: DTB Order Pay Pay Later Layout
  * Description: CSS-only WooPayments order-pay layout for express wallets, BNPL, and card methods. No DOM mutation.
- * Version: 1.5.1
+ * Version: 1.6.0
  * Author: Drywall Toolbox
  */
 
@@ -19,20 +19,17 @@ add_action(
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
 		<style id="dtb-order-pay-pay-later-layout">
-			@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
-
 			body.dtb-payment-runtime {
-				--dtb-pay-font: "Varela Round", ui-rounded, "Arial Rounded MT Bold", "Arial Rounded MT", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 				--dtb-pay-bg-left: #ffffff;
 				--dtb-pay-bg-right: #f4f6fa;
-				--dtb-pay-panel: rgba(255, 255, 255, 0.94);
+				--dtb-pay-panel: rgba(255, 255, 255, 0.95);
 				--dtb-pay-line: rgba(148, 163, 184, 0.30);
 				--dtb-pay-line-strong: rgba(100, 116, 139, 0.32);
 				--dtb-pay-text: #0f172a;
 				--dtb-pay-muted: #64748b;
 				--dtb-pay-blue: #2563eb;
 				--dtb-pay-shadow: 0 26px 76px rgba(15, 23, 42, 0.10), 0 5px 20px rgba(15, 23, 42, 0.06);
-				font-family: var(--dtb-pay-font) !important;
+				font-family: "Varela Round", ui-rounded, "Arial Rounded MT Bold", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
 				background: linear-gradient(90deg, var(--dtb-pay-bg-left) 0%, var(--dtb-pay-bg-left) 50%, var(--dtb-pay-bg-right) 50%, var(--dtb-pay-bg-right) 100%) !important;
 				color: var(--dtb-pay-text) !important;
 				-webkit-font-smoothing: antialiased !important;
@@ -43,57 +40,26 @@ add_action(
 			html body.dtb-payment-runtime *:not(svg):not(svg *),
 			html body.dtb-payment-runtime *::before,
 			html body.dtb-payment-runtime *::after {
-				font-family: var(--dtb-pay-font) !important;
+				font-family: "Varela Round", ui-rounded, "Arial Rounded MT Bold", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
 			}
 
+			body.dtb-payment-runtime .dtb-payment-runtime-title,
 			body.dtb-payment-runtime h1,
 			body.dtb-payment-runtime h2,
 			body.dtb-payment-runtime h3,
-			body.dtb-payment-runtime h4,
-			body.dtb-payment-runtime p,
-			body.dtb-payment-runtime a,
-			body.dtb-payment-runtime span,
-			body.dtb-payment-runtime small,
-			body.dtb-payment-runtime label,
-			body.dtb-payment-runtime button,
-			body.dtb-payment-runtime input,
-			body.dtb-payment-runtime select,
-			body.dtb-payment-runtime textarea,
-			body.dtb-payment-runtime table,
-			body.dtb-payment-runtime th,
-			body.dtb-payment-runtime td,
-			body.dtb-payment-runtime strong,
-			body.dtb-payment-runtime b,
-			body.dtb-payment-runtime #payment,
-			body.dtb-payment-runtime #payment *:not(svg):not(svg *),
-			body.dtb-payment-runtime .woocommerce,
-			body.dtb-payment-runtime .woocommerce *:not(svg):not(svg *),
-			body.dtb-payment-runtime .shop_table,
-			body.dtb-payment-runtime .shop_table *:not(svg):not(svg *),
-			body.dtb-payment-runtime .dtb-payment-runtime-summary,
-			body.dtb-payment-runtime .dtb-payment-runtime-summary *:not(svg):not(svg *),
-			body.dtb-payment-runtime .dtb-payment-summary,
-			body.dtb-payment-runtime .dtb-payment-summary *:not(svg):not(svg *),
+			body.dtb-payment-runtime .entry-title,
 			body.dtb-payment-runtime .order-summary,
-			body.dtb-payment-runtime .order-summary *:not(svg):not(svg *),
-			body.dtb-payment-runtime .wc_payment_method,
-			body.dtb-payment-runtime .wc_payment_method *:not(svg):not(svg *),
-			body.dtb-payment-runtime .payment_box,
-			body.dtb-payment-runtime .payment_box *:not(svg):not(svg *) {
-				font-family: var(--dtb-pay-font) !important;
-			}
-
-			body.dtb-payment-runtime #payment ul.payment_methods::before,
-			body.dtb-payment-runtime #payment ul.payment_methods::after,
-			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments::before {
-				font-family: var(--dtb-pay-font) !important;
-				font-weight: 400 !important;
+			body.dtb-payment-runtime .order-summary *,
+			body.dtb-payment-runtime .dtb-payment-runtime-summary,
+			body.dtb-payment-runtime .dtb-payment-runtime-summary *,
+			body.dtb-payment-runtime .shop_table,
+			body.dtb-payment-runtime .shop_table * {
+				font-family: "Varela Round", ui-rounded, "Arial Rounded MT Bold", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
 			}
 
 			body.dtb-payment-runtime .dtb-payment-runtime-title,
 			body.dtb-payment-runtime h1,
 			body.dtb-payment-runtime .entry-title {
-				font-family: var(--dtb-pay-font) !important;
 				font-weight: 400 !important;
 				letter-spacing: -0.048em !important;
 				line-height: 1.02 !important;
@@ -186,7 +152,11 @@ add_action(
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_affirm,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_afterpay_clearpay,
-			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_klarna {
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_klarna,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="affirm"],
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="afterpay"],
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="clearpay"],
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="klarna"] {
 				order: 11 !important;
 				grid-column: span 1 !important;
 				width: 100% !important;
@@ -211,7 +181,7 @@ add_action(
 				line-height: 1.18 !important;
 			}
 
-			body.dtb-payment-runtime #payment ul.payment_methods > li:not(.payment_method_woocommerce_payments_google_pay):not(.payment_method_woocommerce_payments_apple_pay):not(.payment_method_woocommerce_payments_paypal):not(.payment_method_ppcp-gateway):not(.payment_method_ppec_paypal):not([class*="google_pay"]):not([class*="google-pay"]):not([class*="gpay"]):not([class*="apple_pay"]):not([class*="apple-pay"]):not([class*="paypal"]):not(.payment_method_woocommerce_payments_affirm):not(.payment_method_woocommerce_payments_afterpay_clearpay):not(.payment_method_woocommerce_payments_klarna):not(.payment_method_woocommerce_payments) {
+			body.dtb-payment-runtime #payment ul.payment_methods > li:not(.payment_method_woocommerce_payments_google_pay):not(.payment_method_woocommerce_payments_apple_pay):not(.payment_method_woocommerce_payments_paypal):not(.payment_method_ppcp-gateway):not(.payment_method_ppec_paypal):not([class*="google_pay"]):not([class*="google-pay"]):not([class*="gpay"]):not([class*="apple_pay"]):not([class*="apple-pay"]):not([class*="paypal"]):not(.payment_method_woocommerce_payments_affirm):not(.payment_method_woocommerce_payments_afterpay_clearpay):not(.payment_method_woocommerce_payments_klarna):not([class*="affirm"]):not([class*="afterpay"]):not([class*="clearpay"]):not([class*="klarna"]):not(.payment_method_woocommerce_payments) {
 				order: 30 !important;
 				grid-column: 1 / -1 !important;
 				width: 100% !important;
@@ -281,7 +251,11 @@ add_action(
 			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="paypal"] > label,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_affirm > label,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_afterpay_clearpay > label,
-			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_klarna > label {
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_klarna > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="affirm"] > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="afterpay"] > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="clearpay"] > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="klarna"] > label {
 				justify-content: center !important;
 				min-height: 66px !important;
 				padding-left: 18px !important;
@@ -325,14 +299,29 @@ add_action(
 				transform-origin: center !important;
 			}
 
-			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_affirm > .payment_box,
-			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_afterpay_clearpay > .payment_box,
-			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_klarna > .payment_box {
+			/* Do not let wallet/BNPL gateway sheets open inside a one-column tile. WooPayments owns submission; order-pay stays visually stable. */
+			body.dtb-payment-runtime #payment ul.payment_methods > li:not(.payment_method_woocommerce_payments) > .payment_box,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="affirm"] > .payment_box,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="afterpay"] > .payment_box,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="clearpay"] > .payment_box,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="klarna"] > .payment_box,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="google"] > .payment_box,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="gpay"] > .payment_box,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="apple"] > .payment_box,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="paypal"] > .payment_box {
 				display: none !important;
+				visibility: hidden !important;
+				max-height: 0 !important;
+				overflow: hidden !important;
+				margin: 0 !important;
+				padding: 0 !important;
+				border: 0 !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments > .payment_box {
 				display: block !important;
+				visibility: visible !important;
+				max-height: none !important;
 				width: 100% !important;
 				max-width: none !important;
 				box-sizing: border-box !important;
@@ -355,11 +344,6 @@ add_action(
 				width: 100% !important;
 				max-width: none !important;
 				box-sizing: border-box !important;
-			}
-
-			body.dtb-payment-runtime #payment .wcpay-upe-element,
-			body.dtb-payment-runtime #payment #wcpay-payment-element {
-				min-width: 0 !important;
 			}
 
 			body.dtb-payment-runtime #payment .place-order {
@@ -398,18 +382,9 @@ add_action(
 				box-shadow: 0 22px 42px rgba(37, 99, 235, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
 			}
 
-			body.dtb-payment-runtime .dtb-payment-runtime-summary,
-			body.dtb-payment-runtime .dtb-payment-summary,
-			body.dtb-payment-runtime .order-summary,
-			body.dtb-payment-runtime .shop_table,
-			body.dtb-payment-runtime .shop_table *:not(svg):not(svg *) {
-				font-family: var(--dtb-pay-font) !important;
-			}
-
 			body.dtb-payment-runtime .dtb-payment-runtime-summary h2,
 			body.dtb-payment-runtime .order-summary h2,
 			body.dtb-payment-runtime h2 {
-				font-family: var(--dtb-pay-font) !important;
 				font-weight: 400 !important;
 				letter-spacing: -0.024em !important;
 				line-height: 1.12 !important;
@@ -420,7 +395,6 @@ add_action(
 			body.dtb-payment-runtime .order-summary small,
 			body.dtb-payment-runtime .order-summary .sku {
 				color: var(--dtb-pay-muted) !important;
-				font-family: var(--dtb-pay-font) !important;
 				font-weight: 400 !important;
 				letter-spacing: -0.004em !important;
 			}
@@ -428,19 +402,7 @@ add_action(
 			body.dtb-payment-runtime .dtb-payment-runtime-summary strong,
 			body.dtb-payment-runtime .order-summary strong,
 			body.dtb-payment-runtime .shop_table strong,
-			body.dtb-payment-runtime .shop_table .amount,
-			body.dtb-payment-runtime .product-name,
-			body.dtb-payment-runtime .product-name *,
-			body.dtb-payment-runtime .product-total,
-			body.dtb-payment-runtime .product-total *,
-			body.dtb-payment-runtime .cart_item,
-			body.dtb-payment-runtime .cart_item *:not(svg):not(svg *),
-			body.dtb-payment-runtime [class*="summary"] strong,
-			body.dtb-payment-runtime [class*="summary"] .amount,
-			body.dtb-payment-runtime [class*="summary"] [class*="title"],
-			body.dtb-payment-runtime [class*="summary"] [class*="product"],
-			body.dtb-payment-runtime [class*="order"] [class*="summary"] *:not(svg):not(svg *) {
-				font-family: var(--dtb-pay-font) !important;
+			body.dtb-payment-runtime .shop_table .amount {
 				font-weight: 400 !important;
 				letter-spacing: -0.006em !important;
 			}
@@ -461,7 +423,11 @@ add_action(
 				body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_ppec_paypal,
 				body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_affirm,
 				body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_afterpay_clearpay,
-				body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_klarna {
+				body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_klarna,
+				body.dtb-payment-runtime #payment ul.payment_methods > li[class*="affirm"],
+				body.dtb-payment-runtime #payment ul.payment_methods > li[class*="afterpay"],
+				body.dtb-payment-runtime #payment ul.payment_methods > li[class*="clearpay"],
+				body.dtb-payment-runtime #payment ul.payment_methods > li[class*="klarna"] {
 					grid-column: 1 / -1 !important;
 				}
 			}
