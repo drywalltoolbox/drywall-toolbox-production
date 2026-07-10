@@ -7,8 +7,21 @@
 
 defined( 'ABSPATH' ) || exit;
 
+function dtb_order_rewards_events_disabled(): bool {
+	return defined( 'DTB_REWARDS_ENABLED' ) && false === DTB_REWARDS_ENABLED;
+}
+
+function dtb_order_is_rewards_event( string $event_type ): bool {
+	$normalized = strtolower( str_replace( [ '_', '-' ], '.', $event_type ) );
+	return str_starts_with( $normalized, 'integration.rewards.' ) || str_starts_with( $normalized, 'rewards.' );
+}
+
 function dtb_order_append_event( int $order_id, string $event_type, array $args = [] ): int|false {
 	if ( $order_id <= 0 || '' === $event_type ) {
+		return false;
+	}
+
+	if ( dtb_order_rewards_events_disabled() && dtb_order_is_rewards_event( $event_type ) ) {
 		return false;
 	}
 
@@ -124,7 +137,7 @@ function dtb_order_get_integration_state( int $order_id ): array {
 			'last_error_at'        => null,
 			'updated_at'           => null,
 		],
-		'rewards'       => [ 'status' => 'pending', 'points_issued' => null, 'error' => null, 'updated_at' => null ],
+		'rewards'       => [ 'status' => 'disabled', 'points_issued' => null, 'error' => null, 'updated_at' => null ],
 		'notifications' => [],
 	];
 	$stored   = get_post_meta( $order_id, '_dtb_integration_state', true );
@@ -132,6 +145,10 @@ function dtb_order_get_integration_state( int $order_id ): array {
 }
 
 function dtb_order_update_integration_state( int $order_id, string $slice, array $data ): void {
+	if ( dtb_order_rewards_events_disabled() && 'rewards' === sanitize_key( $slice ) ) {
+		return;
+	}
+
 	$state = dtb_order_get_integration_state( $order_id );
 	$slice = sanitize_key( $slice );
 
