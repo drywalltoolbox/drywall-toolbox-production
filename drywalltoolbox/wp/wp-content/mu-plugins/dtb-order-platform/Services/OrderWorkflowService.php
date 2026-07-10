@@ -54,6 +54,11 @@ function dtb_order_on_refunded( int $order_id, int $refund_id ): void {
 }
 
 function dtb_order_dispatch_processing_jobs( int $order_id ): void {
+	$order = function_exists( 'wc_get_order' ) ? wc_get_order( $order_id ) : null;
+	if ( $order instanceof WC_Order && function_exists( 'dtb_checkout_handoff_is_unpaid_order' ) && dtb_checkout_handoff_is_unpaid_order( $order ) ) {
+		return;
+	}
+
 	dtb_order_append_event( $order_id, 'order.fulfillment_queued', [
 		'source'     => 'system',
 		'actor_type' => 'system',
