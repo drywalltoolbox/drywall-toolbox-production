@@ -14,11 +14,8 @@ import ProtectedRoute from './components/routing/ProtectedRoute';
 import HomepageSignupCTA from './components/cta/HomepageSignupCTA.jsx';
 import MobileInstallNudge from './components/pwa/MobileInstallNudge.jsx';
 import SmartBackButton from './components/navigation/SmartBackButton.jsx';
-import GlobalLoadingOverlay from './components/shared/GlobalLoadingOverlay.jsx';
 import { isRewardsEnabled } from './utils/featureFlags.js';
 import { initializeWebpackPublicPath } from './setWebpackPublicPath.js';
-import { GlobalLoadingProvider } from './context/GlobalLoadingContext.jsx';
-import { emitGlobalLoadingEnd, emitGlobalLoadingStart } from './utils/globalLoadingEvents.js';
 
 const HOMEPAGE_SIGNUP_CTA_SEEN_KEY = 'dtb:homepage-signup-cta-seen:v1';
 const HOMEPAGE_SIGNUP_CTA_DELAY_MS = 900;
@@ -106,14 +103,12 @@ const ReturnPolicy = lazyWithReload(() => import('./pages/ReturnPolicy'));
 const TechnicalSpecificationsPreview = lazyWithReload(() => import('./pages/TechnicalSpecificationsPreview'));
 
 function RouteChunkFallback() {
-  useEffect(() => {
-    emitGlobalLoadingStart();
-    return () => {
-      emitGlobalLoadingEnd();
-    };
-  }, []);
-
-  return null;
+  return (
+    <div className="dtb-route-chunk-fallback" role="status" aria-live="polite" aria-label="Loading page">
+      <span className="dtb-route-chunk-fallback__spinner" aria-hidden="true" />
+      <span className="sr-only">Loading page</span>
+    </div>
+  );
 }
 
 function ScrollToTop() {
@@ -302,12 +297,10 @@ function App() {
         <WooCommerceProvider>
           <CartProvider>
             <WorkflowTransitionProvider>
-              <GlobalLoadingProvider>
-                <Router basename={basename}>
-                  <ScrollToTop />
-                  <AppShell cartOpen={cartOpen} toggleCart={toggleCart} closeCart={closeCart} />
-                </Router>
-              </GlobalLoadingProvider>
+              <Router basename={basename}>
+                <ScrollToTop />
+                <AppShell cartOpen={cartOpen} toggleCart={toggleCart} closeCart={closeCart} />
+              </Router>
             </WorkflowTransitionProvider>
           </CartProvider>
         </WooCommerceProvider>
@@ -344,7 +337,6 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
       {!minimalChrome && <CartSidebar isOpen={cartOpen} onClose={closeCart} />}
       <MobileInstallNudge />
       {!user && <HomepageSignupCtaController />}
-      <GlobalLoadingOverlay />
     </>
   );
 }
