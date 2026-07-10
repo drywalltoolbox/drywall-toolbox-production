@@ -101,6 +101,7 @@
 		if ( ! endpoint ) return;
 
 		state.inFlight = true;
+		state.lastAttemptAt = Date.now();
 		region.classList.add( 'is-refreshing' );
 		setToolbarState( toolbar, 'refreshing', 'Checking for new actions, workflows, and logs…' );
 
@@ -120,10 +121,9 @@
 			const parsed = normalizePayload( await response.json() );
 			if ( ! parsed.html ) throw new Error( 'Empty live payload' );
 
-			const nextHash = parsed.meta?.html_hash || String( parsed.html.length ) + ':' + parsed.html.slice( 0, 120 );
 			const previousSignature = signatureForRegion( region );
-			if ( nextHash !== state.lastHash ) {
-				state.lastHash = nextHash;
+			if ( parsed.html !== state.lastHtml ) {
+				state.lastHtml = parsed.html;
 				region.innerHTML = parsed.html;
 				region.classList.add( 'is-updating' );
 				window.setTimeout( () => region.classList.remove( 'is-updating' ), 220 );
@@ -157,7 +157,8 @@
 			controller: null,
 			failures: 0,
 			inFlight: false,
-			lastHash: '',
+			lastAttemptAt: 0,
+			lastHtml: '',
 			paused: false,
 		};
 
@@ -178,16 +179,14 @@
 		}
 
 		region.addEventListener( 'dtb:live:navigated', () => {
-			state.lastHash = '';
+			state.lastHtml = '';
 			window.setTimeout( refresh, 120 );
 		} );
 
 		window.setTimeout( refresh, 250 );
 		window.setInterval( () => {
 			const delay = state.failures > 0 ? ERROR_BACKOFF_MS : POLL_INTERVAL_MS;
-			const last = state.lastAttemptAt || 0;
-			if ( Date.now() - last < delay ) return;
-			state.lastAttemptAt = Date.now();
+			if ( Date.now() - state.lastAttemptAt < delay ) return;
 			refresh();
 		}, 1000 );
 	}
