@@ -1,14 +1,9 @@
 import { useId, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  BookOpen,
-  Boxes,
   ChevronDown,
   ChevronRight,
-  PackageSearch,
   ShieldCheck,
-  Tags,
-  Wrench,
 } from 'lucide-react';
 import { dedupeCatalogBrandEntries } from '../../utils/catalogFacets.js';
 import '../../styles/storefront-shop-mega-menu.css';
@@ -49,14 +44,10 @@ function MegaTextLink({ to, label, badge, onNavigate }) {
   );
 }
 
-function RailLink({ to, title, subtitle, Icon, onNavigate }) {
+function RailLink({ to, title, onNavigate }) {
   return (
     <Link to={to} className="storefront-shop-mega__rail-link" onClick={onNavigate}>
-      <span className="storefront-shop-mega__rail-icon"><Icon size={18} /></span>
-      <span className="storefront-shop-mega__rail-copy">
-        <span className="storefront-shop-mega__rail-title">{title}</span>
-        <span className="storefront-shop-mega__rail-subtitle">{subtitle}</span>
-      </span>
+      <span className="storefront-shop-mega__rail-title">{title}</span>
       <ChevronRight size={16} className="storefront-shop-mega__rail-chevron" />
     </Link>
   );
@@ -126,11 +117,11 @@ export default function StorefrontShopMegaMenu({
         <div className="storefront-shop-mega__topline" />
         <div className="storefront-shop-mega__shell">
           <aside className="storefront-shop-mega__rail" aria-label="Shop shortcuts">
-            <RailLink to="/products" title="All Products" subtitle="Complete professional finishing catalog" Icon={PackageSearch} onNavigate={onNavigate} />
-            <RailLink to="/products/brands" title="Shop by Brand" subtitle="TapeTech, Columbia, LEVEL5, SurPro" Icon={Tags} onNavigate={onNavigate} />
-            <RailLink to="/parts" title="Parts Library" subtitle="Repair parts, wear items, schematics" Icon={Boxes} onNavigate={onNavigate} />
-            <RailLink to="/schematics" title="Schematics" subtitle="Model diagrams and part lookup" Icon={BookOpen} onNavigate={onNavigate} />
-            <RailLink to="/repairs" title="Repair Services" subtitle="Send tools in for service or quotes" Icon={Wrench} onNavigate={onNavigate} />
+            <RailLink to="/products" title="All Products" onNavigate={onNavigate} />
+            <RailLink to="/products/brands" title="Shop by Brand" onNavigate={onNavigate} />
+            <RailLink to="/parts" title="Parts Library" onNavigate={onNavigate} />
+            <RailLink to="/schematics" title="Schematics" onNavigate={onNavigate} />
+            <RailLink to="/repairs" title="Repair Services" onNavigate={onNavigate} />
           </aside>
 
           <div className="storefront-shop-mega__content">
