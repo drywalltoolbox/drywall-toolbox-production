@@ -62,6 +62,6 @@ function dtb_order_dispatch_processing_jobs( int $order_id ): void {
 
 	dtb_order_enqueue_job( 'dtb_order_sync_veeqo',                  $order_id );
 	dtb_order_enqueue_job( 'dtb_order_sync_quickbooks',              $order_id, [ 'action' => 'create' ] );
-	dtb_order_enqueue_job( 'dtb_order_issue_rewards',                $order_id );
+	// Rewards are intentionally disabled until the account rewards program is fully implemented and audited.
 	dtb_order_enqueue_job( 'dtb_order_refresh_tracking_projection',  $order_id );
 }
