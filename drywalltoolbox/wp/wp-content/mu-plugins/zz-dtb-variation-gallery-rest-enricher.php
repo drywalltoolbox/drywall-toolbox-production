@@ -109,7 +109,8 @@ function dtb_variation_gallery_enrich_variation( $variation ) {
 		return $variation;
 	}
 
-	$gallery = dtb_variation_gallery_find_for_sku( $sku );
+	$variation_id = (int) ( $variation['id'] ?? 0 );
+	$gallery      = dtb_variation_gallery_find_for_sku( $sku, $variation_id );
 	if ( count( $gallery ) <= 1 ) {
 		return $variation;
 	}
@@ -119,11 +120,11 @@ function dtb_variation_gallery_enrich_variation( $variation ) {
 	$media['images']          = $gallery;
 	$media['image']           = (string) ( $gallery[0]['src'] ?? $media['image'] ?? '' );
 
-	$variation['media']                   = $media;
-	$variation['images']                  = $gallery;
-	$variation['image']                   = $gallery[0] ?? ( $variation['image'] ?? null );
-	$variation['variationImages']         = $gallery;
-	$variation['variationGalleryImages']  = $gallery;
+	$variation['media']                    = $media;
+	$variation['images']                   = $gallery;
+	$variation['image']                    = $gallery[0] ?? ( $variation['image'] ?? null );
+	$variation['variationImages']          = $gallery;
+	$variation['variationGalleryImages']   = $gallery;
 	$variation['variation_gallery_images'] = $gallery;
 
 	return $variation;
@@ -132,27 +133,33 @@ function dtb_variation_gallery_enrich_variation( $variation ) {
 /**
  * Find ordered gallery images for a variation SKU.
  *
- * @param string $sku Variation SKU.
+ * @param string $sku          Variation SKU.
+ * @param int    $variation_id WooCommerce variation post ID.
  * @return array<int,array{src:string}>
  */
-function dtb_variation_gallery_find_for_sku( string $sku ): array {
+function dtb_variation_gallery_find_for_sku( string $sku, int $variation_id = 0 ): array {
 	static $cache = [];
 
 	$key = strtolower( trim( $sku ) );
 	if ( '' === $key ) {
 		return [];
 	}
-	if ( isset( $cache[ $key ] ) ) {
-		return $cache[ $key ];
+
+	$cache_key = $key . ':' . $variation_id;
+	if ( isset( $cache[ $cache_key ] ) ) {
+		return $cache[ $cache_key ];
 	}
 
 	$gallery = dtb_variation_gallery_find_from_catalog_manifest( $key );
 	if ( empty( $gallery ) ) {
 		$gallery = dtb_variation_gallery_find_from_uploads( $key );
 	}
+	if ( count( $gallery ) <= 1 && $variation_id > 0 ) {
+		$gallery = dtb_variation_gallery_find_from_woocommerce_media( $key, $variation_id, $gallery );
+	}
 
-	$cache[ $key ] = dtb_variation_gallery_unique_gallery( $gallery );
-	return $cache[ $key ];
+	$cache[ $cache_key ] = dtb_variation_gallery_unique_gallery( $gallery );
+	return $cache[ $cache_key ];
 }
 
 /**
@@ -248,6 +255,117 @@ function dtb_variation_gallery_find_from_uploads( string $sku_key ): array {
 		static fn( string $file ): array => [ 'src' => trailingslashit( $url ) . rawurlencode( $file ) ],
 		array_values( $matches )
 	);
+}
+
+/**
+ * Fallback resolver: scan the selected variation + parent WooCommerce media.
+ *
+ * This catches real production cases where all SKU-specific images are attached
+ * to the parent variable product gallery and only one thumbnail is copied onto
+ * the selected variation object.
+ *
+ * @param string                   $sku_key          Lowercase SKU.
+ * @param int                      $variation_id     WooCommerce variation post ID.
+ * @param array<int,array{src:string}> $seed_gallery Existing gallery entries.
+ * @return array<int,array{src:string}>
+ */
+function dtb_variation_gallery_find_from_woocommerce_media( string $sku_key, int $variation_id, array $seed_gallery = [] ): array {
+	if ( ! function_exists( 'wc_get_product' ) ) {
+		return $seed_gallery;
+	}
+
+	$variation = wc_get_product( $variation_id );
+	if ( ! $variation ) {
+		return $seed_gallery;
+	}
+
+	$sku_token = dtb_variation_gallery_tokenize( $sku_key );
+	if ( strlen( $sku_token ) < 3 ) {
+		return $seed_gallery;
+	}
+
+	$primary = [];
+	if ( method_exists( $variation, 'get_image_id' ) ) {
+		$primary = dtb_variation_gallery_image_entry_from_attachment_id( (int) $variation->get_image_id() );
+	}
+
+	$matches   = [];
+	$parent_id = method_exists( $variation, 'get_parent_id' ) ? (int) $variation->get_parent_id() : 0;
+	$parent    = $parent_id > 0 ? wc_get_product( $parent_id ) : null;
+	$ids       = [];
+
+	if ( $parent && method_exists( $parent, 'get_image_id' ) ) {
+		$ids[] = (int) $parent->get_image_id();
+	}
+	if ( $parent && method_exists( $parent, 'get_gallery_image_ids' ) ) {
+		$ids = array_merge( $ids, array_map( 'intval', (array) $parent->get_gallery_image_ids() ) );
+	}
+	if ( method_exists( $variation, 'get_image_id' ) ) {
+		array_unshift( $ids, (int) $variation->get_image_id() );
+	}
+
+	foreach ( array_values( array_unique( array_filter( $ids ) ) ) as $attachment_id ) {
+		$entry = dtb_variation_gallery_image_entry_from_attachment_id( $attachment_id );
+		if ( empty( $entry['src'] ) ) {
+			continue;
+		}
+
+		$haystack = dtb_variation_gallery_attachment_match_text( $attachment_id, $entry['src'] );
+		if ( str_contains( $haystack, $sku_token ) ) {
+			$matches[] = $entry;
+		}
+	}
+
+	$gallery = [];
+	if ( ! empty( $primary ) ) {
+		$gallery[] = $primary;
+	}
+	$gallery = array_merge( $gallery, $matches, $seed_gallery );
+
+	return dtb_variation_gallery_unique_gallery( $gallery );
+}
+
+/**
+ * Build an image gallery entry from a WordPress attachment ID.
+ *
+ * @param int $attachment_id Attachment ID.
+ * @return array{src:string}|array{}
+ */
+function dtb_variation_gallery_image_entry_from_attachment_id( int $attachment_id ): array {
+	if ( $attachment_id <= 0 ) {
+		return [];
+	}
+
+	$src = wp_get_attachment_image_url( $attachment_id, 'full' );
+	if ( ! $src ) {
+		return [];
+	}
+
+	$entry = [ 'src' => (string) $src ];
+	$alt   = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
+	if ( is_string( $alt ) && '' !== trim( $alt ) ) {
+		$entry['alt'] = trim( $alt );
+	}
+
+	return $entry;
+}
+
+/**
+ * Build normalized attachment match text from URL, filename, title, caption, and alt text.
+ *
+ * @param int    $attachment_id Attachment ID.
+ * @param string $src           Attachment URL.
+ * @return string
+ */
+function dtb_variation_gallery_attachment_match_text( int $attachment_id, string $src ): string {
+	$parts = [
+		basename( (string) wp_parse_url( $src, PHP_URL_PATH ) ),
+		(string) get_the_title( $attachment_id ),
+		(string) wp_get_attachment_caption( $attachment_id ),
+		(string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
+	];
+
+	return dtb_variation_gallery_tokenize( implode( ' ', array_filter( $parts ) ) );
 }
 
 /**
