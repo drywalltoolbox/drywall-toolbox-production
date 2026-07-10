@@ -1,0 +1,11 @@
+.storefront-shop-mega__rail-link {
+    grid-template-columns: 1fr 18px;
+    min-height: 48px;
+    padding: 0 14px;
+}
+
+.storefront-shop-mega__rail-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
