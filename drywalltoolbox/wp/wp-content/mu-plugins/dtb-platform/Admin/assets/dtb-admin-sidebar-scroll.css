@@ -3,7 +3,7 @@
  *
  * Global, intentionally narrow wp-admin chrome fix.
  * Makes the left admin navigation independently scrollable on desktop screens
- * without changing WooCommerce, WordPress, or DTB page content layout.
+ * while preserving WordPress hover/flyout submenu navigation.
  */
 
 @media screen and (min-width: 783px) {
@@ -25,6 +25,30 @@
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
     -webkit-overflow-scrolling: touch;
+    z-index: 9990;
+  }
+
+  /*
+   * WordPress renders inactive top-level submenus as horizontal flyouts on hover.
+   * A scrollable #adminmenuwrap normally clips those flyouts. Temporarily release
+   * clipping while a submenu is hovered/open so admins can access nested pages.
+   */
+  body.wp-admin:not(.folded) #adminmenuwrap:has(#adminmenu > li.wp-has-submenu:hover),
+  body.wp-admin:not(.folded) #adminmenuwrap:has(#adminmenu > li.opensub),
+  body.wp-admin:not(.folded) #adminmenuwrap:has(#adminmenu > li:hover > .wp-submenu) {
+    overflow: visible !important;
+  }
+
+  body.wp-admin:not(.folded) #adminmenuwrap:has(#adminmenu > li.wp-has-submenu:hover) #adminmenu,
+  body.wp-admin:not(.folded) #adminmenuwrap:has(#adminmenu > li.opensub) #adminmenu,
+  body.wp-admin:not(.folded) #adminmenuwrap:has(#adminmenu > li:hover > .wp-submenu) #adminmenu {
+    overflow: visible !important;
+  }
+
+  body.wp-admin:not(.folded) #adminmenu > li.wp-has-submenu:hover > .wp-submenu,
+  body.wp-admin:not(.folded) #adminmenu > li.opensub > .wp-submenu,
+  body.wp-admin:not(.folded) #adminmenu > li:hover > .wp-submenu {
+    z-index: 10020 !important;
   }
 
   body.wp-admin:not(.folded) #adminmenu {
@@ -51,5 +75,19 @@
 
   body.wp-admin:not(.folded) #adminmenuwrap::-webkit-scrollbar-thumb:hover {
     background: #646970;
+  }
+}
+
+@media screen and (min-width: 783px) {
+  body.wp-admin.folded #adminmenuwrap,
+  body.wp-admin.auto-fold #adminmenuwrap {
+    overflow: visible !important;
+  }
+
+  body.wp-admin.folded #adminmenu > li.wp-has-submenu:hover > .wp-submenu,
+  body.wp-admin.folded #adminmenu > li.opensub > .wp-submenu,
+  body.wp-admin.auto-fold #adminmenu > li.wp-has-submenu:hover > .wp-submenu,
+  body.wp-admin.auto-fold #adminmenu > li.opensub > .wp-submenu {
+    z-index: 10020 !important;
   }
 }
