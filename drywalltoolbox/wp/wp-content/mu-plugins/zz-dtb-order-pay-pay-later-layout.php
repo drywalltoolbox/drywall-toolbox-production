@@ -2,7 +2,7 @@
 /**
  * Plugin Name: DTB Order Pay Pay Later Layout
  * Description: CSS-only WooPayments order-pay layout for express wallets, BNPL, and card methods. No DOM mutation.
- * Version: 1.5.0
+ * Version: 1.5.1
  * Author: Drywall Toolbox
  */
 
@@ -19,7 +19,10 @@ add_action(
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
 		<style id="dtb-order-pay-pay-later-layout">
+			@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+
 			body.dtb-payment-runtime {
+				--dtb-pay-font: "Varela Round", ui-rounded, "Arial Rounded MT Bold", "Arial Rounded MT", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 				--dtb-pay-bg-left: #ffffff;
 				--dtb-pay-bg-right: #f4f6fa;
 				--dtb-pay-panel: rgba(255, 255, 255, 0.94);
@@ -29,16 +32,18 @@ add_action(
 				--dtb-pay-muted: #64748b;
 				--dtb-pay-blue: #2563eb;
 				--dtb-pay-shadow: 0 26px 76px rgba(15, 23, 42, 0.10), 0 5px 20px rgba(15, 23, 42, 0.06);
-				font-family: "Varela Round", ui-rounded, "Arial Rounded MT Bold", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+				font-family: var(--dtb-pay-font) !important;
 				background: linear-gradient(90deg, var(--dtb-pay-bg-left) 0%, var(--dtb-pay-bg-left) 50%, var(--dtb-pay-bg-right) 50%, var(--dtb-pay-bg-right) 100%) !important;
 				color: var(--dtb-pay-text) !important;
 				-webkit-font-smoothing: antialiased !important;
 				text-rendering: geometricPrecision !important;
 			}
 
-			body.dtb-payment-runtime,
-			body.dtb-payment-runtime *:not(svg):not(svg *) {
-				font-family: "Varela Round", ui-rounded, "Arial Rounded MT Bold", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+			html body.dtb-payment-runtime,
+			html body.dtb-payment-runtime *:not(svg):not(svg *),
+			html body.dtb-payment-runtime *::before,
+			html body.dtb-payment-runtime *::after {
+				font-family: var(--dtb-pay-font) !important;
 			}
 
 			body.dtb-payment-runtime h1,
@@ -60,13 +65,35 @@ add_action(
 			body.dtb-payment-runtime strong,
 			body.dtb-payment-runtime b,
 			body.dtb-payment-runtime #payment,
-			body.dtb-payment-runtime #payment *:not(svg):not(svg *) {
-				font-family: "Varela Round", ui-rounded, "Arial Rounded MT Bold", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+			body.dtb-payment-runtime #payment *:not(svg):not(svg *),
+			body.dtb-payment-runtime .woocommerce,
+			body.dtb-payment-runtime .woocommerce *:not(svg):not(svg *),
+			body.dtb-payment-runtime .shop_table,
+			body.dtb-payment-runtime .shop_table *:not(svg):not(svg *),
+			body.dtb-payment-runtime .dtb-payment-runtime-summary,
+			body.dtb-payment-runtime .dtb-payment-runtime-summary *:not(svg):not(svg *),
+			body.dtb-payment-runtime .dtb-payment-summary,
+			body.dtb-payment-runtime .dtb-payment-summary *:not(svg):not(svg *),
+			body.dtb-payment-runtime .order-summary,
+			body.dtb-payment-runtime .order-summary *:not(svg):not(svg *),
+			body.dtb-payment-runtime .wc_payment_method,
+			body.dtb-payment-runtime .wc_payment_method *:not(svg):not(svg *),
+			body.dtb-payment-runtime .payment_box,
+			body.dtb-payment-runtime .payment_box *:not(svg):not(svg *) {
+				font-family: var(--dtb-pay-font) !important;
+			}
+
+			body.dtb-payment-runtime #payment ul.payment_methods::before,
+			body.dtb-payment-runtime #payment ul.payment_methods::after,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments::before {
+				font-family: var(--dtb-pay-font) !important;
+				font-weight: 400 !important;
 			}
 
 			body.dtb-payment-runtime .dtb-payment-runtime-title,
 			body.dtb-payment-runtime h1,
 			body.dtb-payment-runtime .entry-title {
+				font-family: var(--dtb-pay-font) !important;
 				font-weight: 400 !important;
 				letter-spacing: -0.048em !important;
 				line-height: 1.02 !important;
@@ -376,12 +403,13 @@ add_action(
 			body.dtb-payment-runtime .order-summary,
 			body.dtb-payment-runtime .shop_table,
 			body.dtb-payment-runtime .shop_table *:not(svg):not(svg *) {
-				font-family: "Varela Round", ui-rounded, "Arial Rounded MT Bold", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+				font-family: var(--dtb-pay-font) !important;
 			}
 
 			body.dtb-payment-runtime .dtb-payment-runtime-summary h2,
 			body.dtb-payment-runtime .order-summary h2,
 			body.dtb-payment-runtime h2 {
+				font-family: var(--dtb-pay-font) !important;
 				font-weight: 400 !important;
 				letter-spacing: -0.024em !important;
 				line-height: 1.12 !important;
@@ -392,6 +420,7 @@ add_action(
 			body.dtb-payment-runtime .order-summary small,
 			body.dtb-payment-runtime .order-summary .sku {
 				color: var(--dtb-pay-muted) !important;
+				font-family: var(--dtb-pay-font) !important;
 				font-weight: 400 !important;
 				letter-spacing: -0.004em !important;
 			}
@@ -399,7 +428,19 @@ add_action(
 			body.dtb-payment-runtime .dtb-payment-runtime-summary strong,
 			body.dtb-payment-runtime .order-summary strong,
 			body.dtb-payment-runtime .shop_table strong,
-			body.dtb-payment-runtime .shop_table .amount {
+			body.dtb-payment-runtime .shop_table .amount,
+			body.dtb-payment-runtime .product-name,
+			body.dtb-payment-runtime .product-name *,
+			body.dtb-payment-runtime .product-total,
+			body.dtb-payment-runtime .product-total *,
+			body.dtb-payment-runtime .cart_item,
+			body.dtb-payment-runtime .cart_item *:not(svg):not(svg *),
+			body.dtb-payment-runtime [class*="summary"] strong,
+			body.dtb-payment-runtime [class*="summary"] .amount,
+			body.dtb-payment-runtime [class*="summary"] [class*="title"],
+			body.dtb-payment-runtime [class*="summary"] [class*="product"],
+			body.dtb-payment-runtime [class*="order"] [class*="summary"] *:not(svg):not(svg *) {
+				font-family: var(--dtb-pay-font) !important;
 				font-weight: 400 !important;
 				letter-spacing: -0.006em !important;
 			}
