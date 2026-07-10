@@ -107,6 +107,7 @@
 
 .product-category-card {
   --selector-card-image-bed: #f3f5f6;
+  --selector-card-image: none;
   position: relative;
   display: block;
   width: 100%;
@@ -120,7 +121,7 @@
   background: var(--selector-card-image-bed);
   text-align: left;
   animation: pcCardSlideUp 0.38s ease-out both;
-  transition: transform 0.22s ease, border-color 0.22s ease;
+  transition: transform 0.22s ease;
 }
 
 @keyframes pcCardSlideUp {
@@ -137,20 +138,39 @@
   outline-offset: 3px;
 }
 
+/*
+ * The original selector images are flattened JPG/WebP canvases, so a plain
+ * <img object-fit="contain"> exposes the file's rectangular canvas.  Mirror
+ * the same image as a blurred cover layer behind the contained preview, then
+ * softly mask the contained image's outer canvas. The tool remains fully
+ * visible; only the artificial raster rectangle is blended into the card bed.
+ */
 .product-category-card:has(.product-category-card__image)::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: -18px;
   z-index: 0;
-  background: var(--selector-card-image-bed);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(15, 23, 42, 0.08)),
+    var(--selector-card-image) center / cover no-repeat,
+    var(--selector-card-image-bed);
+  filter: blur(18px) saturate(1.04);
+  opacity: 0.82;
+  transform: scale(1.08);
   pointer-events: none;
 }
 
 .product-category-card:has(.product-category-card__image)::after {
-  display: none;
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    radial-gradient(ellipse 76% 62% at 50% 42%, rgba(243, 245, 246, 0) 0%, rgba(243, 245, 246, 0) 68%, rgba(243, 245, 246, 0.36) 86%, rgba(243, 245, 246, 0.72) 100%),
+    linear-gradient(180deg, rgba(243, 245, 246, 0.14) 0%, rgba(243, 245, 246, 0) 34%, rgba(243, 245, 246, 0) 62%, rgba(15, 23, 42, 0.06) 100%);
+  pointer-events: none;
 }
 
-/* Selector thumbnails use the same clean image-bed model as product cards: no blend mode, crop mask, or artificial shadows. */
 .product-category-card__image {
   position: absolute;
   inset: 0;
@@ -165,20 +185,27 @@
   backface-visibility: hidden;
   transform: translateZ(0);
   opacity: 1;
-  mix-blend-mode: normal;
-  filter: none;
+  filter: saturate(1.02) contrast(1.02);
   transition: none;
+  -webkit-mask-image: radial-gradient(ellipse 84% 76% at 50% 44%, #000 0%, #000 64%, rgba(0, 0, 0, 0.72) 80%, transparent 100%);
+  mask-image: radial-gradient(ellipse 84% 76% at 50% 44%, #000 0%, #000 64%, rgba(0, 0, 0, 0.72) 80%, transparent 100%);
 }
 
 .product-category-card:hover .product-category-card__image {
   transform: translateZ(0);
-  opacity: 1;
-  filter: none;
 }
 
 .product-category-card--all-products {
   background: var(--selector-card-image-bed);
   box-shadow: none;
+}
+
+.product-category-card--all-products::before {
+  inset: 0;
+  background: var(--selector-card-image-bed);
+  filter: none;
+  opacity: 1;
+  transform: none;
 }
 
 .product-category-card__image--logo {
@@ -192,9 +219,10 @@
   object-fit: contain;
   object-position: center;
   opacity: 1;
-  mix-blend-mode: normal;
   filter: none;
   transform: translate3d(-50%, -50%, 0);
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 
 .product-category-card:hover .product-category-card__image--logo {
