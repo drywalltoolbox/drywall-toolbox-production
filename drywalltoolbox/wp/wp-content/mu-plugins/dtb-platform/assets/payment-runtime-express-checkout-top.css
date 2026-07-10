@@ -1,6 +1,6 @@
 /*
  * DTB Order Pay Express Checkout Top
- * Presents wallet/express methods above the standard card payment section.
+ * Presents wallet/express and BNPL methods above the standard card payment section.
  */
 
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout {
@@ -18,6 +18,7 @@
 
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-header,
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-separator,
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-bnpl-header,
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-standard-header {
 	grid-column: 1 / -1;
 	min-width: 0;
@@ -48,34 +49,39 @@
 	min-width: 0;
 }
 
-.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-row > label {
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-row > label,
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-bnpl-row > label {
 	justify-content: center;
 	min-height: 48px;
 	border: 1px solid rgba(15, 23, 42, 0.12);
-	border-radius: 7px;
+	border-radius: 9px;
 	background: #ffffff;
 	padding: 10px 12px;
 	box-shadow: none;
 	transition: border-color 140ms ease, background 140ms ease, transform 120ms ease;
 }
 
-.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-row > label:hover {
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-row > label:hover,
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-bnpl-row > label:hover {
 	border-color: rgba(15, 23, 42, 0.22);
 	background: #fbfbfc;
 }
 
-.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-row > label:active {
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-row > label:active,
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-bnpl-row > label:active {
 	transform: translateY(1px);
 }
 
-.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-row.is-active > label {
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-row.is-active > label,
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-bnpl-row.is-active > label {
 	border-color: #2563eb;
 	background: #eff6ff;
 	box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.14);
 }
 
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-row .dtb-payment-method-radio,
-.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-row .dtb-payment-provider-text {
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-row .dtb-payment-provider-text,
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-bnpl-row .dtb-payment-provider-text {
 	display: none !important;
 }
 
@@ -102,8 +108,45 @@
 	border-color: #5a31f4;
 }
 
-.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-separator {
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-bnpl-header {
 	order: 2;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	margin: 4px 0 0;
+	text-align: left;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-bnpl-header strong,
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-standard-header strong {
+	color: #111827;
+	font-size: 16px;
+	font-weight: 900;
+	letter-spacing: -0.02em;
+	line-height: 1.15;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-bnpl-header span,
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-standard-header span {
+	color: #6b7280;
+	font-size: 12px;
+	font-weight: 550;
+	line-height: 1.35;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-bnpl-row {
+	order: 3;
+	grid-column: auto !important;
+	min-width: 0;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-bnpl-row > label {
+	justify-content: flex-start;
+	background: #ffffff;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-separator {
+	order: 4;
 	display: grid;
 	grid-template-columns: 1fr auto 1fr;
 	align-items: center;
@@ -124,7 +167,7 @@
 }
 
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-standard-header {
-	order: 3;
+	order: 5;
 	display: flex;
 	flex-direction: column;
 	gap: 3px;
@@ -133,22 +176,11 @@
 }
 
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-standard-header strong {
-	color: #111827;
 	font-size: 18px;
-	font-weight: 900;
-	letter-spacing: -0.02em;
-	line-height: 1.15;
-}
-
-.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-standard-header span {
-	color: #6b7280;
-	font-size: 12px;
-	font-weight: 550;
-	line-height: 1.35;
 }
 
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-standard-row {
-	order: 4;
+	order: 6;
 	grid-column: 1 / -1;
 	width: 100%;
 }
@@ -158,7 +190,9 @@
 	width: 100%;
 }
 
-.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-standard-row > .payment_box {
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-standard-row > .payment_box,
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-bnpl-row > .payment_box {
+	grid-column: 1 / -1;
 	width: 100% !important;
 	max-width: none !important;
 }
@@ -190,7 +224,8 @@
 		grid-template-columns: 1fr;
 	}
 
-	.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-row {
+	.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-row,
+	.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-bnpl-row {
 		grid-column: 1 / -1 !important;
 	}
 }
