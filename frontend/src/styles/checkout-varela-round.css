@@ -1,0 +1,56 @@
+@import url("https://fonts.googleapis.com/css2?family=Varela+Round&display=swap");
+
+/*
+ * frontend/src/styles/checkout-varela-round.css
+ *
+ * Final checkout font enforcement layer. Imported last so it wins over
+ * storefront, checkout, mobile, and order typography overrides.
+ */
+
+.dtb-checkout {
+  --co-font: "Varela Round", ui-rounded, "Arial Rounded MT Bold", "SF Pro Rounded", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+  --checkout-font: var(--co-font) !important;
+  --checkout-display-font: var(--co-font) !important;
+  font-family: var(--co-font) !important;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dtb-checkout,
+.dtb-checkout :where(*):not(svg):not(svg *),
+.dtb-checkout :where(*):not(svg):not(svg *)::before,
+.dtb-checkout :where(*):not(svg):not(svg *)::after {
+  font-family: var(--co-font) !important;
+}
+
+.dtb-checkout :where(input, select, textarea, button, option, optgroup),
+.dtb-checkout :where(.dtb-co-input, .dtb-co-select, .dtb-co-textarea),
+.dtb-checkout :where(.dtb-co-btn-primary, .dtb-co-back-link, .dtb-co-header__secure, .dtb-co-header__signin),
+.dtb-checkout :where(.dtb-co-section__title, .dtb-co-label, .dtb-co-complete-badge),
+.dtb-checkout :where(.dtb-co-rate-name, .dtb-co-rate-eta, .dtb-co-rate-price),
+.dtb-checkout :where(.dtb-co-order-item__name, .dtb-co-order-item__unit, .dtb-co-order-item__price),
+.dtb-checkout :where(.dtb-co-total-row, .dtb-co-total-row__label, .dtb-co-total-row__value),
+.dtb-checkout :where(.dtb-co-msummary, .dtb-co-msummary *),
+.dtb-checkout :where(.dtb-checkout-payment-logos, .dtb-checkout-payment-logos *) {
+  font-family: var(--co-font) !important;
+}
+
+.dtb-checkout h1,
+.dtb-checkout h2,
+.dtb-checkout h3,
+.dtb-checkout h4,
+.dtb-checkout .dtb-co-section__title,
+.dtb-checkout .dtb-summary-panel h2,
+.dtb-checkout .dtb-co-msummary__toggle-left {
+  font-family: var(--co-font) !important;
+  letter-spacing: -0.035em;
+}
+
+.dtb-checkout .tabular-nums,
+.dtb-checkout [class*="amount"],
+.dtb-checkout [class*="price"],
+.dtb-checkout [class*="total"] {
+  font-family: var(--co-font) !important;
+  font-variant-numeric: tabular-nums;
+}
