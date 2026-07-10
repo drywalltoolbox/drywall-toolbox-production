@@ -1,32 +1,45 @@
 /**
- * DTB System Manager — live operations console runtime.
+ * DTB System Manager — manual snapshot refresh runtime.
  *
- * Provides short-interval, resilient polling for the System Manager page without
- * changing the global admin live-region cadence used by heavier queue pages.
+ * The System Manager is an operational inspection tool. It must not continuously
+ * replace administrator-visible snapshots; refreshes are explicit, page-load
+ * driven, or tab-navigation driven only.
  */
 ( function () {
 	'use strict';
 
 	const cfg = window.dtbAdminConfig || {};
 	const DtbAdmin = window.DtbAdmin || null;
-	const POLL_INTERVAL_MS = 5000;
-	const ERROR_BACKOFF_MS = 15000;
 
 	function isSystemManagerPage() {
 		return cfg?.page?.slug === 'dtb-system-manager' || document.querySelector( '.dtb-admin[data-dtb-page="dtb-system-manager"]' );
+	}
+
+	function suppressGlobalAutoPolling() {
+		if ( ! DtbAdmin || ! DtbAdmin.registerLiveRegion || DtbAdmin._dtbSystemManagerManualRefreshPatch ) return;
+
+		const originalRegisterLiveRegion = DtbAdmin.registerLiveRegion;
+		DtbAdmin.registerLiveRegion = function ( el ) {
+			if ( el && el.getAttribute( 'data-dtb-live-module' ) === 'system-manager' ) {
+				el.setAttribute( 'data-dtb-refresh-interval', '0' );
+			}
+			return originalRegisterLiveRegion.call( DtbAdmin, el );
+		};
+		DtbAdmin._dtbSystemManagerManualRefreshPatch = true;
 	}
 
 	function endpointWithCurrentState( endpoint ) {
 		const url = new URL( endpoint, window.location.origin );
 		const params = new URLSearchParams( window.location.search );
 		params.forEach( ( value, key ) => {
+			if ( key === 'status' || key === 'paged' || key === '_dtb_live' ) return;
 			if ( value === '' ) {
 				url.searchParams.delete( key );
 			} else {
 				url.searchParams.set( key, value );
 			}
 		} );
-		url.searchParams.set( '_dtb_live', String( Date.now() ) );
+		url.searchParams.set( '_dtb_snapshot', String( Date.now() ) );
 		return url.toString();
 	}
 
@@ -50,12 +63,11 @@
 		toolbar.setAttribute( 'data-state', 'ready' );
 		toolbar.innerHTML = [
 			'<div class="dtb-system-live-toolbar__left">',
-				'<span class="dtb-system-live-toolbar__status"><span class="dtb-system-live-toolbar__dot" aria-hidden="true"></span><span data-dtb-live-label>Live stream active</span></span>',
-				'<span class="dtb-system-live-toolbar__meta" data-dtb-live-meta>Waiting for first sync…</span>',
+				'<span class="dtb-system-live-toolbar__status"><span class="dtb-system-live-toolbar__dot" aria-hidden="true"></span><span data-dtb-live-label>Manual snapshot mode</span></span>',
+				'<span class="dtb-system-live-toolbar__meta" data-dtb-live-meta>Refresh manually, reload the page, or switch tabs to update this view.</span>',
 			'</div>',
 			'<div class="dtb-system-live-toolbar__right">',
-				'<button type="button" class="dtb-system-live-toolbar__button" data-dtb-system-refresh>Refresh now</button>',
-				'<button type="button" class="dtb-system-live-toolbar__button" data-dtb-system-pause>Pause</button>',
+				'<button type="button" class="dtb-system-live-toolbar__button" data-dtb-system-refresh>Refresh snapshot</button>',
 			'</div>',
 		].join( '' );
 
@@ -69,7 +81,7 @@
 		const label = toolbar.querySelector( '[data-dtb-live-label]' );
 		const meta = toolbar.querySelector( '[data-dtb-live-meta]' );
 		if ( label ) {
-			label.textContent = state === 'error' ? 'Live stream degraded' : state === 'paused' ? 'Live stream paused' : state === 'refreshing' ? 'Syncing live data' : 'Live stream active';
+			label.textContent = state === 'error' ? 'Snapshot refresh failed' : state === 'refreshing' ? 'Refreshing snapshot' : 'Manual snapshot mode';
 		}
 		if ( meta && message ) meta.textContent = message;
 	}
@@ -96,14 +108,13 @@
 	}
 
 	async function fetchRegion( region, toolbar, state ) {
-		if ( state.inFlight || state.paused || document.hidden ) return;
+		if ( state.inFlight || document.hidden ) return;
 		const endpoint = region.getAttribute( 'data-dtb-endpoint' );
 		if ( ! endpoint ) return;
 
 		state.inFlight = true;
-		state.lastAttemptAt = Date.now();
 		region.classList.add( 'is-refreshing' );
-		setToolbarState( toolbar, 'refreshing', 'Checking for new actions, workflows, and logs…' );
+		setToolbarState( toolbar, 'refreshing', 'Loading the latest actions, workflows, and logs…' );
 
 		try {
 			if ( state.controller ) state.controller.abort();
@@ -119,27 +130,23 @@
 
 			if ( ! response.ok ) throw new Error( 'HTTP ' + response.status );
 			const parsed = normalizePayload( await response.json() );
-			if ( ! parsed.html ) throw new Error( 'Empty live payload' );
+			if ( ! parsed.html ) throw new Error( 'Empty snapshot payload' );
 
 			const previousSignature = signatureForRegion( region );
-			if ( parsed.html !== state.lastHtml ) {
-				state.lastHtml = parsed.html;
-				region.innerHTML = parsed.html;
-				region.classList.add( 'is-updating' );
-				window.setTimeout( () => region.classList.remove( 'is-updating' ), 220 );
-				markNewRows( region, previousSignature );
-				scrollLogTailToEnd( region );
-				if ( DtbAdmin?.rebind ) DtbAdmin.rebind( region );
-			}
+			state.lastHtml = parsed.html;
+			region.innerHTML = parsed.html;
+			region.classList.add( 'is-updating' );
+			window.setTimeout( () => region.classList.remove( 'is-updating' ), 220 );
+			markNewRows( region, previousSignature );
+			scrollLogTailToEnd( region );
+			if ( DtbAdmin?.rebind ) DtbAdmin.rebind( region );
 
-			state.failures = 0;
 			const nowLabel = parsed.meta?.updated_at || new Date().toLocaleTimeString();
-			setToolbarState( toolbar, 'ready', 'Last synced ' + nowLabel + ' · 5s cadence' );
+			setToolbarState( toolbar, 'ready', 'Snapshot refreshed ' + nowLabel + '. No automatic polling is running.' );
 		} catch ( error ) {
 			if ( error?.name === 'AbortError' ) return;
-			state.failures += 1;
-			setToolbarState( toolbar, 'error', 'Live sync failed. Retrying in ' + Math.round( ERROR_BACKOFF_MS / 1000 ) + 's.' );
-			window.console.warn( '[DTB System Manager] live stream refresh failed:', error );
+			setToolbarState( toolbar, 'error', 'Refresh failed. Check the PHP error log if this repeats.' );
+			window.console.warn( '[DTB System Manager] snapshot refresh failed:', error );
 		} finally {
 			state.inFlight = false;
 			region.classList.remove( 'is-refreshing' );
@@ -151,45 +158,28 @@
 		const region = document.querySelector( '[data-dtb-live-region][data-dtb-live-module="system-manager"]' );
 		if ( ! region ) return;
 
+		region.setAttribute( 'data-dtb-refresh-interval', '0' );
 		region.classList.add( 'dtb-system-live-region' );
 		const toolbar = createToolbar( region );
 		const state = {
 			controller: null,
-			failures: 0,
 			inFlight: false,
-			lastAttemptAt: 0,
-			lastHtml: '',
-			paused: false,
+			lastHtml: region.innerHTML,
 		};
 
 		const refresh = () => fetchRegion( region, toolbar, state );
-		const pauseButton = toolbar.querySelector( '[data-dtb-system-pause]' );
 		const refreshButton = toolbar.querySelector( '[data-dtb-system-refresh]' );
-
 		if ( refreshButton ) {
 			refreshButton.addEventListener( 'click', () => refresh() );
 		}
-		if ( pauseButton ) {
-			pauseButton.addEventListener( 'click', () => {
-				state.paused = ! state.paused;
-				pauseButton.textContent = state.paused ? 'Resume' : 'Pause';
-				setToolbarState( toolbar, state.paused ? 'paused' : 'ready', state.paused ? 'Polling paused by admin.' : 'Live polling resumed.' );
-				if ( ! state.paused ) refresh();
-			} );
-		}
 
 		region.addEventListener( 'dtb:live:navigated', () => {
-			state.lastHtml = '';
-			window.setTimeout( refresh, 120 );
+			state.lastHtml = region.innerHTML;
+			setToolbarState( toolbar, 'ready', 'Snapshot updated from tab navigation. No automatic polling is running.' );
 		} );
-
-		window.setTimeout( refresh, 250 );
-		window.setInterval( () => {
-			const delay = state.failures > 0 ? ERROR_BACKOFF_MS : POLL_INTERVAL_MS;
-			if ( Date.now() - state.lastAttemptAt < delay ) return;
-			refresh();
-		}, 1000 );
 	}
+
+	suppressGlobalAutoPolling();
 
 	if ( document.readyState === 'loading' ) {
 		document.addEventListener( 'DOMContentLoaded', init );
