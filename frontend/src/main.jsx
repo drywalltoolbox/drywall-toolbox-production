@@ -28,6 +28,7 @@ import './styles/product-compatible-schematics-cleanup.css'
 import './styles/order-tracking-layout-fixes.css'
 import './styles/mobile-account-order-layout-fixes.css'
 import './styles/order-checkout-font-consistency.css'
+import './styles/checkout-desktop-layout.css'
 import './styles/global-loading.css'
 import App from './App.jsx'
 import './components/catalog/products-selector-overrides.css'
@@ -79,9 +80,3 @@ createRoot(document.getElementById('root')).render(
     </HelmetProvider>
   </StrictMode>,
 )
-
-// ─── Service Worker policy ───────────────────────────────────────────────────
-// We intentionally do not register the old Vite PWA service worker here. Prior
-// deployments may still have cached /sw.js or /service-worker.js, but
-// bootstrapRuntimeAssetBase.js.unregisters those legacy workers before the app
-// renders so stale precache manifests cannot serve deleted hashed chunks.
