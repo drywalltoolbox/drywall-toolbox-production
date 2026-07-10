@@ -1,6 +1,11 @@
 import { ArrowLeft } from 'lucide-react';
 
-export default function BackButton({ onClick, label = 'Back', className = '' }) {
+export default function BackButton({
+  onClick,
+  label = 'Back',
+  className = '',
+  hideLabelOnMobile = false,
+}) {
   return (
     <button
       onClick={onClick}
@@ -9,7 +14,7 @@ export default function BackButton({ onClick, label = 'Back', className = '' }) 
       title={label}
     >
       <ArrowLeft size={20} />
-      <span>{label}</span>
+      <span className={hideLabelOnMobile ? 'hidden sm:inline' : ''}>{label}</span>
     </button>
   );
 }
