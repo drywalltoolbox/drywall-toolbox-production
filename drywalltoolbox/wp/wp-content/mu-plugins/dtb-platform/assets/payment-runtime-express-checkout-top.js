@@ -32,9 +32,33 @@
     return compactText(parts.join(' '));
   }
 
+  function looksLikeCardMethod(element, signature) {
+    if (!element) return false;
+    var input = element.querySelector('input[type="radio"]');
+    var value = compactText(input && input.value);
+    var methodClass = compactText(element.className);
+
+    return value === 'woocommerce_payments' ||
+      value === 'stripe' ||
+      value === 'card' ||
+      methodClass.indexOf('payment_method_woocommerce_payments') !== -1 ||
+      methodClass.indexOf('payment_method_stripe') !== -1 ||
+      element.classList.contains('dtb-payment-method--card-brands') ||
+      (
+        signature.indexOf('visa') !== -1 &&
+        signature.indexOf('mastercard') !== -1 &&
+        signature.indexOf('american express') !== -1
+      ) ||
+      signature.indexOf('card number') !== -1 ||
+      signature.indexOf('secure card payment') !== -1 ||
+      signature.indexOf('credit card') !== -1 ||
+      signature.indexOf('credit / debit card') !== -1;
+  }
+
   function expressKeyFor(element) {
     var signature = signatureFor(element);
 
+    if (looksLikeCardMethod(element, signature)) return '';
     if (signature.indexOf('woo pay') !== -1 || signature.indexOf('woopay') !== -1) return '';
     if (signature.indexOf('shop pay') !== -1 || signature.indexOf('shoppay') !== -1) return 'shop-pay';
     if (signature.indexOf('paypal') !== -1 || signature.indexOf('pay pal') !== -1) return 'paypal';
@@ -140,7 +164,7 @@
     var wrappers = Array.prototype.filter.call(form.querySelectorAll(selector), function (node) {
       if (!node || node.closest('#payment')) return false;
       if (node.classList.contains('dtb-wallet-disabled') || node.classList.contains('dtb-wallet-duplicate')) return false;
-      return Boolean(expressKeyFor(node) || compactText(node.textContent).length || node.querySelector('button, iframe'));
+      return Boolean(expressKeyFor(node));
     });
 
     wrappers.forEach(function (wrapper) {
