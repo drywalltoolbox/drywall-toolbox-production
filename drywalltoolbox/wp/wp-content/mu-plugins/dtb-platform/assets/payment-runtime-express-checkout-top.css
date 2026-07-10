@@ -197,6 +197,71 @@
 	max-width: none !important;
 }
 
+.dtb-payment-runtime #payment .dtb-payment-standard-row.payment_method_woocommerce_payments,
+.dtb-payment-runtime #payment .dtb-payment-standard-row.payment_method_stripe,
+.dtb-payment-runtime #payment .dtb-payment-standard-row:has(#wcpay-payment-element),
+.dtb-payment-runtime #payment .dtb-payment-standard-row:has(#wc-stripe-upe-form) {
+	display: block !important;
+	grid-column: 1 / -1 !important;
+	width: 100% !important;
+}
+
+.dtb-payment-runtime #payment .dtb-payment-standard-row.payment_method_woocommerce_payments > label,
+.dtb-payment-runtime #payment .dtb-payment-standard-row.payment_method_stripe > label,
+.dtb-payment-runtime #payment .dtb-payment-standard-row:has(#wcpay-payment-element) > label,
+.dtb-payment-runtime #payment .dtb-payment-standard-row:has(#wc-stripe-upe-form) > label {
+	display: flex !important;
+	align-items: center;
+	gap: 10px;
+	min-height: 52px;
+	width: 100%;
+	padding: 14px 16px;
+	border: 1px solid rgba(37, 99, 235, 0.35);
+	border-radius: 12px 12px 0 0;
+	background: #eff6ff;
+}
+
+.dtb-payment-runtime #payment .dtb-payment-standard-row.payment_method_woocommerce_payments > .payment_box,
+.dtb-payment-runtime #payment .dtb-payment-standard-row.payment_method_stripe > .payment_box,
+.dtb-payment-runtime #payment .dtb-payment-standard-row:has(#wcpay-payment-element) > .payment_box,
+.dtb-payment-runtime #payment .dtb-payment-standard-row:has(#wc-stripe-upe-form) > .payment_box {
+	display: block !important;
+	width: 100% !important;
+	max-width: none !important;
+	margin: 0 !important;
+	padding: 18px !important;
+	border: 1px solid rgba(37, 99, 235, 0.20) !important;
+	border-top: 0 !important;
+	border-radius: 0 0 12px 12px !important;
+	background: #ffffff !important;
+}
+
+.dtb-payment-runtime #payment #wcpay-payment-element,
+.dtb-payment-runtime #payment #wc-stripe-upe-form,
+.dtb-payment-runtime #payment .wc-stripe-upe-element,
+.dtb-payment-runtime #payment .wcpay-upe-element,
+.dtb-payment-runtime #payment .StripeElement,
+.dtb-payment-runtime #payment .__PrivateStripeElement,
+.dtb-payment-runtime #payment .wc-payment-form,
+.dtb-payment-runtime #payment .woocommerce-SavedPaymentMethods,
+.dtb-payment-runtime #payment .payment_box iframe {
+	box-sizing: border-box !important;
+	width: 100% !important;
+	max-width: none !important;
+}
+
+.dtb-payment-runtime #payment #wcpay-payment-element iframe,
+.dtb-payment-runtime #payment #wc-stripe-upe-form iframe,
+.dtb-payment-runtime #payment .payment_box iframe {
+	min-width: 100% !important;
+}
+
+.dtb-payment-runtime #payment .dtb-payment-standard-row:has(#wcpay-payment-element) .payment_box fieldset,
+.dtb-payment-runtime #payment .dtb-payment-standard-row:has(#wc-stripe-upe-form) .payment_box fieldset {
+	width: 100% !important;
+	max-width: none !important;
+}
+
 .dtb-payment-runtime .dtb-standalone-express-checkout {
 	order: 0;
 	grid-column: 1;
