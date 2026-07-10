@@ -66,12 +66,12 @@ function dtb_order_admin_ajax_operator_action(): void {
 			break;
 
 		case 'resend_confirm':
-			dtb_order_enqueue_job( 'dtb_order_send_notification', $order_id, [ 'template' => 'order-confirmation', 'force' => true ] );
+			dtb_order_enqueue_job( 'dtb_order_send_notification', $order_id, [ 'template' => 'order-confirmation' ] );
 			wp_send_json_success( [ 'message' => __( 'Order confirmation re-queued.', 'drywall-toolbox' ) ] );
 			break;
 
 		case 'resend_shipped':
-			dtb_order_enqueue_job( 'dtb_order_send_notification', $order_id, [ 'template' => 'order-shipped', 'force' => true ] );
+			dtb_order_enqueue_job( 'dtb_order_send_notification', $order_id, [ 'template' => 'order-shipped' ] );
 			wp_send_json_success( [ 'message' => __( 'Shipping email re-queued.', 'drywall-toolbox' ) ] );
 			break;
 

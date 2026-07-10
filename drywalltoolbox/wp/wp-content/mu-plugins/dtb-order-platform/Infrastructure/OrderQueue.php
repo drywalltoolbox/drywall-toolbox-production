@@ -83,31 +83,6 @@ function dtb_order_release_notification_send( int $order_id, string $template ):
 	}
 }
 
-function dtb_order_notification_wc_email_map(): array {
-	return [
-		'order-confirmation' => 'WC_Email_Customer_Processing_Order',
-		'order-shipped'      => 'WC_Email_Customer_Completed_Order',
-	];
-}
-
-function dtb_order_notification_should_use_wc_email( WC_Order $order, string $template, array $args ): bool {
-	$force = ! empty( $args['force'] );
-
-	if ( $force ) {
-		return true;
-	}
-
-	if ( 'order-confirmation' === $template ) {
-		return false;
-	}
-
-	if ( 'order-shipped' === $template && 'completed' === $order->get_status() ) {
-		return false;
-	}
-
-	return isset( dtb_order_notification_wc_email_map()[ $template ] );
-}
-
 function dtb_order_job_exception_retryable( Throwable $e ): bool {
 	if ( method_exists( $e, 'is_retryable' ) ) {
 		return (bool) $e->is_retryable();
@@ -350,17 +325,14 @@ function dtb_order_job_send_notification( int $order_id, array $args = [] ): voi
 	if ( ! $order ) {
 		return;
 	}
+	if ( ! dtb_order_claim_notification_send( $order_id, $template ) ) {
+		error_log( "[DTB Orders] Skipping duplicate notification '{$template}' for order {$order_id}." );
+		return;
+	}
 	try {
-		$sent    = false;
-		$skipped = false;
-
-		if ( dtb_order_notification_should_use_wc_email( $order, $template, $args ) ) {
-			if ( empty( $args['force'] ) && ! dtb_order_claim_notification_send( $order_id, $template ) ) {
-				error_log( "[DTB Orders] Skipping duplicate notification '{$template}' for order {$order_id}." );
-				return;
-			}
-
-			$wc_email_map = dtb_order_notification_wc_email_map();
+		$sent         = false;
+		$wc_email_map = [ 'order-confirmation' => 'WC_Email_Customer_Processing_Order', 'order-shipped' => 'WC_Email_Customer_Completed_Order', 'order-cancelled' => 'WC_Email_Customer_Note' ];
+		if ( isset( $wc_email_map[ $template ] ) ) {
 			$mailer      = WC()->mailer();
 			$email_class = $wc_email_map[ $template ];
 			foreach ( $mailer->get_emails() as $email ) {
@@ -370,12 +342,10 @@ function dtb_order_job_send_notification( int $order_id, array $args = [] ): voi
 					break;
 				}
 			}
-		} else {
-			$skipped = true;
 		}
-		$notification_type = 'notification.' . str_replace( '-', '_', $template ) . ( $skipped ? '.skipped' : '.sent' );
-		dtb_order_append_event( $order_id, $notification_type, [ 'source' => 'cron', 'actor_type' => 'system', 'visibility' => 'customer', 'payload' => [ 'template' => $template, 'sent' => $sent, 'skipped' => $skipped ] ] );
-		dtb_order_update_integration_state( $order_id, 'notifications', [ 'template' => $template, 'sent' => $sent, 'skipped' => $skipped ] );
+		$notification_type = 'notification.' . str_replace( '-', '_', $template ) . '.sent';
+		dtb_order_append_event( $order_id, $notification_type, [ 'source' => 'cron', 'actor_type' => 'system', 'visibility' => 'customer', 'payload' => [ 'template' => $template, 'sent' => $sent ] ] );
+		dtb_order_update_integration_state( $order_id, 'notifications', [ 'template' => $template, 'sent' => $sent ] );
 	} catch ( Throwable $e ) {
 		dtb_order_release_notification_send( $order_id, $template );
 		error_log( "[DTB Orders] Notification '{$template}' failed for order {$order_id}: " . $e->getMessage() );

@@ -11,84 +11,14 @@
 
 defined( 'ABSPATH' ) || exit;
 
-if ( ! function_exists( 'dtb_payment_runtime_order_pay_id' ) ) {
-	/**
-	 * Resolve the order ID from the canonical Woo endpoint or the raw request
-	 * path. The runtime template must not depend on a separately loaded MU
-	 * plugin for this essential routing context.
-	 */
-	function dtb_payment_runtime_order_pay_id(): int {
-		foreach ( [ 'dtb_wc_payment_runtime_order_pay_id', 'dtb_payment_handoff_order_pay_id' ] as $resolver ) {
-			if ( function_exists( $resolver ) ) {
-				$order_id = absint( call_user_func( $resolver ) );
-				if ( $order_id > 0 ) {
-					return $order_id;
-				}
-			}
-		}
-
-		$order_id = absint( function_exists( 'get_query_var' ) ? get_query_var( 'order-pay' ) : 0 );
-		if ( $order_id > 0 ) {
-			return $order_id;
-		}
-
-		$request_uri = isset( $_SERVER['REQUEST_URI'] )
-			? (string) wp_unslash( $_SERVER['REQUEST_URI'] )
-			: '';
-		$path = (string) wp_parse_url( $request_uri, PHP_URL_PATH );
-
-		if ( preg_match( '#/(?:wp/)?checkout/order-pay/(\d+)/?#', $path, $matches ) ) {
-			return absint( $matches[1] ?? 0 );
-		}
-
-		return 0;
-	}
-}
-
-if ( ! function_exists( 'dtb_payment_runtime_prime_order_pay_context' ) ) {
-	/** Ensure WooCommerce sees its standard order-pay endpoint query variable. */
-	function dtb_payment_runtime_prime_order_pay_context( int $order_id ): void {
-		if ( $order_id <= 0 ) {
-			return;
-		}
-
-		global $wp, $wp_query;
-
-		if ( isset( $wp ) && is_object( $wp ) ) {
-			$wp->query_vars['order-pay'] = $order_id;
-		}
-
-		if ( isset( $wp_query ) && is_object( $wp_query ) ) {
-			$wp_query->query_vars['order-pay'] = $order_id;
-		}
-
-		if ( function_exists( 'set_query_var' ) ) {
-			set_query_var( 'order-pay', $order_id );
-		}
-	}
-}
-
-if ( ! function_exists( 'dtb_payment_runtime_prepare_payable_order' ) ) {
-	/** Delegate payment-state normalization to the loaded runtime implementation. */
-	function dtb_payment_runtime_prepare_payable_order( int $order_id ): void {
-		if ( function_exists( 'dtb_wc_payment_runtime_prepare_payable_order' ) ) {
-			dtb_wc_payment_runtime_prepare_payable_order( $order_id );
-			return;
-		}
-
-		if ( function_exists( 'dtb_payment_handoff_prepare_order' ) ) {
-			dtb_payment_handoff_prepare_order( $order_id );
-		}
-	}
-}
-
 if ( ! function_exists( 'dtb_payment_runtime_render_native_checkout' ) ) {
 	function dtb_payment_runtime_render_native_checkout(): void {
-		$order_pay_id = dtb_payment_runtime_order_pay_id();
-		dtb_payment_runtime_prime_order_pay_context( $order_pay_id );
+		$order_pay_id = function_exists( 'dtb_wc_payment_runtime_order_pay_id' )
+			? dtb_wc_payment_runtime_order_pay_id()
+			: 0;
 
-		if ( $order_pay_id > 0 ) {
-			dtb_payment_runtime_prepare_payable_order( $order_pay_id );
+		if ( $order_pay_id > 0 && function_exists( 'dtb_wc_payment_runtime_prepare_payable_order' ) ) {
+			dtb_wc_payment_runtime_prepare_payable_order( $order_pay_id );
 		}
 
 		if (
@@ -100,9 +30,12 @@ if ( ! function_exists( 'dtb_payment_runtime_render_native_checkout' ) ) {
 			return;
 		}
 
-		// Never fall back to WooCommerce's full checkout here. That shortcode owns
-		// its own order creation flow and would bypass the DTB checkout finalizer.
-		echo '<main class="woocommerce"><p>Secure payment is temporarily unavailable. Please return to the checkout page and try again.</p></main>';
+		if ( shortcode_exists( 'woocommerce_checkout' ) ) {
+			echo do_shortcode( '[woocommerce_checkout]' );
+			return;
+		}
+
+		echo '<main class="woocommerce"><p>Secure payment is temporarily unavailable. Please contact support.</p></main>';
 	}
 }
 

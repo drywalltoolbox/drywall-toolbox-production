@@ -1,6 +1,3 @@
-+Exit code: 0
-Wall time: 0.7 seconds
-Output:
 <?php
 /**
  * DTB_CategoryNormalizer
@@ -397,37 +394,19 @@ final class DTB_CategoryNormalizer {
 		}
 
 		$known = self::DISPLAY_CATEGORY_RAW_FORMS[ $canonical_slug ] ?? [];
-		$forms = ! empty( $known )
-			? $known
-			: [
-				$canonical_slug,
-				str_replace( '_', ' ', $canonical_slug ),
-				ucwords( str_replace( '_', ' ', $canonical_slug ) ),
-			];
-		$expanded = [];
 
-		// Imports have historically used underscores, hyphens, spaces, and singular
-		// aliases for the same category. Query every equivalent persisted form.
-		foreach ( $forms as $form ) {
-			$form = trim( (string) $form );
-			if ( '' === $form ) {
-				continue;
-			}
-
-			$space_form = str_replace( [ '_', '-' ], ' ', $form );
-			$space_form = preg_replace( '/\s+/', ' ', $space_form ) ?? $space_form;
-			$expanded   = array_merge(
-				$expanded,
-				[
-					$form,
-					str_replace( ' ', '_', $space_form ),
-					str_replace( ' ', '-', $space_form ),
-					$space_form,
-					ucwords( $space_form ),
-				]
-			);
+		if ( ! empty( $known ) ) {
+			return $known;
 		}
 
-		return array_values( array_unique( array_filter( $expanded ) ) );
+		// Fallback: generate the 3 standard normalised forms for unknown slugs.
+		$space_form = str_replace( '_', ' ', $canonical_slug );
+		$title_form = ucwords( $space_form );
+
+		return array_values( array_unique( array_filter( [
+			$canonical_slug,
+			$space_form,
+			$title_form,
+		] ) ) );
 	}
 }
