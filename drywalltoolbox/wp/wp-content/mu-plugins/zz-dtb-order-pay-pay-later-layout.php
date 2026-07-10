@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: DTB Order Pay Pay Later Layout
- * Description: CSS-only WooPayments order-pay layout for BNPL and card methods. No DOM mutation.
- * Version: 1.2.0
+ * Description: CSS-only WooPayments order-pay layout for BNPL, wallet, and card methods. No DOM mutation.
+ * Version: 1.2.1
  * Author: Drywall Toolbox
  */
 
@@ -47,11 +47,12 @@ add_action(
 				grid-column: 1 / -1 !important;
 				display: block !important;
 				height: 1px !important;
-				margin: 2px 0 0 !important;
+				margin: 4px 0 0 !important;
 				background: rgba(148, 163, 184, 0.34) !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li {
+				position: relative !important;
 				min-width: 0 !important;
 				margin: 0 !important;
 				padding: 0 !important;
@@ -74,22 +75,33 @@ add_action(
 				width: 100% !important;
 			}
 
-			/* Other WooPayments methods remain available after the card method. */
+			/* Other WooPayments methods remain available as full-width wallet tiles after the card method. */
 			body.dtb-payment-runtime #payment ul.payment_methods > li:not(.payment_method_woocommerce_payments_affirm):not(.payment_method_woocommerce_payments_afterpay_clearpay):not(.payment_method_woocommerce_payments_klarna):not(.payment_method_woocommerce_payments) {
 				order: 30 !important;
 				grid-column: 1 / -1 !important;
 				width: 100% !important;
 			}
 
+			body.dtb-payment-runtime #payment ul.payment_methods > li > input[type="radio"] {
+				position: absolute !important;
+				left: 18px !important;
+				top: 29px !important;
+				z-index: 3 !important;
+				width: 18px !important;
+				height: 18px !important;
+				margin: -9px 0 0 !important;
+				accent-color: #2563eb !important;
+			}
+
 			body.dtb-payment-runtime #payment ul.payment_methods > li > label {
 				display: flex !important;
 				align-items: center !important;
 				justify-content: center !important;
-				gap: 10px !important;
+				gap: 12px !important;
 				min-height: 58px !important;
 				width: 100% !important;
 				box-sizing: border-box !important;
-				padding: 12px 14px !important;
+				padding: 12px 18px 12px 52px !important;
 				border: 1px solid rgba(148, 163, 184, 0.42) !important;
 				border-radius: 14px !important;
 				background: #ffffff !important;
@@ -110,29 +122,66 @@ add_action(
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li input[type="radio"]:checked + label,
-			body.dtb-payment-runtime #payment ul.payment_methods > li.wc_payment_method--selected > label {
+			body.dtb-payment-runtime #payment ul.payment_methods > li.wc_payment_method--selected > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.is-active > label {
 				border-color: #2563eb !important;
 				background: #eff6ff !important;
 				box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.14) !important;
 			}
 
+			/* Card row: keep card brands centered and the full payment form aligned to the card shell. */
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments > label {
-				justify-content: flex-start !important;
+				justify-content: center !important;
+				min-height: 62px !important;
+				padding-left: 58px !important;
+				padding-right: 22px !important;
+				border-radius: 14px 14px 0 0 !important;
 			}
 
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments > label img,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments > label svg {
+				max-width: 128px !important;
+				max-height: 30px !important;
+				object-fit: contain !important;
+			}
+
+			/* Pay Later tiles. */
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_affirm > label,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_afterpay_clearpay > label,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_klarna > label {
 				justify-content: center !important;
 				min-height: 60px !important;
+				padding-left: 46px !important;
+				padding-right: 14px !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li img,
 			body.dtb-payment-runtime #payment ul.payment_methods > li svg {
-				max-width: 104px !important;
-				max-height: 28px !important;
+				max-width: 112px !important;
+				max-height: 30px !important;
 				width: auto !important;
 				height: auto !important;
+				object-fit: contain !important;
+			}
+
+			/* Wallet rows, including Google Pay. These render as full-width methods and need larger logos. */
+			body.dtb-payment-runtime #payment ul.payment_methods > li:not(.payment_method_woocommerce_payments_affirm):not(.payment_method_woocommerce_payments_afterpay_clearpay):not(.payment_method_woocommerce_payments_klarna):not(.payment_method_woocommerce_payments) > label {
+				justify-content: center !important;
+				min-height: 64px !important;
+				padding-left: 58px !important;
+				padding-right: 22px !important;
+			}
+
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_google_pay > label img,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_google_pay > label svg,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="google"] > label img,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="google"] > label svg,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="gpay"] > label img,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="gpay"] > label svg {
+				max-width: 156px !important;
+				max-height: 38px !important;
+				transform: scale(1.16) !important;
+				transform-origin: center !important;
 			}
 
 			/* Prevent BNPL explanatory panels from expanding/collapsing the page during method switching. */
@@ -148,23 +197,28 @@ add_action(
 				max-width: none !important;
 				box-sizing: border-box !important;
 				margin: 0 !important;
-				padding: 14px !important;
+				padding: 16px !important;
 				border: 1px solid rgba(148, 163, 184, 0.28) !important;
 				border-top: 0 !important;
 				border-radius: 0 0 14px 14px !important;
 				background: #ffffff !important;
-			}
-
-			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments > label {
-				border-radius: 14px 14px 0 0 !important;
+				overflow: visible !important;
 			}
 
 			body.dtb-payment-runtime #payment .wcpay-upe-element,
 			body.dtb-payment-runtime #payment .wc-stripe-upe-element,
 			body.dtb-payment-runtime #payment #wcpay-payment-element,
+			body.dtb-payment-runtime #payment .wc-payment-form,
+			body.dtb-payment-runtime #payment .woocommerce-SavedPaymentMethods,
 			body.dtb-payment-runtime #payment iframe {
 				width: 100% !important;
 				max-width: none !important;
+				box-sizing: border-box !important;
+			}
+
+			body.dtb-payment-runtime #payment .wcpay-upe-element,
+			body.dtb-payment-runtime #payment #wcpay-payment-element {
+				min-width: 0 !important;
 			}
 
 			@media (max-width: 860px) {
