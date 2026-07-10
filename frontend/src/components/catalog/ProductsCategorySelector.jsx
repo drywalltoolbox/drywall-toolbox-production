@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { ChevronRight } from 'lucide-react';
-import BackButton from '../shared/BackButton';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
 import './products-selector.css';
 
 const ALL_PRODUCTS_CATEGORY = {
@@ -8,6 +7,32 @@ const ALL_PRODUCTS_CATEGORY = {
   slug: 'all-products',
   name: 'All Products',
   isAllProducts: true,
+};
+
+const COLUMBIA_CATEGORY_IMAGE_OVERRIDES = {
+  'automatic_tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_ptaper_01.webp',
+  'automatic-tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_ptaper_01.webp',
+  'corner_tools': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_cr_01.webp',
+  'corner-tools': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_cr_01.webp',
+  'finishing_boxes': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_10ffba_01.webp',
+  'finishing-boxes': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_10ffba_01.webp',
+  'handles': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_c1h_01.webp',
+  'handles_extensions': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_c1h_01.webp',
+  'handles-extensions': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_c1h_01.webp',
+  'nail_spotters': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_3ns_01.webp',
+  'nail-spotters': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_3ns_01.webp',
+  'parts': 'https://cdn.shopify.com/s/files/1/0277/6678/4139/products/FA268_bd097418-98a3-491a-a1ab-f39a2cae3ba0.jpg?v=1764182531',
+  'replacement_parts': 'https://cdn.shopify.com/s/files/1/0277/6678/4139/products/FA268_bd097418-98a3-491a-a1ab-f39a2cae3ba0.jpg?v=1764182531',
+  'replacement-parts': 'https://cdn.shopify.com/s/files/1/0277/6678/4139/products/FA268_bd097418-98a3-491a-a1ab-f39a2cae3ba0.jpg?v=1764182531',
+  'pumps': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_hmp_01.webp',
+  'predator_family': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_predator_family_01.webp',
+  'predator-family': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_predator_family_01.webp',
+  'semi_automatic_tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_sat_01.webp',
+  'semi-automatic-tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_sat_01.webp',
+  'semi_automatic_taper': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_sat_01.webp',
+  'semi-automatic-taper': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_sat_01.webp',
+  'toolsets': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_ts_01.webp',
+  'tool-sets-kits': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_ts_01.webp',
 };
 
 /**
@@ -32,31 +57,8 @@ const CATEGORY_IMAGE_OVERRIDES = {
     'nail_spotters': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_ns03tt_02.webp',
     'nail-spotters': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/tapetech_ns03tt_02.webp',
   },
-  'columbia-tools': {
-    'automatic_tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_ptaper_01.webp',
-    'automatic-tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_ptaper_01.webp',
-    'corner_tools': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_cr_01.webp',
-    'corner-tools': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_cr_01.webp',
-    'finishing_boxes': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_10ffba_01.webp',
-    'finishing-boxes': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_10ffba_01.webp',
-    'handles': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_c1h_01.webp',
-    'handles_extensions': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_c1h_01.webp',
-    'handles-extensions': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_c1h_01.webp',
-    'nail_spotters': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_3ns_01.webp',
-    'nail-spotters': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_3ns_01.webp',
-    'parts': 'https://cdn.shopify.com/s/files/1/0277/6678/4139/products/FA268_bd097418-98a3-491a-a1ab-f39a2cae3ba0.jpg?v=1764182531',
-    'replacement_parts': 'https://cdn.shopify.com/s/files/1/0277/6678/4139/products/FA268_bd097418-98a3-491a-a1ab-f39a2cae3ba0.jpg?v=1764182531',
-    'replacement-parts': 'https://cdn.shopify.com/s/files/1/0277/6678/4139/products/FA268_bd097418-98a3-491a-a1ab-f39a2cae3ba0.jpg?v=1764182531',
-    'pumps': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_hmp_01.webp',
-    'predator_family': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_predator_family_01.webp',
-    'predator-family': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_predator_family_01.webp',
-    'semi_automatic_tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_sat_01.webp',
-    'semi-automatic-tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_sat_01.webp',
-    'semi_automatic_taper': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_sat_01.webp',
-    'semi-automatic-taper': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_sat_01.webp',
-    'toolsets': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_ts_01.webp',
-    'tool-sets-kits': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_ts_01.webp',
-  },
+  'columbia-tools': COLUMBIA_CATEGORY_IMAGE_OVERRIDES,
+  'columbia-taping-tools': COLUMBIA_CATEGORY_IMAGE_OVERRIDES,
   'platinum-drywall-tools': {
     // Show a flat box handle — not the mini box handle — for this category card
     'handles': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/platinum_pt_bh34_01.webp',
@@ -186,12 +188,15 @@ export default function ProductsCategorySelector({
   return (
     <div className="product-selector">
       <div className="product-selector-header">
-        <BackButton
+        <button
+          type="button"
           onClick={onBack}
-          label="Brands"
-          className="dtb-product-nav-back"
-          hideLabelOnMobile
-        />
+          className="back-button dtb-product-nav-back dtb-product-nav-back--icon-only"
+          aria-label="Back to brands"
+          title="Back to brands"
+        >
+          <ArrowLeft size={20} aria-hidden="true" />
+        </button>
         <div className="product-selector-header-content">
           {brandLogo && (
             <img
