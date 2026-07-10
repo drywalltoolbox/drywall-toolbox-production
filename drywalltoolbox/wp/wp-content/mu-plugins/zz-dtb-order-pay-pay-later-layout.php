@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: DTB Order Pay Pay Later Layout
- * Description: CSS-only WooPayments order-pay layout for BNPL, wallet, and card methods. No DOM mutation.
- * Version: 1.2.1
+ * Description: CSS-only WooPayments order-pay layout for express wallets, BNPL, and card methods. No DOM mutation.
+ * Version: 1.3.0
  * Author: Drywall Toolbox
  */
 
@@ -27,9 +27,9 @@ add_action(
 				list-style: none !important;
 			}
 
+			/* Section header: wallet methods above BNPL. */
 			body.dtb-payment-runtime #payment ul.payment_methods::before {
-				content: "Pay Later\A Split your purchase with available financing options." !important;
-				white-space: pre-line !important;
+				content: "Express Checkout" !important;
 				order: 0 !important;
 				grid-column: 1 / -1 !important;
 				display: block !important;
@@ -38,17 +38,24 @@ add_action(
 				font-size: 18px !important;
 				font-weight: 760 !important;
 				letter-spacing: -0.025em !important;
-				line-height: 1.25 !important;
+				line-height: 1.2 !important;
 			}
 
+			/* Section header: BNPL methods. */
 			body.dtb-payment-runtime #payment ul.payment_methods::after {
-				content: "" !important;
-				order: 19 !important;
+				content: "Pay Later\A Split your purchase with available financing options." !important;
+				white-space: pre-line !important;
+				order: 10 !important;
 				grid-column: 1 / -1 !important;
 				display: block !important;
-				height: 1px !important;
-				margin: 4px 0 0 !important;
-				background: rgba(148, 163, 184, 0.34) !important;
+				margin: 6px 0 2px !important;
+				padding-top: 14px !important;
+				border-top: 1px solid rgba(148, 163, 184, 0.34) !important;
+				color: #0f172a !important;
+				font-size: 18px !important;
+				font-weight: 760 !important;
+				letter-spacing: -0.025em !important;
+				line-height: 1.25 !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li {
@@ -59,11 +66,28 @@ add_action(
 				list-style: none !important;
 			}
 
+			/* Express checkout wallet method IDs/classes. Keep these above Pay Later. */
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_google_pay,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_apple_pay,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_paypal,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_ppcp-gateway,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_ppec_paypal,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="google_pay"],
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="google-pay"],
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="gpay"],
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="apple_pay"],
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="apple-pay"],
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="paypal"] {
+				order: 1 !important;
+				grid-column: span 1 !important;
+				width: 100% !important;
+			}
+
 			/* WooPayments BNPL method IDs. Do not move these nodes with JavaScript. */
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_affirm,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_afterpay_clearpay,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_klarna {
-				order: 1 !important;
+				order: 11 !important;
 				grid-column: span 1 !important;
 				width: 100% !important;
 			}
@@ -73,10 +97,23 @@ add_action(
 				order: 20 !important;
 				grid-column: 1 / -1 !important;
 				width: 100% !important;
+				padding-top: 16px !important;
+				border-top: 1px solid rgba(148, 163, 184, 0.34) !important;
 			}
 
-			/* Other WooPayments methods remain available as full-width wallet tiles after the card method. */
-			body.dtb-payment-runtime #payment ul.payment_methods > li:not(.payment_method_woocommerce_payments_affirm):not(.payment_method_woocommerce_payments_afterpay_clearpay):not(.payment_method_woocommerce_payments_klarna):not(.payment_method_woocommerce_payments) {
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments::before {
+				content: "Card Payment" !important;
+				display: block !important;
+				margin: 0 0 8px !important;
+				color: #0f172a !important;
+				font-size: 18px !important;
+				font-weight: 760 !important;
+				letter-spacing: -0.025em !important;
+				line-height: 1.2 !important;
+			}
+
+			/* Other methods remain available below the card method. Cash App/Link stay out of Express unless WooPayments renders them as wallet rows above. */
+			body.dtb-payment-runtime #payment ul.payment_methods > li:not(.payment_method_woocommerce_payments_google_pay):not(.payment_method_woocommerce_payments_apple_pay):not(.payment_method_woocommerce_payments_paypal):not(.payment_method_ppcp-gateway):not(.payment_method_ppec_paypal):not([class*="google_pay"]):not([class*="google-pay"]):not([class*="gpay"]):not([class*="apple_pay"]):not([class*="apple-pay"]):not([class*="paypal"]):not(.payment_method_woocommerce_payments_affirm):not(.payment_method_woocommerce_payments_afterpay_clearpay):not(.payment_method_woocommerce_payments_klarna):not(.payment_method_woocommerce_payments) {
 				order: 30 !important;
 				grid-column: 1 / -1 !important;
 				width: 100% !important;
@@ -129,20 +166,22 @@ add_action(
 				box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.14) !important;
 			}
 
-			/* Card row: keep card brands centered and the full payment form aligned to the card shell. */
-			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments > label {
+			/* Express wallet tiles. */
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_google_pay > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_apple_pay > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_paypal > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_ppcp-gateway > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_ppec_paypal > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="google_pay"] > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="google-pay"] > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="gpay"] > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="apple_pay"] > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="apple-pay"] > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="paypal"] > label {
 				justify-content: center !important;
 				min-height: 62px !important;
-				padding-left: 58px !important;
-				padding-right: 22px !important;
-				border-radius: 14px 14px 0 0 !important;
-			}
-
-			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments > label img,
-			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments > label svg {
-				max-width: 128px !important;
-				max-height: 30px !important;
-				object-fit: contain !important;
+				padding-left: 46px !important;
+				padding-right: 14px !important;
 			}
 
 			/* Pay Later tiles. */
@@ -155,21 +194,28 @@ add_action(
 				padding-right: 14px !important;
 			}
 
+			/* Card row: keep card brands centered and the full payment form aligned to the card shell. */
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments > label {
+				justify-content: center !important;
+				min-height: 62px !important;
+				padding-left: 58px !important;
+				padding-right: 22px !important;
+				border-radius: 14px 14px 0 0 !important;
+			}
+
 			body.dtb-payment-runtime #payment ul.payment_methods > li img,
 			body.dtb-payment-runtime #payment ul.payment_methods > li svg {
-				max-width: 112px !important;
-				max-height: 30px !important;
+				max-width: 124px !important;
+				max-height: 32px !important;
 				width: auto !important;
 				height: auto !important;
 				object-fit: contain !important;
 			}
 
-			/* Wallet rows, including Google Pay. These render as full-width methods and need larger logos. */
-			body.dtb-payment-runtime #payment ul.payment_methods > li:not(.payment_method_woocommerce_payments_affirm):not(.payment_method_woocommerce_payments_afterpay_clearpay):not(.payment_method_woocommerce_payments_klarna):not(.payment_method_woocommerce_payments) > label {
-				justify-content: center !important;
-				min-height: 64px !important;
-				padding-left: 58px !important;
-				padding-right: 22px !important;
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments > label img,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments > label svg {
+				max-width: 132px !important;
+				max-height: 30px !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_google_pay > label img,
@@ -178,9 +224,9 @@ add_action(
 			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="google"] > label svg,
 			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="gpay"] > label img,
 			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="gpay"] > label svg {
-				max-width: 156px !important;
-				max-height: 38px !important;
-				transform: scale(1.16) !important;
+				max-width: 160px !important;
+				max-height: 40px !important;
+				transform: scale(1.12) !important;
 				transform-origin: center !important;
 			}
 
@@ -226,6 +272,11 @@ add_action(
 					grid-template-columns: 1fr !important;
 				}
 
+				body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_google_pay,
+				body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_apple_pay,
+				body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_paypal,
+				body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_ppcp-gateway,
+				body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_ppec_paypal,
 				body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_affirm,
 				body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_afterpay_clearpay,
 				body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_klarna {
