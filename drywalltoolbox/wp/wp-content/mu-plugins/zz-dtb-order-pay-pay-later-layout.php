@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: DTB Order Pay Pay Later Layout
- * Description: Forces BNPL payment methods above the card payment form and aligns them horizontally in the order-pay runtime.
- * Version: 1.0.0
+ * Description: Forces BNPL payment methods above the card payment form and aligns them horizontally in the order-pay runtime without DOM reflow loops.
+ * Version: 1.1.0
  * Author: Drywall Toolbox
  */
 
@@ -30,18 +30,30 @@ add_action(
 				content: none !important;
 			}
 
-			body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-bnpl-header {
+			body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-express-header {
+				order: 0 !important;
+				grid-column: 1 / -1 !important;
+			}
+
+			body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-express-row {
+				order: 1 !important;
+				grid-column: span 1 !important;
+			}
+
+			body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-bnpl-header,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.dtb-payment-bnpl-header {
 				order: 10 !important;
 				grid-column: 1 / -1 !important;
 				display: flex !important;
 				flex-direction: column !important;
 				gap: 4px !important;
-				margin: 0 0 2px !important;
+				margin: 4px 0 0 !important;
 				padding: 0 !important;
 				border: 0 !important;
 				background: transparent !important;
 				box-shadow: none !important;
 				list-style: none !important;
+				pointer-events: none !important;
 				text-align: left !important;
 			}
 
@@ -98,7 +110,9 @@ add_action(
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-bnpl-row.is-active > label,
-			body.dtb-payment-runtime #payment ul.payment_methods > li.dtb-order-pay-bnpl-row.is-active > label {
+			body.dtb-payment-runtime #payment ul.payment_methods > li.dtb-order-pay-bnpl-row.is-active > label,
+			body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-bnpl-row input[type="radio"]:checked + label,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.dtb-order-pay-bnpl-row input[type="radio"]:checked + label {
 				border-color: #2563eb !important;
 				background: #eff6ff !important;
 				box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.14) !important;
@@ -119,6 +133,47 @@ add_action(
 				height: auto !important;
 			}
 
+			/* BNPL gateways inject explanatory boxes when selected. Those boxes caused the observed bounce/reflow loop.
+			 * The selected radio state is sufficient on order-pay; gateway handoff still happens from the Pay for order button.
+			 */
+			body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-bnpl-row > .payment_box,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.dtb-order-pay-bnpl-row > .payment_box {
+				display: none !important;
+			}
+
+			body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-express-separator,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.dtb-order-pay-card-separator {
+				order: 19 !important;
+				grid-column: 1 / -1 !important;
+				display: grid !important;
+				grid-template-columns: 1fr auto 1fr !important;
+				align-items: center !important;
+				gap: 12px !important;
+				margin: 10px 0 0 !important;
+				padding: 0 !important;
+				border: 0 !important;
+				background: transparent !important;
+				box-shadow: none !important;
+				color: #94a3b8 !important;
+				font-size: 10px !important;
+				font-weight: 760 !important;
+				letter-spacing: 0.08em !important;
+				line-height: 1 !important;
+				list-style: none !important;
+				pointer-events: none !important;
+				text-align: center !important;
+				text-transform: uppercase !important;
+			}
+
+			body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-express-separator::before,
+			body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-express-separator::after,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.dtb-order-pay-card-separator::before,
+			body.dtb-payment-runtime #payment ul.payment_methods > li.dtb-order-pay-card-separator::after {
+				content: "" !important;
+				height: 1px !important;
+				background: rgba(148, 163, 184, 0.38) !important;
+			}
+
 			body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-standard-header,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.dtb-order-pay-card-header {
 				order: 20 !important;
@@ -126,12 +181,13 @@ add_action(
 				display: flex !important;
 				flex-direction: column !important;
 				gap: 4px !important;
-				margin: 10px 0 0 !important;
+				margin: 0 !important;
 				padding: 0 !important;
 				border: 0 !important;
 				background: transparent !important;
 				box-shadow: none !important;
 				list-style: none !important;
+				pointer-events: none !important;
 				text-align: left !important;
 			}
 
@@ -151,38 +207,6 @@ add_action(
 				font-weight: 500 !important;
 				letter-spacing: -0.01em !important;
 				line-height: 1.4 !important;
-			}
-
-			body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-express-separator,
-			body.dtb-payment-runtime #payment ul.payment_methods > li.dtb-order-pay-card-separator {
-				order: 19 !important;
-				grid-column: 1 / -1 !important;
-				display: grid !important;
-				grid-template-columns: 1fr auto 1fr !important;
-				align-items: center !important;
-				gap: 12px !important;
-				margin: 8px 0 0 !important;
-				padding: 0 !important;
-				border: 0 !important;
-				background: transparent !important;
-				box-shadow: none !important;
-				color: #94a3b8 !important;
-				font-size: 10px !important;
-				font-weight: 760 !important;
-				letter-spacing: 0.08em !important;
-				line-height: 1 !important;
-				list-style: none !important;
-				text-align: center !important;
-				text-transform: uppercase !important;
-			}
-
-			body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-express-separator::before,
-			body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-express-separator::after,
-			body.dtb-payment-runtime #payment ul.payment_methods > li.dtb-order-pay-card-separator::before,
-			body.dtb-payment-runtime #payment ul.payment_methods > li.dtb-order-pay-card-separator::after {
-				content: "" !important;
-				height: 1px !important;
-				background: rgba(148, 163, 184, 0.38) !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-standard-row,
@@ -205,6 +229,7 @@ add_action(
 					grid-template-columns: 1fr !important;
 				}
 
+				body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-express-row,
 				body.dtb-payment-runtime #payment ul.payment_methods > .dtb-payment-bnpl-row,
 				body.dtb-payment-runtime #payment ul.payment_methods > li.dtb-order-pay-bnpl-row {
 					grid-column: 1 / -1 !important;
@@ -214,6 +239,9 @@ add_action(
 		<script id="dtb-order-pay-pay-later-layout-js">
 			(function () {
 				'use strict';
+
+				var isApplying = false;
+				var scheduled = 0;
 
 				function textOf(node) {
 					return String(node && node.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
@@ -266,79 +294,98 @@ add_action(
 						sig.indexOf('instalment') !== -1;
 				}
 
-				function ensureRow(methods, className, html) {
-					var row = methods.querySelector(':scope > .' + className);
+				function ensureUtility(methods, className, html) {
+					var row = methods.querySelector(':scope > .' + className.split(' ')[0]);
 					if (!row) {
 						row = document.createElement('li');
 						row.className = className;
 						row.tabIndex = -1;
 						row.setAttribute('aria-hidden', 'true');
+						methods.appendChild(row);
 					}
 					if (row.innerHTML !== html) row.innerHTML = html;
 					return row;
 				}
 
 				function applyLayout() {
+					if (isApplying) return;
 					var methods = document.querySelector('body.dtb-payment-runtime #payment ul.payment_methods');
 					if (!methods) return;
 
-					var rows = Array.prototype.filter.call(methods.children, function (child) {
-						return child && child.tagName && child.tagName.toLowerCase() === 'li' && !isUtilityRow(child);
-					});
+					isApplying = true;
+					try {
+						var rows = Array.prototype.filter.call(methods.children, function (child) {
+							return child && child.tagName && child.tagName.toLowerCase() === 'li' && !isUtilityRow(child);
+						});
 
-					var bnplRows = [];
-					var cardRows = [];
-					var otherRows = [];
+						var bnplCount = 0;
+						var cardCount = 0;
 
-					rows.forEach(function (row) {
-						row.classList.remove('dtb-order-pay-bnpl-row', 'dtb-order-pay-card-row');
-						if (isBnplRow(row)) {
-							row.classList.add('dtb-payment-bnpl-row', 'dtb-order-pay-bnpl-row');
-							bnplRows.push(row);
-						} else if (isCardRow(row)) {
-							row.classList.add('dtb-payment-standard-row', 'dtb-order-pay-card-row');
-							cardRows.push(row);
-						} else {
-							otherRows.push(row);
+						rows.forEach(function (row) {
+							var nextType = isBnplRow(row) ? 'bnpl' : (isCardRow(row) ? 'card' : 'other');
+							if (row.getAttribute('data-dtb-payment-row-type') === nextType) {
+								if (nextType === 'bnpl') bnplCount += 1;
+								if (nextType === 'card') cardCount += 1;
+								return;
+							}
+
+							row.classList.remove('dtb-order-pay-bnpl-row', 'dtb-order-pay-card-row');
+							if (nextType === 'bnpl') {
+								row.classList.add('dtb-payment-bnpl-row', 'dtb-order-pay-bnpl-row');
+								bnplCount += 1;
+							} else if (nextType === 'card') {
+								row.classList.add('dtb-payment-standard-row', 'dtb-order-pay-card-row');
+								cardCount += 1;
+							}
+							row.setAttribute('data-dtb-payment-row-type', nextType);
+						});
+
+						methods.classList.toggle('dtb-has-pay-later', bnplCount > 0);
+						methods.classList.toggle('dtb-has-card-payment', cardCount > 0);
+
+						if (bnplCount > 0) {
+							ensureUtility(methods, 'dtb-payment-bnpl-header', '<strong>Pay Later</strong><span>Split your purchase with available financing options.</span>');
 						}
-					});
 
-					if (!bnplRows.length || !cardRows.length) return;
+						if (bnplCount > 0 && cardCount > 0) {
+							ensureUtility(methods, 'dtb-payment-express-separator dtb-order-pay-card-separator', '<span>OR</span>');
+						}
 
-					var existingUtilityRows = Array.prototype.slice.call(methods.querySelectorAll(':scope > .dtb-payment-bnpl-header, :scope > .dtb-payment-express-separator, :scope > .dtb-payment-standard-header, :scope > .dtb-order-pay-card-header, :scope > .dtb-order-pay-card-separator'));
-					existingUtilityRows.forEach(function (row) { row.remove(); });
-
-					var fragment = document.createDocumentFragment();
-					fragment.appendChild(ensureRow(methods, 'dtb-payment-bnpl-header', '<strong>Pay Later</strong><span>Split your purchase with available financing options.</span>'));
-					bnplRows.forEach(function (row) { fragment.appendChild(row); });
-					fragment.appendChild(ensureRow(methods, 'dtb-payment-express-separator dtb-order-pay-card-separator', '<span>OR</span>'));
-					fragment.appendChild(ensureRow(methods, 'dtb-payment-standard-header dtb-order-pay-card-header', '<strong>Card Payment</strong><span>Pay securely using a credit or debit card.</span>'));
-					cardRows.forEach(function (row) { fragment.appendChild(row); });
-					otherRows.forEach(function (row) { fragment.appendChild(row); });
-
-					methods.prepend(fragment);
+						if (cardCount > 0) {
+							ensureUtility(methods, 'dtb-payment-standard-header dtb-order-pay-card-header', '<strong>Card Payment</strong><span>Pay securely using a credit or debit card.</span>');
+						}
+					} finally {
+						isApplying = false;
+					}
 				}
 
-				function schedule() {
+				function schedule(delay) {
+					window.clearTimeout(scheduled);
+					scheduled = window.setTimeout(applyLayout, delay || 120);
+				}
+
+				function boot() {
 					applyLayout();
-					window.setTimeout(applyLayout, 200);
-					window.setTimeout(applyLayout, 700);
-					window.setTimeout(applyLayout, 1400);
-					window.setTimeout(applyLayout, 2600);
+					window.setTimeout(applyLayout, 350);
+					window.setTimeout(applyLayout, 1000);
 				}
 
 				if (document.readyState === 'loading') {
-					document.addEventListener('DOMContentLoaded', schedule);
+					document.addEventListener('DOMContentLoaded', boot, { once: true });
 				} else {
-					schedule();
+					boot();
 				}
 
 				if ('MutationObserver' in window) {
 					var root = document.querySelector('body.dtb-payment-runtime #payment');
 					if (root) {
-						var observer = new MutationObserver(function () {
-							window.clearTimeout(observer._dtbPayLaterTimer);
-							observer._dtbPayLaterTimer = window.setTimeout(applyLayout, 80);
+						var observer = new MutationObserver(function (mutations) {
+							var shouldApply = mutations.some(function (mutation) {
+								return Array.prototype.some.call(mutation.addedNodes || [], function (node) {
+									return node && node.nodeType === 1 && !node.classList.contains('dtb-payment-bnpl-header') && !node.classList.contains('dtb-payment-express-separator') && !node.classList.contains('dtb-payment-standard-header');
+								});
+							});
+							if (shouldApply) schedule(160);
 						});
 						observer.observe(root, { childList: true, subtree: true });
 					}
