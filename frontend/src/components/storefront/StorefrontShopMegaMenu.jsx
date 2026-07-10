@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { dedupeCatalogBrandEntries } from '../../utils/catalogFacets.js';
 import '../../styles/storefront-shop-mega-menu.css';
+import '../../styles/storefront-shop-mega-menu-rail-compact.css';
 
 const FALLBACK_CATEGORIES = [
   { slug: 'automatic-tapers', to: '/products?category=automatic-tapers', label: 'Automatic Tapers' },
