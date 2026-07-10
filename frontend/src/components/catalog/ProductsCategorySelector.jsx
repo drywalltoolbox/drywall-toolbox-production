@@ -10,8 +10,8 @@ const ALL_PRODUCTS_CATEGORY = {
 };
 
 const COLUMBIA_CATEGORY_IMAGE_OVERRIDES = {
-  'automatic_tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_ptaper_01.webp',
-  'automatic-tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_ptaper_01.webp',
+  'automatic_tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_taper_04-scaled.webp',
+  'automatic-tapers': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_taper_04-scaled.webp',
   'corner_tools': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_8cfb_01.webp',
   'corner-tools': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_8cfb_01.webp',
   'finishing_boxes': 'https://drywalltoolbox.com/wp-content/uploads/2026/media/columbia_tools_10ffba_01.webp',
