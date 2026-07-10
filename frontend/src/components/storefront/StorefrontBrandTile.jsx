@@ -13,7 +13,6 @@ export default function StorefrontBrandTile({ name, logo, to }) {
           />
         </span>
       ) : null}
-      <span className="storefront-brand-tile__name">{name}</span>
     </Link>
   );
 }
