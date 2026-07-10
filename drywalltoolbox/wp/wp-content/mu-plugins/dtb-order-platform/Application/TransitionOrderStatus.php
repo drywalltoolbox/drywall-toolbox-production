@@ -13,6 +13,20 @@ defined( 'ABSPATH' ) || exit;
 add_action( 'woocommerce_order_status_changed', 'dtb_order_on_status_changed', 10, 4 );
 
 function dtb_order_on_status_changed( int $order_id, string $from_status, string $to_status, $order ): void {
+	if ( ! $order instanceof WC_Order && function_exists( 'wc_get_order' ) ) {
+		$order = wc_get_order( $order_id );
+	}
+
+	if ( $order instanceof WC_Order && function_exists( 'dtb_checkout_handoff_is_unpaid_order' ) && dtb_checkout_handoff_is_unpaid_order( $order ) ) {
+		// Native order-pay redirects can transiently promote unpaid handoff orders to
+		// processing before the gateway has produced a transaction/date-paid state.
+		// Never emit payment-confirmed events or fulfillment/accounting jobs for that
+		// transient state.
+		if ( in_array( $to_status, [ 'processing', 'completed' ], true ) ) {
+			return;
+		}
+	}
+
 	$actor_id   = get_current_user_id();
 	$actor_type = $actor_id ? 'admin' : 'system';
 	$source     = is_admin() ? 'wp_admin' : 'system';
