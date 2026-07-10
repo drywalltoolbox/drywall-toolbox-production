@@ -106,6 +106,7 @@
 }
 
 .product-category-card {
+  --selector-card-image-bed: #f3f5f6;
   position: relative;
   display: block;
   width: 100%;
@@ -113,26 +114,22 @@
   overflow: hidden;
   isolation: isolate;
   cursor: pointer;
-  aspect-ratio: 3/2;
+  aspect-ratio: 3 / 2;
   border: 0;
   padding: 0;
-  /* Match the neutral studio background baked into selector preview images. */
-  background: #edf1f4;
+  background: var(--selector-card-image-bed);
   text-align: left;
-  animation: pcCardSlideUp 0.5s ease-out both;
-  transition:
-    transform 0.35s cubic-bezier(0.23, 1, 0.32, 1),
-    box-shadow 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+  animation: pcCardSlideUp 0.38s ease-out both;
+  transition: transform 0.22s ease, border-color 0.22s ease;
 }
 
 @keyframes pcCardSlideUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 .product-category-card:hover {
-  transform: translateY(-5px) scale(1.015);
-  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.18);
+  transform: translateY(-2px);
 }
 
 .product-category-card:focus-visible {
@@ -145,23 +142,15 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: #edf1f4;
+  background: var(--selector-card-image-bed);
   pointer-events: none;
 }
 
 .product-category-card:has(.product-category-card__image)::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  background:
-    radial-gradient(ellipse 72% 58% at 50% 40%, rgba(237, 241, 244, 0) 0%, rgba(237, 241, 244, 0) 68%, rgba(237, 241, 244, 0.38) 84%, rgba(237, 241, 244, 0.72) 100%),
-    linear-gradient(90deg, rgba(237, 241, 244, 0.58) 0%, rgba(237, 241, 244, 0.16) 15%, rgba(237, 241, 244, 0) 30%, rgba(237, 241, 244, 0) 70%, rgba(237, 241, 244, 0.16) 85%, rgba(237, 241, 244, 0.58) 100%),
-    linear-gradient(180deg, rgba(237, 241, 244, 0.54) 0%, rgba(237, 241, 244, 0) 22%, rgba(237, 241, 244, 0) 64%, rgba(15, 23, 42, 0.08) 100%);
-  pointer-events: none;
+  display: none;
 }
 
-/* Selector thumbnails must represent the full tool/category while visually blending with the card bed. */
+/* Selector thumbnails use the same clean image-bed model as product cards: no blend mode, crop mask, or artificial shadows. */
 .product-category-card__image {
   position: absolute;
   inset: 0;
@@ -175,23 +164,20 @@
   image-rendering: auto;
   backface-visibility: hidden;
   transform: translateZ(0);
-  opacity: 0.98;
-  mix-blend-mode: multiply;
-  filter: saturate(1.02) contrast(1.03) drop-shadow(0 14px 22px rgba(15, 23, 42, 0.12));
-  transition:
-    transform 0.5s cubic-bezier(0.23, 1, 0.32, 1),
-    opacity 0.35s ease,
-    filter 0.35s ease;
+  opacity: 1;
+  mix-blend-mode: normal;
+  filter: none;
+  transition: none;
 }
 
 .product-category-card:hover .product-category-card__image {
-  transform: translateZ(0) scale(1.018);
+  transform: translateZ(0);
   opacity: 1;
-  filter: saturate(1.04) contrast(1.04) drop-shadow(0 16px 24px rgba(15, 23, 42, 0.15));
+  filter: none;
 }
 
 .product-category-card--all-products {
-  background: #edf1f4;
+  background: var(--selector-card-image-bed);
   box-shadow: none;
 }
 
@@ -205,14 +191,14 @@
   padding: 0;
   object-fit: contain;
   object-position: center;
-  opacity: 0.96;
-  mix-blend-mode: multiply;
-  filter: drop-shadow(0 12px 26px rgba(15, 23, 42, 0.18)) saturate(1.03) contrast(1.04);
+  opacity: 1;
+  mix-blend-mode: normal;
+  filter: none;
   transform: translate3d(-50%, -50%, 0);
 }
 
 .product-category-card:hover .product-category-card__image--logo {
-  transform: translate3d(-50%, -50%, 0) scale(1.025);
+  transform: translate3d(-50%, -50%, 0);
 }
 
 .product-category-card__scrim {
@@ -220,7 +206,7 @@
   inset: 0;
   z-index: 3;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.74) 0%, rgba(0, 0, 0, 0.26) 42%, rgba(0, 0, 0, 0.02) 100%);
-  transition: background 0.3s ease;
+  transition: background 0.2s ease;
 }
 
 .product-category-card:hover .product-category-card__scrim,
@@ -279,7 +265,7 @@
   font-weight: 500;
   margin: 0;
   letter-spacing: 0.01em;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .product-category-card:hover .product-category-card__count {
@@ -291,11 +277,11 @@
   flex-shrink: 0;
   align-self: center;
   margin-bottom: 1px;
-  transition: transform 0.3s ease, color 0.3s ease;
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .product-category-card:hover .product-category-card__chevron {
-  transform: translateX(4px);
+  transform: translateX(3px);
   color: #ffffff;
 }
 
