@@ -19,7 +19,7 @@ defined( 'ABSPATH' ) || exit;
 
 final class DTB_CatalogFacetService {
 
-	const CACHE_KEY = 'dtb_catalog_facets_v2';
+	const CACHE_KEY = 'dtb_catalog_facets_v3';
 	const CACHE_TTL = 600; // 10 minutes
 
 	/**
@@ -127,7 +127,7 @@ final class DTB_CatalogFacetService {
 					continue;
 				}
 
-				$brand   = $dto['brand'];
+				$brand   = self::canonical_brand_identity( $dto['brand'] ?? [] );
 				$cat     = $dto['category'];
 				$dis_cat = self::customer_display_category( $dto );
 
@@ -202,6 +202,36 @@ final class DTB_CatalogFacetService {
 		];
 	}
 
+	/**
+	 * Collapse legacy brand keys onto the canonical brand identity used by routes.
+	 * Known brands must never be split into separate facet buckets merely because
+	 * an older import stored a non-canonical _dtb_brand_key value.
+	 *
+	 * @param  array<string,mixed> $brand
+	 * @return array{ key: string, label: string, slug: string }
+	 */
+	private static function canonical_brand_identity( array $brand ): array {
+		$source = trim( (string) ( $brand['label'] ?? '' ) );
+		if ( '' === $source ) {
+			$source = trim( (string) ( $brand['key'] ?? $brand['slug'] ?? '' ) );
+		}
+
+		$normalized = DTB_BrandNormalizer::normalize( $source );
+		if ( '' === $normalized['key'] ) {
+			return $normalized;
+		}
+
+		if ( ! DTB_BrandNormalizer::is_known_slug( $normalized['slug'] ) ) {
+			$legacy_key = sanitize_title( (string) ( $brand['key'] ?? $brand['slug'] ?? '' ) );
+			if ( '' !== $legacy_key ) {
+				$normalized['key']  = $legacy_key;
+				$normalized['slug'] = $legacy_key;
+			}
+		}
+
+		return $normalized;
+	}
+
 	/** Return the customer-facing display bucket for a normalized product. */
 	private static function customer_display_category( array $dto ): array {
 		if ( ! empty( $dto['isParts'] ) ) {
@@ -242,7 +272,7 @@ final class DTB_CatalogFacetService {
 
 		if ( isset( $scope['brand'] ) && '' !== $scope['brand'] ) {
 			$needle = sanitize_title( $scope['brand'] );
-			$brand  = $dto['brand'] ?? [];
+			$brand  = self::canonical_brand_identity( $dto['brand'] ?? [] );
 			$values = array_filter([
 				sanitize_title( (string) ( $brand['key'] ?? '' ) ),
 				sanitize_title( (string) ( $brand['slug'] ?? '' ) ),
