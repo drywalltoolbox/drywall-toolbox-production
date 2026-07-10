@@ -1,8 +1,8 @@
 /*
  * DTB Order Pay Summary Polish
  * Scoped visual overrides for the native WooCommerce order-pay flow.
- * Mirrors a modern split checkout: payment controls on the left, compact order
- * summary on the right. Shipping/address collection intentionally remains absent
+ * Layout mirrors a modern split checkout: express/payment controls on the left,
+ * compact order summary on the right. Shipping/address fields remain absent
  * because the React checkout intake already owns those fields.
  */
 
@@ -10,8 +10,19 @@ body.dtb-payment-runtime {
 	background: #f6f7f9;
 }
 
+.dtb-payment-runtime .dtb-payment-header {
+	background: #071126;
+	box-shadow: none;
+}
+
+.dtb-payment-runtime .dtb-payment-header-inner {
+	width: min(1120px, calc(100% - 48px));
+	min-height: 76px;
+}
+
 .dtb-payment-runtime .dtb-payment-shell {
-	padding: 34px 24px 72px;
+	min-height: calc(100vh - 76px);
+	padding: 30px 24px 72px;
 }
 
 .dtb-payment-runtime .dtb-payment-card {
@@ -24,13 +35,19 @@ body.dtb-payment-runtime {
 }
 
 .dtb-payment-runtime .dtb-payment-title {
+	margin: 0;
+	color: #071126;
 	font-size: clamp(30px, 3vw, 42px);
+	font-weight: 950;
 	letter-spacing: -0.045em;
+	line-height: 1.02;
 }
 
 .dtb-payment-runtime .dtb-payment-subtitle {
+	margin-top: 8px;
 	color: #526173;
 	font-size: 14px;
+	line-height: 1.45;
 }
 
 .dtb-payment-runtime form#order_review {
@@ -38,12 +55,119 @@ body.dtb-payment-runtime {
 	gap: 24px;
 }
 
+.dtb-payment-runtime #payment,
+.dtb-payment-runtime .woocommerce-checkout-payment {
+	position: relative;
+	width: 100%;
+	min-width: 0;
+	border: 1px solid #d9e1ea;
+	border-radius: 20px;
+	background: #ffffff;
+	padding: 26px;
+	box-shadow: 0 18px 50px rgba(15, 23, 42, 0.06);
+}
+
+.dtb-payment-runtime #payment::before {
+	display: none;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods {
+	display: flex !important;
+	flex-direction: column;
+	gap: 12px;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent !important;
+	list-style: none;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods::before {
+	content: "Payment";
+	display: block;
+	margin: 0;
+	color: #111827;
+	font-size: 18px;
+	font-weight: 900;
+	letter-spacing: -0.02em;
+	line-height: 1.15;
+	order: 0;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods::after {
+	content: "All transactions are secure and encrypted.";
+	display: block;
+	margin: -6px 0 2px;
+	color: #6b7280;
+	font-size: 12px;
+	font-weight: 550;
+	line-height: 1.4;
+	order: 1;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods > li {
+	width: 100%;
+	min-width: 0;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods > li > label {
+	width: 100%;
+	min-height: 48px;
+	border: 1px solid #d9e1ea;
+	border-radius: 12px;
+	background: #fff;
+	padding: 12px 14px;
+	box-shadow: none;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods > li.is-active > label {
+	border-color: #2563eb;
+	background: #eff6ff;
+	box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.12);
+}
+
+.dtb-payment-runtime #payment ul.payment_methods > li.is-active {
+	width: 100%;
+}
+
+.dtb-payment-runtime #payment .payment_box,
+.dtb-payment-runtime #payment ul.payment_methods > li.is-active > .payment_box:not(.dtb-payment-box-empty) {
+	display: block !important;
+	width: 100% !important;
+	max-width: none !important;
+	min-width: 0 !important;
+	margin: 0 !important;
+	border: 1px solid #d9e1ea;
+	border-radius: 14px;
+	background: #f8fafc !important;
+	padding: 16px !important;
+	box-shadow: none !important;
+}
+
+.dtb-payment-runtime #payment .wc-payment-form,
+.dtb-payment-runtime #payment .wcpay-upe-form,
+.dtb-payment-runtime #payment .wcpay-upe-element,
+.dtb-payment-runtime #payment .StripeElement,
+.dtb-payment-runtime #payment iframe {
+	width: 100% !important;
+	max-width: 100% !important;
+	min-width: 0 !important;
+	box-sizing: border-box;
+}
+
+.dtb-payment-runtime .form-row,
+.dtb-payment-runtime #payment .form-row {
+	width: 100%;
+	max-width: none;
+}
+
 .dtb-order-summary-card {
 	position: relative;
 	min-width: 0;
 	overflow: hidden;
-	border: 1px solid rgba(15, 23, 42, 0.08);
-	border-radius: 22px;
+	border: 1px solid rgba(15, 23, 42, 0.10);
+	border-radius: 20px;
 	background: #f3f4f6;
 	box-shadow: none;
 }
@@ -53,18 +177,22 @@ body.dtb-payment-runtime {
 }
 
 .dtb-payment-runtime table.shop_table {
-	background: transparent;
+	width: 100%;
+	margin: 0;
+	border: 0;
 	border-collapse: separate;
 	border-spacing: 0;
+	background: transparent;
+	box-shadow: none;
 }
 
 .dtb-payment-runtime table.shop_table caption {
 	position: relative;
 	padding: 24px 24px 10px;
 	background: transparent;
-	color: #1f2937;
+	color: #111827;
 	font-size: 14px;
-	font-weight: 850;
+	font-weight: 900;
 	letter-spacing: 0.12em;
 	line-height: 1.2;
 	text-align: center;
@@ -109,36 +237,56 @@ body.dtb-payment-runtime {
 }
 
 .dtb-order-product {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
 	min-width: 0;
 }
 
 .dtb-order-product-media {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 52px;
+	height: 52px;
+	flex: 0 0 52px;
+	overflow: hidden;
 	border: 1px solid rgba(15, 23, 42, 0.08);
+	border-radius: 10px;
 	background: #ffffff;
 	box-shadow: none;
 }
 
 .dtb-order-product-image {
-	padding: 6px;
+	display: block;
+	width: 100% !important;
+	height: 100% !important;
+	margin: 0 !important;
+	padding: 5px;
+	object-fit: contain;
 }
 
 .dtb-order-product-copy {
+	display: flex;
+	flex-direction: column;
 	gap: 4px;
+	min-width: 0;
 }
 
 .dtb-order-product-name,
 .dtb-order-product-name a {
 	color: #111827;
 	font-size: 13px;
-	font-weight: 800;
+	font-weight: 850;
 	letter-spacing: -0.015em;
-	line-height: 1.28;
+	line-height: 1.25;
+	text-decoration: none;
 }
 
 .dtb-order-product-sku {
 	width: fit-content;
 	border-radius: 999px;
-	background: rgba(255, 255, 255, 0.72);
+	background: rgba(255, 255, 255, 0.76);
 	padding: 2px 7px;
 	color: #6b7280;
 	font-size: 10px;
@@ -146,17 +294,29 @@ body.dtb-payment-runtime {
 }
 
 .dtb-order-qty-row {
-	border-color: rgba(15, 23, 42, 0.08);
+	display: inline-flex;
+	align-items: center;
+	gap: 0;
+	overflow: hidden;
+	border: 1px solid rgba(15, 23, 42, 0.08);
 	border-radius: 999px;
-	background: rgba(255, 255, 255, 0.78);
+	background: rgba(255, 255, 255, 0.82);
 	box-shadow: none;
 }
 
 .dtb-order-qty-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	width: 28px;
 	height: 28px;
-	flex-basis: 28px;
+	flex: 0 0 28px;
+	border: 0;
+	background: transparent;
 	color: #64748b;
+	padding: 0;
+	cursor: pointer;
+	touch-action: manipulation;
 }
 
 .dtb-order-qty-btn:hover:not(:disabled) {
@@ -170,6 +330,7 @@ body.dtb-payment-runtime {
 	font-size: 12.5px;
 	font-weight: 850;
 	line-height: 28px;
+	text-align: center;
 }
 
 .dtb-payment-runtime table.shop_table .amount {
@@ -182,40 +343,18 @@ body.dtb-payment-runtime {
 	display: none !important;
 }
 
-.dtb-payment-runtime #payment,
-.dtb-payment-runtime .woocommerce-checkout-payment {
-	border: 1px solid rgba(15, 23, 42, 0.10);
-	border-radius: 18px;
-	background: #ffffff;
-	box-shadow: none;
-}
-
-.dtb-payment-runtime #payment::before {
-	display: none;
-}
-
-.dtb-payment-runtime #payment ul.payment_methods::before {
-	content: "Payment";
-	font-size: 18px;
-	font-weight: 900;
-	letter-spacing: -0.02em;
-}
-
-.dtb-payment-runtime #payment ul.payment_methods::after {
-	content: "All transactions are secure and encrypted.";
-	margin-bottom: 14px;
-	color: #6b7280;
-	font-size: 12px;
-}
-
 @media (min-width: 861px) {
 	body.dtb-payment-runtime {
 		background: linear-gradient(90deg, #ffffff 0%, #ffffff 50%, #f4f5f7 50%, #f4f5f7 100%);
 	}
 
+	.dtb-payment-runtime .dtb-payment-card {
+		width: min(1120px, calc(100vw - 64px));
+	}
+
 	.dtb-payment-runtime form#order_review {
 		display: grid;
-		grid-template-columns: minmax(0, 620px) minmax(360px, 430px);
+		grid-template-columns: minmax(0, 620px) minmax(340px, 420px);
 		align-items: start;
 		column-gap: 56px;
 	}
@@ -224,7 +363,7 @@ body.dtb-payment-runtime {
 	.dtb-payment-runtime .woocommerce-checkout-payment {
 		order: 1;
 		grid-column: 1;
-		padding: 24px;
+		padding: 26px;
 	}
 
 	.dtb-order-summary-card {
@@ -238,11 +377,7 @@ body.dtb-payment-runtime {
 		box-shadow: none;
 	}
 
-	.dtb-payment-runtime table.shop_table {
-		display: block;
-		width: 100%;
-	}
-
+	.dtb-payment-runtime table.shop_table,
 	.dtb-payment-runtime table.shop_table caption,
 	.dtb-payment-runtime table.shop_table tbody,
 	.dtb-payment-runtime table.shop_table tfoot {
@@ -301,32 +436,6 @@ body.dtb-payment-runtime {
 		white-space: nowrap;
 	}
 
-	.dtb-order-product {
-		align-items: flex-start;
-		gap: 12px;
-	}
-
-	.dtb-order-product-media {
-		width: 48px;
-		height: 48px;
-		flex: 0 0 48px;
-		border-radius: 8px;
-	}
-
-	.dtb-order-product-image {
-		padding: 4px;
-	}
-
-	.dtb-order-product-name,
-	.dtb-order-product-name a {
-		font-size: 12.5px;
-		line-height: 1.25;
-	}
-
-	.dtb-order-product-sku {
-		font-size: 9.5px;
-	}
-
 	.dtb-payment-runtime table.shop_table tfoot {
 		display: flex;
 		flex-direction: column;
@@ -348,10 +457,10 @@ body.dtb-payment-runtime {
 		box-shadow: none;
 	}
 
-	.dtb-payment-runtime table.shop_table tfoot tr:first-child th,
-	.dtb-payment-runtime table.shop_table tfoot tr:first-child td,
 	.dtb-payment-runtime table.shop_table tfoot th,
 	.dtb-payment-runtime table.shop_table tfoot td,
+	.dtb-payment-runtime table.shop_table tfoot tr:first-child th,
+	.dtb-payment-runtime table.shop_table tfoot tr:first-child td,
 	.dtb-payment-runtime table.shop_table tfoot tr:last-child th,
 	.dtb-payment-runtime table.shop_table tfoot tr:last-child td {
 		display: block;
@@ -401,6 +510,16 @@ body.dtb-payment-runtime {
 }
 
 @media (max-width: 860px) {
+	.dtb-payment-runtime .dtb-payment-shell {
+		padding: 20px 14px 0;
+	}
+
+	.dtb-payment-runtime #payment,
+	.dtb-payment-runtime .woocommerce-checkout-payment {
+		border-radius: 22px 22px 0 0;
+		padding: 26px 18px calc(18px + env(safe-area-inset-bottom));
+	}
+
 	.dtb-payment-runtime table.shop_table caption {
 		padding: 22px 18px 15px;
 		font-size: 15px;
