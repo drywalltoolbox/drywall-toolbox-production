@@ -69,10 +69,23 @@
     return '';
   }
 
+  function bnplKeyFor(element) {
+    var signature = signatureFor(element);
+    if (looksLikeCardMethod(element, signature)) return '';
+
+    if (signature.indexOf('afterpay') !== -1 || signature.indexOf('cash app afterpay') !== -1 || signature.indexOf('clearpay') !== -1) return 'afterpay';
+    if (signature.indexOf('affirm') !== -1) return 'affirm';
+    if (signature.indexOf('klarna') !== -1) return 'klarna';
+    if (signature.indexOf('pay later') !== -1 || signature.indexOf('pay in 4') !== -1 || signature.indexOf('installment') !== -1 || signature.indexOf('instalment') !== -1) return 'pay-later';
+
+    return '';
+  }
+
   function isUtilityRow(row) {
     return row && row.classList && (
       row.classList.contains('dtb-payment-express-header') ||
       row.classList.contains('dtb-payment-express-separator') ||
+      row.classList.contains('dtb-payment-bnpl-header') ||
       row.classList.contains('dtb-payment-standard-header')
     );
   }
@@ -100,8 +113,10 @@
     });
 
     var expressRows = [];
+    var bnplRows = [];
     rows.forEach(function (row) {
-      var key = expressKeyFor(row);
+      var expressKey = expressKeyFor(row);
+      var bnplKey = bnplKeyFor(row);
       row.classList.remove(
         'dtb-payment-express-row',
         'dtb-payment-express-row--shop-pay',
@@ -109,32 +124,48 @@
         'dtb-payment-express-row--apple-pay',
         'dtb-payment-express-row--google-pay',
         'dtb-payment-express-row--link',
+        'dtb-payment-bnpl-row',
+        'dtb-payment-bnpl-row--afterpay',
+        'dtb-payment-bnpl-row--affirm',
+        'dtb-payment-bnpl-row--klarna',
+        'dtb-payment-bnpl-row--pay-later',
         'dtb-payment-standard-row'
       );
 
-      if (key && !row.classList.contains('dtb-wallet-disabled') && !row.classList.contains('dtb-wallet-duplicate') && !row.classList.contains('dtb-payment-method-duplicate')) {
-        row.classList.add('dtb-payment-express-row', 'dtb-payment-express-row--' + key);
+      if (expressKey && !row.classList.contains('dtb-wallet-disabled') && !row.classList.contains('dtb-wallet-duplicate') && !row.classList.contains('dtb-payment-method-duplicate')) {
+        row.classList.add('dtb-payment-express-row', 'dtb-payment-express-row--' + expressKey);
         expressRows.push(row);
+      } else if (bnplKey && !row.classList.contains('dtb-wallet-disabled') && !row.classList.contains('dtb-wallet-duplicate') && !row.classList.contains('dtb-payment-method-duplicate')) {
+        row.classList.add('dtb-payment-bnpl-row', 'dtb-payment-bnpl-row--' + bnplKey);
+        bnplRows.push(row);
       } else {
         row.classList.add('dtb-payment-standard-row');
       }
     });
 
-    methods.classList.toggle('dtb-express-layout', expressRows.length > 0);
+    var hasAlternativeRows = expressRows.length > 0 || bnplRows.length > 0;
+    methods.classList.toggle('dtb-express-layout', hasAlternativeRows);
 
-    Array.prototype.forEach.call(methods.querySelectorAll(':scope > .dtb-payment-express-header, :scope > .dtb-payment-express-separator, :scope > .dtb-payment-standard-header'), function (row) {
+    Array.prototype.forEach.call(methods.querySelectorAll(':scope > .dtb-payment-express-header, :scope > .dtb-payment-express-separator, :scope > .dtb-payment-bnpl-header, :scope > .dtb-payment-standard-header'), function (row) {
       row.remove();
     });
 
-    if (expressRows.length === 0) return;
+    if (!hasAlternativeRows) return;
 
-    var expressHeader = ensureUtilityRow(methods, 'dtb-payment-express-header', '<span>Express checkout</span>');
-    var separator = ensureUtilityRow(methods, 'dtb-payment-express-separator', '<span>OR</span>');
-    var standardHeader = ensureUtilityRow(methods, 'dtb-payment-standard-header', '<strong>Payment</strong><span>All transactions are secure and encrypted.</span>');
+    if (expressRows.length > 0) {
+      var expressHeader = ensureUtilityRow(methods, 'dtb-payment-express-header', '<span>Express checkout</span>');
+      methods.insertBefore(expressHeader, methods.firstChild);
+    }
 
-    methods.insertBefore(expressHeader, methods.firstChild);
+    var firstBnpl = methods.querySelector(':scope > .dtb-payment-bnpl-row');
+    if (firstBnpl) {
+      var bnplHeader = ensureUtilityRow(methods, 'dtb-payment-bnpl-header', '<strong>Buy now, pay later</strong><span>Available methods from your WooCommerce payment configuration.</span>');
+      methods.insertBefore(bnplHeader, firstBnpl);
+    }
 
     var firstStandard = methods.querySelector(':scope > .dtb-payment-standard-row');
+    var separator = ensureUtilityRow(methods, 'dtb-payment-express-separator', '<span>OR</span>');
+    var standardHeader = ensureUtilityRow(methods, 'dtb-payment-standard-header', '<strong>Payment</strong><span>All transactions are secure and encrypted.</span>');
     if (firstStandard) {
       methods.insertBefore(separator, firstStandard);
       methods.insertBefore(standardHeader, firstStandard);
