@@ -315,6 +315,7 @@ export async function syncAndPlace(
 
   const session = await createCheckoutSession( {
     gateway,
+    idempotency_key: finalIdempotencyKey,
     payment_method: paymentMethod,
     line_items,
   } );

@@ -112,32 +112,6 @@ export function WooCommerceProvider({ children }) {
     }
   }, [isEnabled]);
 
-  const createOrder = useCallback(async (cartItems, customerInfo, paymentMethod = 'cod') => {
-    if (!isEnabled) {
-      return null;
-    }
-
-    try {
-      return await wooCommerceService.syncCartToOrder(cartItems, customerInfo, paymentMethod);
-    } catch (error) {
-      console.error('Order creation failed:', error);
-      throw error;
-    }
-  }, [isEnabled]);
-
-  const markOrderPaid = useCallback(async (orderId, transactionId) => {
-    if (!isEnabled) {
-      return null;
-    }
-
-    try {
-      return await wooCommerceService.markOrderPaid(orderId, transactionId);
-    } catch (error) {
-      console.error('Failed to mark order as paid:', error);
-      throw error;
-    }
-  }, [isEnabled]);
-
   const getOrder = useCallback(async (orderId) => {
     if (!isEnabled) {
       return null;
@@ -161,11 +135,9 @@ export function WooCommerceProvider({ children }) {
     disconnect,
     syncProducts,
     checkInventory,
-    createOrder,
-    markOrderPaid,
     getOrder
   }), [isEnabled, config, syncStatus, paymentGateways, updateConfig, testConnection,
-       disconnect, syncProducts, checkInventory, createOrder, markOrderPaid, getOrder]);
+       disconnect, syncProducts, checkInventory, getOrder]);
 
   return <WooCommerceContext.Provider value={value}>{children}</WooCommerceContext.Provider>;
 }

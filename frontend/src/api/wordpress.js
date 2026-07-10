@@ -132,20 +132,3 @@ export async function getProduct(id) {
   const url = `${WP_BASE_URL}/wp-json/wc/v3/products/${id}`;
   return apiFetch(url, { headers: { Authorization: wcAuthHeader() } });
 }
-
-/**
- * Create a new order.
- * POST {WP_BASE_URL}/wp-json/wc/v3/orders
- * https://woocommerce.github.io/woocommerce-rest-api-docs/#create-an-order
- *
- * @param {Object} payload  WooCommerce order object
- * @returns {Promise<Object>}
- */
-export async function createOrder(payload) {
-  const url = `${WP_BASE_URL}/wp-json/wc/v3/orders`;
-  return apiFetch(url, {
-    method:  'POST',
-    headers: { Authorization: wcAuthHeader() },
-    body:    JSON.stringify(payload),
-  });
-}

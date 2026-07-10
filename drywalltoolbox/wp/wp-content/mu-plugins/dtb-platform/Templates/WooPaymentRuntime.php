@@ -30,12 +30,9 @@ if ( ! function_exists( 'dtb_payment_runtime_render_native_checkout' ) ) {
 			return;
 		}
 
-		if ( shortcode_exists( 'woocommerce_checkout' ) ) {
-			echo do_shortcode( '[woocommerce_checkout]' );
-			return;
-		}
-
-		echo '<main class="woocommerce"><p>Secure payment is temporarily unavailable. Please contact support.</p></main>';
+		// Never fall back to WooCommerce's full checkout here. That shortcode owns
+		// its own order creation flow and would bypass the DTB checkout finalizer.
+		echo '<main class="woocommerce"><p>Secure payment is temporarily unavailable. Please return to the checkout page and try again.</p></main>';
 	}
 }
 

@@ -171,33 +171,6 @@ class WooCommerceService {
   }
 
   /**
-   * Create order in WooCommerce
-   */
-  async createOrder(orderData) {
-    return this.apiRequest('/orders', {
-      method: 'POST',
-      body: JSON.stringify(orderData)
-    });
-  }
-
-  /**
-   * Update order
-   */
-  async updateOrder(orderId, orderData) {
-    return this.apiRequest(`/orders/${orderId}`, {
-      method: 'PUT',
-      body: JSON.stringify(orderData)
-    });
-  }
-
-  /**
-   * Update order status
-   */
-  async updateOrderStatus(orderId, status) {
-    return this.updateOrder(orderId, { status });
-  }
-
-  /**
    * Get payment gateways
    */
   async getPaymentGateways() {
@@ -267,101 +240,6 @@ class WooCommerceService {
       method: 'POST',
       body: JSON.stringify(customerData)
     });
-  }
-
-  /**
-   * Sync cart to WooCommerce order
-   */
-  async syncCartToOrder(cartItems, customerInfo, paymentMethod = 'cod') {
-    if (!this.isEnabled()) {
-      console.log('WooCommerce integration not enabled, skipping order sync');
-      return null;
-    }
-
-    try {
-      // Calculate shipping
-      const shipping = await this.calculateShipping({
-        line_items: cartItems.map(item => ({
-          price: item.price,
-          quantity: item.quantity
-        }))
-      });
-
-      // Build order data
-      const orderData = {
-        payment_method: paymentMethod,
-        payment_method_title: this.getPaymentMethodTitle(paymentMethod),
-        set_paid: false, // Will be set to true after payment confirmation
-        billing: {
-          first_name: customerInfo.firstName,
-          last_name: customerInfo.lastName,
-          address_1: customerInfo.address,
-          city: customerInfo.city,
-          state: customerInfo.state,
-          postcode: customerInfo.zip,
-          country: customerInfo.country || 'US',
-          email: customerInfo.email,
-          phone: customerInfo.phone
-        },
-        shipping: {
-          first_name: customerInfo.firstName,
-          last_name: customerInfo.lastName,
-          address_1: customerInfo.address,
-          city: customerInfo.city,
-          state: customerInfo.state,
-          postcode: customerInfo.zip,
-          country: customerInfo.country || 'US'
-        },
-        line_items: cartItems.map(item => ({
-          product_id: item.id,
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price
-        })),
-        shipping_lines: [
-          {
-            method_id: shipping.method.toLowerCase().replace(/\s+/g, '_'),
-            method_title: shipping.method,
-            total: shipping.total.toString()
-          }
-        ]
-      };
-
-      const order = await this.createOrder(orderData);
-      console.log('Order synced to WooCommerce:', order);
-      return order;
-    } catch (error) {
-      console.error('Failed to sync order to WooCommerce:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get payment method title
-   */
-  getPaymentMethodTitle(method) {
-    const methods = {
-      paypal: 'PayPal',
-      cod: 'Cash on Delivery',
-      bacs: 'Direct Bank Transfer'
-    };
-    return methods[method] || method;
-  }
-
-  /**
-   * Mark order as paid
-   */
-  async markOrderPaid(orderId, transactionId = null) {
-    const updateData = {
-      set_paid: true,
-      status: 'processing'
-    };
-
-    if (transactionId) {
-      updateData.transaction_id = transactionId;
-    }
-
-    return this.updateOrder(orderId, updateData);
   }
 
   /**

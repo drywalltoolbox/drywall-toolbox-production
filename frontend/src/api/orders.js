@@ -108,23 +108,6 @@ export async function getOrdersHealth() {
   return apiClient( '/wp-json/dtb/v1/orders/health' );
 }
 
-// ─── Legacy proxy compat ──────────────────────────────────────────────────────
-
-/**
- * @deprecated Use getOrder() which now calls the dtb/v1 endpoint.
- * Kept for backward-compat with existing order confirmation code.
- *
- * @param {number|string} id
- * @returns {Promise<Object>}
- */
-export async function createOrder( payload ) {
-  // Create via WooCommerce REST API proxy (existing flow via drywall/v1).
-  return apiClient( '/wp-json/drywall/v1/orders', {
-    method: 'POST',
-    body: JSON.stringify( payload ),
-  } );
-}
-
 /**
  * @deprecated Use getOrders() which calls the dtb/v1 endpoint.
  *

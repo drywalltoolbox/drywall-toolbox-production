@@ -14,6 +14,7 @@ require_once __DIR__ . '/Cart/ToolsetCartItemData.php';
 require_once __DIR__ . '/Orders/ToolsetOrderLineMeta.php';
 require_once __DIR__ . '/Services/OrderTypeService.php';
 require_once __DIR__ . '/Services/OrderAdminQueryService.php';
+require_once __DIR__ . '/Email/WooCommerceEmailGuards.php';
 require_once __DIR__ . '/Email/WooCommerceBrandedEmails.php';
 require_once __DIR__ . '/Email/WooCommerceAdminBrandedEmails.php';
 
