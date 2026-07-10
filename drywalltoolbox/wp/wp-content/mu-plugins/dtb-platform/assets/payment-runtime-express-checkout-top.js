@@ -16,14 +16,19 @@
       element.getAttribute('name'),
       element.getAttribute('data-testid'),
       element.getAttribute('data-payment-method'),
+      element.getAttribute('data-payment-method-type'),
       element.textContent
     ];
 
-    Array.prototype.forEach.call(element.querySelectorAll('img, svg, iframe'), function (node) {
+    Array.prototype.forEach.call(element.querySelectorAll('input, button, img, svg, iframe'), function (node) {
       parts.push(node.getAttribute('alt'));
       parts.push(node.getAttribute('aria-label'));
       parts.push(node.getAttribute('title'));
       parts.push(node.getAttribute('src'));
+      parts.push(node.getAttribute('name'));
+      parts.push(node.getAttribute('value'));
+      parts.push(node.getAttribute('data-testid'));
+      parts.push(node.getAttribute('data-payment-method'));
       parts.push(node.className);
       parts.push(node.id);
       parts.push(node.textContent);
@@ -32,13 +37,41 @@
     return compactText(parts.join(' '));
   }
 
+  function containsCardForm(element) {
+    if (!element) return false;
+
+    return Boolean(
+      element.querySelector(
+        [
+          '.payment_box',
+          '.payment_method_woocommerce_payments',
+          '.payment_method_stripe',
+          '#wcpay-payment-element',
+          '#wc-stripe-upe-form',
+          '.wc-stripe-upe-element',
+          '.wc-payment-form',
+          '.woocommerce-SavedPaymentMethods',
+          'input[name="payment_method"][value="woocommerce_payments"]',
+          'input[name="payment_method"][value="stripe"]',
+          'input[name="wc-woocommerce_payments-new-payment-method"]',
+          'input[name="wc-stripe-new-payment-method"]',
+          'iframe[title*="Card"]',
+          'iframe[title*="card"]',
+          'iframe[name*="card"]',
+          'iframe[src*="elements-inner-payment"]'
+        ].join(',')
+      )
+    );
+  }
+
   function looksLikeCardMethod(element, signature) {
     if (!element) return false;
     var input = element.querySelector('input[type="radio"]');
     var value = compactText(input && input.value);
     var methodClass = compactText(element.className);
 
-    return value === 'woocommerce_payments' ||
+    return containsCardForm(element) ||
+      value === 'woocommerce_payments' ||
       value === 'stripe' ||
       value === 'card' ||
       methodClass.indexOf('payment_method_woocommerce_payments') !== -1 ||
@@ -114,6 +147,8 @@
 
     var expressRows = [];
     var bnplRows = [];
+    var standardRows = [];
+
     rows.forEach(function (row) {
       var expressKey = expressKeyFor(row);
       var bnplKey = bnplKeyFor(row);
@@ -140,6 +175,7 @@
         bnplRows.push(row);
       } else {
         row.classList.add('dtb-payment-standard-row');
+        standardRows.push(row);
       }
     });
 
@@ -195,6 +231,8 @@
     var wrappers = Array.prototype.filter.call(form.querySelectorAll(selector), function (node) {
       if (!node || node.closest('#payment')) return false;
       if (node.classList.contains('dtb-wallet-disabled') || node.classList.contains('dtb-wallet-duplicate')) return false;
+      if (containsCardForm(node) || looksLikeCardMethod(node, signatureFor(node))) return false;
+      if (!node.querySelector('button, iframe, [role="button"]')) return false;
       return Boolean(expressKeyFor(node));
     });
 
@@ -205,6 +243,14 @@
         title.className = 'dtb-standalone-express-checkout__title';
         title.textContent = 'Express checkout';
         wrapper.insertBefore(title, wrapper.firstChild);
+      }
+    });
+
+    Array.prototype.forEach.call(form.querySelectorAll('.dtb-standalone-express-checkout'), function (wrapper) {
+      if (wrappers.indexOf(wrapper) === -1) {
+        wrapper.classList.remove('dtb-standalone-express-checkout');
+        var title = wrapper.querySelector(':scope > .dtb-standalone-express-checkout__title');
+        if (title) title.remove();
       }
     });
   }
