@@ -76,8 +76,7 @@ function dtb_order_admin_ajax_operator_action(): void {
 			break;
 
 		case 'recalc_rewards':
-			dtb_order_enqueue_job( 'dtb_order_issue_rewards', $order_id );
-			wp_send_json_success( [ 'message' => __( 'Rewards recalculation queued.', 'drywall-toolbox' ) ] );
+			wp_send_json_error( [ 'message' => __( 'Rewards workflows are disabled for the current launch.', 'drywall-toolbox' ) ], 409 );
 			break;
 
 		default:
