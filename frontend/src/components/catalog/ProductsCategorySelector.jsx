@@ -97,6 +97,11 @@ function withUrlParam(src, key, value) {
   }
 }
 
+function toCssUrl(src = '') {
+  if (!src) return undefined;
+  return `url("${String(src).replace(/"/g, '%22')}")`;
+}
+
 function resolvePreviewImageMeta(src = '') {
   const normalizedSrc = normalizePreviewImageUrl(src);
   if (!normalizedSrc || normalizedSrc.endsWith('.svg')) {
@@ -129,12 +134,16 @@ function ProductCategoryCard({ brand, category, index, onSelectCategory }) {
   const isAllProducts = Boolean(category?.isAllProducts);
   const cardClassName = `product-category-card${cardImage ? '' : ' product-category-card--no-image'}${isAllProducts ? ' product-category-card--all-products' : ''}`;
   const imageClassName = `product-category-card__image${isAllProducts ? ' product-category-card__image--logo' : ''}`;
+  const cardStyle = {
+    animationDelay: `${(index + 1) * 0.07}s`,
+    ...(cardImage ? { '--selector-card-image': toCssUrl(cardImage) } : {}),
+  };
 
   return (
     <button
       type="button"
       className={cardClassName}
-      style={{ animationDelay: `${(index + 1) * 0.07}s` }}
+      style={cardStyle}
       onClick={() => onSelectCategory(category)}
     >
       {cardImage && (
