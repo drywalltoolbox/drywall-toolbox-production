@@ -18,6 +18,9 @@ function dtb_order_enqueue_job( string $job_type, int $order_id, array $args = [
 	if ( '' === $job_type || $order_id <= 0 ) {
 		return false;
 	}
+	if ( 'dtb_order_issue_rewards' === $job_type ) {
+		return false;
+	}
 	if ( 'dtb_order_send_notification' === $job_type && empty( $args['template'] ) ) {
 		return false;
 	}
@@ -40,6 +43,10 @@ function dtb_order_enqueue_job( string $job_type, int $order_id, array $args = [
 }
 
 function dtb_order_retry_job( string $job_type, int $order_id, array $args = [] ): bool {
+	if ( 'dtb_order_issue_rewards' === $job_type ) {
+		return false;
+	}
+
 	$attempt = isset( $args['attempt'] ) ? (int) $args['attempt'] : 1;
 	if ( $attempt >= DTB_ORDER_JOB_MAX_RETRIES ) {
 		error_log( sprintf( '[DTB Orders] Max retries reached for %s on order %d.', $job_type, $order_id ) );
@@ -289,30 +296,8 @@ function dtb_order_job_sync_quickbooks( int $order_id, array $args = [] ): void 
 
 add_action( 'dtb_order_issue_rewards', 'dtb_order_job_issue_rewards', 10, 2 );
 function dtb_order_job_issue_rewards( int $order_id, array $args = [] ): void {
-	dtb_order_append_event( $order_id, 'integration.rewards.queued', [ 'source' => 'cron', 'actor_type' => 'system', 'visibility' => 'operator' ] );
-	$order = wc_get_order( $order_id );
-	if ( ! $order ) {
-		return;
-	}
-	$status = $order->get_status();
-	if ( in_array( $status, [ 'cancelled', 'refunded', 'failed' ], true ) ) {
-		dtb_order_append_event( $order_id, 'integration.rewards.failed', [ 'source' => 'cron', 'actor_type' => 'system', 'visibility' => 'operator', 'payload' => [ 'reason' => "ineligible_status:{$status}" ] ] );
-		return;
-	}
-	$state = dtb_order_get_integration_state( $order_id );
-	if ( isset( $state['rewards']['status'] ) && 'issued' === $state['rewards']['status'] ) {
-		return;
-	}
-	try {
-		$points_issued = function_exists( 'dtb_rewards_issue_for_order' ) ? (int) dtb_rewards_issue_for_order( $order_id, $order ) : 0;
-		dtb_order_update_integration_state( $order_id, 'rewards', [ 'status' => 'issued', 'points_issued' => $points_issued ] );
-		dtb_order_append_event( $order_id, 'integration.rewards.issued', [ 'source' => 'cron', 'actor_type' => 'system', 'visibility' => 'operator', 'payload' => [ 'points_issued' => $points_issued ] ] );
-	} catch ( Throwable $e ) {
-		dtb_order_update_integration_state( $order_id, 'rewards', [ 'status' => 'failed', 'error' => $e->getMessage() ] );
-		dtb_order_append_event( $order_id, 'integration.rewards.failed', [ 'source' => 'cron', 'actor_type' => 'system', 'visibility' => 'operator', 'payload' => [ 'error_type' => get_class( $e ) ] ] );
-		error_log( "[DTB Orders] Rewards issuance failed for order {$order_id}: " . $e->getMessage() );
-		dtb_order_retry_job( 'dtb_order_issue_rewards', $order_id, $args );
-	}
+	// Rewards are intentionally disabled until the account rewards program is fully implemented and audited.
+	return;
 }
 
 add_action( 'dtb_order_send_notification', 'dtb_order_job_send_notification', 10, 2 );
@@ -380,17 +365,7 @@ function dtb_order_job_handle_refund( int $order_id, array $args = [] ): void {
 	if ( ! $order ) {
 		return;
 	}
-	$state = dtb_order_get_integration_state( $order_id );
-	if ( 'issued' === ( $state['rewards']['status'] ?? '' ) ) {
-		try {
-			if ( function_exists( 'dtb_rewards_reverse_for_order' ) ) {
-				dtb_rewards_reverse_for_order( $order_id, $order );
-			}
-			dtb_order_update_integration_state( $order_id, 'rewards', [ 'status' => 'reversed' ] );
-		} catch ( Throwable $e ) {
-			error_log( "[DTB Orders] Reward reversal failed for order {$order_id}: " . $e->getMessage() );
-		}
-	}
+	// Rewards are intentionally disabled until the account rewards program is fully implemented and audited.
 	dtb_order_enqueue_job( 'dtb_order_send_notification', $order_id, [ 'template' => 'refunded' === $order->get_status() ? 'order-refunded' : 'order-cancelled' ] );
 }
 
