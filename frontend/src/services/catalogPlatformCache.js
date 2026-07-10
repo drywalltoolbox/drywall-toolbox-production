@@ -3,7 +3,7 @@ import { brandToSlug, isAllProductsCategorySlug, parseCatalogQuery } from '../ut
 
 const FRESH_CACHE_TTL = 5 * 60 * 1000;
 const STALE_CACHE_TTL = 24 * 60 * 60 * 1000;
-const CACHE_VERSION = 'v7';
+const CACHE_VERSION = 'v8';
 const PRODUCT_STORAGE_PREFIX = `dtb:catalog-products:${CACHE_VERSION}:`;
 const FACETS_STORAGE_PREFIX = `dtb:catalog-facets:${CACHE_VERSION}:`;
 
@@ -106,6 +106,19 @@ function normalizePathSegment(value = '') {
     .replace(/^-+|-+$/g, '');
 }
 
+function normalizeCategoryAlias(value = '') {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function isLiveOnlyCategory(value = '') {
+  return ['compound-tubes', 'compound-tube', 'mud-tubes', 'mud-tube', 'cam-lock-tubes', 'camlock-tubes']
+    .includes(normalizeCategoryAlias(value));
+}
+
 export function normalizeCatalogScope(scope = {}) {
   const normalized = {};
 
@@ -189,6 +202,13 @@ export function buildCatalogProductsUrl(query = {}) {
 function buildCatalogSnapshotUrl(query = {}) {
   const params = buildCatalogProductParams(query);
   if (params.search || params.tool_family || params.builder_slot || params.workflow_scope || params.product_kind) {
+    return '';
+  }
+
+  // Compound Tube category membership is resolved by backend aliases, taxonomy, SKU,
+  // and title fallbacks. Static snapshots can be stale or incomplete for this bucket,
+  // so this category must always use the live catalog endpoint.
+  if (isLiveOnlyCategory(params.display_category || params.category || '')) {
     return '';
   }
 
