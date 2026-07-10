@@ -2,7 +2,7 @@
 /**
  * Plugin Name: DTB Order Pay Summary Title Cleanup
  * Description: Removes duplicate brand/subtitle text and applies refined typography to the native WooCommerce order-pay runtime.
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: Drywall Toolbox
  */
 
@@ -19,7 +19,7 @@ add_action(
 			body.dtb-payment-runtime {
 				-webkit-font-smoothing: antialiased;
 				-moz-osx-font-smoothing: grayscale;
-				font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+				font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
 				color: #0f172a;
 			}
 
@@ -94,6 +94,17 @@ add_action(
 				letter-spacing: -0.012em !important;
 			}
 
+			body.dtb-payment-runtime table.shop_table,
+			body.dtb-payment-runtime table.shop_table caption,
+			body.dtb-payment-runtime table.shop_table th,
+			body.dtb-payment-runtime table.shop_table td,
+			body.dtb-payment-runtime table.shop_table span,
+			body.dtb-payment-runtime .dtb-order-summary-card,
+			body.dtb-payment-runtime .dtb-order-summary-card * {
+				font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+				font-synthesis: none;
+			}
+
 			body.dtb-payment-runtime table.shop_table caption::before,
 			body.dtb-payment-runtime table.shop_table caption::after {
 				display: none !important;
@@ -101,40 +112,75 @@ add_action(
 			}
 
 			body.dtb-payment-runtime table.shop_table caption {
-				padding-bottom: 22px !important;
-				color: #0b1220 !important;
-				font-size: 22px !important;
-				font-weight: 850 !important;
-				letter-spacing: -0.045em !important;
-				line-height: 1.05 !important;
+				padding-bottom: 20px !important;
+				color: #0f172a !important;
+				font-size: 19px !important;
+				font-weight: 780 !important;
+				letter-spacing: -0.03em !important;
+				line-height: 1.08 !important;
 				text-transform: none !important;
+				text-align: center !important;
 			}
 
 			body.dtb-payment-runtime .dtb-order-product-name,
 			body.dtb-payment-runtime .dtb-order-product-name a {
-				color: #0f172a !important;
-				font-size: 14px !important;
-				font-weight: 780 !important;
-				letter-spacing: -0.025em !important;
-				line-height: 1.25 !important;
+				color: #111827 !important;
+				font-size: 13.5px !important;
+				font-weight: 720 !important;
+				letter-spacing: -0.018em !important;
+				line-height: 1.28 !important;
+				text-decoration: none !important;
 			}
 
-			body.dtb-payment-runtime .dtb-order-product-sku,
+			body.dtb-payment-runtime .dtb-order-product-sku {
+				color: #64748b !important;
+				font-size: 11px !important;
+				font-weight: 650 !important;
+				letter-spacing: -0.008em !important;
+				line-height: 1.2 !important;
+			}
+
+			body.dtb-payment-runtime table.shop_table .product-total,
+			body.dtb-payment-runtime table.shop_table .product-total .amount,
+			body.dtb-payment-runtime table.shop_table tbody td:last-child {
+				color: #111827 !important;
+				font-size: 13.5px !important;
+				font-weight: 700 !important;
+				letter-spacing: -0.018em !important;
+			}
+
 			body.dtb-payment-runtime table.shop_table tfoot th,
 			body.dtb-payment-runtime table.shop_table tfoot td {
-				font-size: 12px !important;
-				letter-spacing: -0.01em !important;
+				font-size: 12.5px !important;
+				letter-spacing: -0.012em !important;
+				line-height: 1.35 !important;
 			}
 
 			body.dtb-payment-runtime table.shop_table tfoot th {
 				color: #64748b !important;
-				font-weight: 760 !important;
+				font-weight: 650 !important;
+				text-transform: none !important;
 			}
 
-			body.dtb-payment-runtime table.shop_table .amount,
-			body.dtb-payment-runtime table.shop_table tfoot td {
+			body.dtb-payment-runtime table.shop_table tfoot td,
+			body.dtb-payment-runtime table.shop_table tfoot td .amount {
+				color: #111827 !important;
+				font-weight: 720 !important;
+			}
+
+			body.dtb-payment-runtime table.shop_table tfoot tr.order-total th,
+			body.dtb-payment-runtime table.shop_table tfoot tr.order-total td,
+			body.dtb-payment-runtime table.shop_table tfoot tr.order-total td .amount {
 				color: #0f172a !important;
-				font-weight: 820 !important;
+				font-size: 14px !important;
+				font-weight: 780 !important;
+				letter-spacing: -0.02em !important;
+			}
+
+			body.dtb-payment-runtime .dtb-order-qty-display {
+				font-family: inherit !important;
+				font-size: 12px !important;
+				font-weight: 680 !important;
 			}
 
 			body.dtb-payment-runtime #place_order,
