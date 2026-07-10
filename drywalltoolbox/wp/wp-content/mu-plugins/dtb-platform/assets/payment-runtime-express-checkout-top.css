@@ -4,9 +4,10 @@
  */
 
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout {
-	display: grid;
+	display: grid !important;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 10px;
+	width: 100%;
 }
 
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout::before,
@@ -48,6 +49,7 @@
 }
 
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-row > label {
+	justify-content: center;
 	min-height: 48px;
 	border: 1px solid rgba(15, 23, 42, 0.12);
 	border-radius: 7px;
@@ -148,10 +150,17 @@
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-standard-row {
 	order: 4;
 	grid-column: 1 / -1;
+	width: 100%;
 }
 
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-standard-row > label {
 	justify-content: flex-start;
+	width: 100%;
+}
+
+.dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-standard-row > .payment_box {
+	width: 100% !important;
+	max-width: none !important;
 }
 
 .dtb-payment-runtime .dtb-standalone-express-checkout {
