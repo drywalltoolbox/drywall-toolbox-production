@@ -39,19 +39,15 @@ import { installRepairPackageSelectionRuntime } from './utils/repairPackageSelec
 import { installCustomerFacingCopyRuntime } from './utils/customerFacingCopyRuntime.js'
 
 // ─── Pre-warm product catalog cache ──────────────────────────────────────────
-// Product listing pages use the DTB catalog-platform endpoints, so prewarm
-// those first. The legacy all-products cache is useful for older schematic
-// lookups, but it is intentionally delayed so it cannot compete with the first
-// visible product grid render on a cold device.
+// The legacy all-products cache is intentionally delayed so it cannot compete
+// with the first visible catalog/product render on a cold device.
 import { prewarmCatalog } from './services/catalog.js';
-import { prewarmCatalogPlatformForCurrentRoute } from './services/catalogPlatformCache.js';
 
 installSchematicPageLabelRuntime();
 installMobileCheckoutSummaryAutoOpen();
 installMobileSchematicNavRuntime();
 installRepairPackageSelectionRuntime();
 installCustomerFacingCopyRuntime();
-prewarmCatalogPlatformForCurrentRoute();
 
 if (typeof window !== 'undefined') {
   const pathname = window.location.pathname.replace(/^\/drywall-toolbox(?=\/|$)/, '') || '/';
