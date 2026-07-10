@@ -3,7 +3,7 @@ import { brandToSlug, isAllProductsCategorySlug, parseCatalogQuery } from '../ut
 
 const FRESH_CACHE_TTL = 5 * 60 * 1000;
 const STALE_CACHE_TTL = 24 * 60 * 60 * 1000;
-const CACHE_VERSION = 'v6';
+const CACHE_VERSION = 'v7';
 const PRODUCT_STORAGE_PREFIX = `dtb:catalog-products:${CACHE_VERSION}:`;
 const FACETS_STORAGE_PREFIX = `dtb:catalog-facets:${CACHE_VERSION}:`;
 
@@ -109,7 +109,9 @@ function normalizePathSegment(value = '') {
 export function normalizeCatalogScope(scope = {}) {
   const normalized = {};
 
-  if (scope.brand) normalized.brand = String(scope.brand);
+  if (scope.brand) {
+    normalized.brand = brandToSlug(scope.brand) || String(scope.brand);
+  }
   if (scope.category) normalized.category = String(scope.category);
   if (scope.displayCategory && !isAllProductsCategorySlug(scope.displayCategory)) {
     normalized.display_category = String(scope.displayCategory);
@@ -268,31 +270,24 @@ export function fetchCatalogProductSnapshot(query = {}) {
   return snapshotInflight.get(key);
 }
 
-export function fetchCatalogProducts(query = {}, options = {}) {
-  const forceNetwork = Boolean(options?.forceNetwork);
-  const params = buildCatalogProductParams(query);
-  const key = sortedKey(params);
+export function fetchCatalogProducts(query = {}) {
+  const key = sortedKey(buildCatalogProductParams(query));
+  const cached = getCacheEntry(productCache, key, PRODUCT_STORAGE_PREFIX);
+  if (cached?.data) return Promise.resolve(cached.data);
 
-  if (!forceNetwork) {
-    const cached = getCacheEntry(productCache, key, PRODUCT_STORAGE_PREFIX);
-    if (cached?.data) return Promise.resolve(cached.data);
-
-    if (!productInflight.has(key)) {
-      productInflight.set(
-        key,
-        apiClient(buildCatalogProductsUrl(query))
-          .then((data) => setCacheEntry(productCache, key, PRODUCT_STORAGE_PREFIX, data))
-          .finally(() => {
-            productInflight.delete(key);
-          }),
-      );
-    }
-
-    return productInflight.get(key);
+  if (!productInflight.has(key)) {
+    productInflight.set(
+      key,
+      fetchCatalogProductSnapshot(query)
+        .then((snapshot) => snapshot || apiClient(buildCatalogProductsUrl(query)))
+        .then((data) => setCacheEntry(productCache, key, PRODUCT_STORAGE_PREFIX, data))
+        .finally(() => {
+          productInflight.delete(key);
+        }),
+    );
   }
 
-  return apiClient(buildCatalogProductsUrl(query))
-    .then((data) => setCacheEntry(productCache, key, PRODUCT_STORAGE_PREFIX, data));
+  return productInflight.get(key);
 }
 
 export function invalidateCatalogPlatformCache() {
@@ -301,30 +296,18 @@ export function invalidateCatalogPlatformCache() {
   facetsCache.clear();
   facetsInflight.clear();
   snapshotInflight.clear();
+
+  if (!canUseStorage()) return;
+
+  try {
+    Object.keys(window.localStorage)
+      .filter((key) => key.startsWith(PRODUCT_STORAGE_PREFIX) || key.startsWith(FACETS_STORAGE_PREFIX))
+      .forEach((key) => window.localStorage.removeItem(key));
+  } catch {
+    // Non-critical cleanup.
+  }
 }
 
-export function prewarmCatalogPlatformForCurrentRoute() {
-  if (typeof window === 'undefined') return;
-
-  const pathname = window.location.pathname.replace(/^\/drywall-toolbox(?=\/|$)/, '') || '/';
-  if (!pathname.startsWith('/products') && !pathname.startsWith('/parts')) return;
-
-  const pathParts = pathname.split('/').filter(Boolean);
-  const isParts = pathname.startsWith('/parts') ? 1 : 0;
-  const pathParams = {};
-
-  if (pathParts[0] === 'products' && pathParts[1] === 'brands' && pathParts[2]) {
-    pathParams.brandSlug = pathParts[2];
-    if (pathParts[3] === 'categories' && pathParts[4]) {
-      pathParams.categorySlug = pathParts[4];
-    }
-  }
-
-  const query = parseCatalogQuery(new URLSearchParams(window.location.search), pathParams);
-  const productQuery = { ...query, isParts };
-  const facetScope = { isParts, brand: query.brands?.[0] || '' };
-
-  fetchCatalogProductSnapshot(productQuery).catch(() => {});
-  fetchCatalogFacets(facetScope).catch(() => {});
-  fetchCatalogProducts(productQuery, { forceNetwork: true }).catch(() => {});
+export function parseCatalogUrlSearch(search = '') {
+  return parseCatalogQuery(new URLSearchParams(search));
 }
