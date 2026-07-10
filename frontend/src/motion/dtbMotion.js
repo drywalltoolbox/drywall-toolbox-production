@@ -1,27 +1,39 @@
 export const dtbEase = {
   standard: [0.22, 1, 0.36, 1],
   emphasized: [0.16, 1, 0.3, 1],
-  exit: [0.36, 0, 0.66, 0],
+  soft: [0.2, 0.8, 0.2, 1],
+  exit: [0.4, 0, 0.2, 1],
 };
 
 export const dtbDuration = {
-  instant: 0.12,
+  instant: 0.1,
   fast: 0.18,
-  normal: 0.28,
-  elevated: 0.36,
+  normal: 0.3,
+  elevated: 0.38,
 };
 
 export const routeVariants = {
-  initial: { opacity: 0, y: 6 },
+  initial: {
+    opacity: 0,
+    y: 8,
+    filter: 'blur(2px)',
+  },
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: dtbDuration.fast, ease: dtbEase.standard },
+    filter: 'blur(0px)',
+    transition: {
+      duration: 0.26,
+      ease: dtbEase.standard,
+      opacity: { duration: 0.22, ease: dtbEase.soft },
+      filter: { duration: 0.18, ease: dtbEase.soft },
+    },
   },
   exit: {
     opacity: 0,
-    y: -4,
-    transition: { duration: dtbDuration.instant, ease: dtbEase.exit },
+    y: -3,
+    filter: 'blur(1px)',
+    transition: { duration: 0.14, ease: dtbEase.exit },
   },
 };
 
