@@ -311,8 +311,6 @@ wcClient.interceptors.request.use(
  * @throws {{ code: string, message: string, status: number, retryAfter?: number }}
  */
 export async function apiClient( endpoint, options = {} ) {
-  emitGlobalLoadingStart();
-
   const requestUrls = buildApiRequestUrls( endpoint );
 
   const method = ( options.method || 'GET' ).toUpperCase();
@@ -347,6 +345,8 @@ export async function apiClient( endpoint, options = {} ) {
       return inflightGetRequests.get( requestKey );
     }
   }
+
+  emitGlobalLoadingStart();
 
   const execute = async () => {
     let lastError = null;

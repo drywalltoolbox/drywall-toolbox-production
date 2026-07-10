@@ -108,6 +108,17 @@ ErrorDocument 511 /errors/511.html
   RewriteRule ^wp-json/(.*)$ wp/index.php?rest_route=/$1 [QSA,L]
   RewriteRule ^dtb/(.*)$ wp/index.php?rest_route=/dtb/$1 [QSA,L]
 
+  # Staging REST aliases -> WordPress in /wp.
+  # Prevent /staging/2972/wp-json/* from falling into the staging SPA shell.
+  RewriteRule ^staging/2972/wp-json/?$ wp/index.php?rest_route=/ [QSA,L]
+  RewriteRule ^staging/2972/wp-json/(.*)$ wp/index.php?rest_route=/$1 [QSA,L]
+  RewriteRule ^staging/2972/dtb/(.*)$ wp/index.php?rest_route=/dtb/$1 [QSA,L]
+
+  # Route staging rest_route query probes into WordPress as well.
+  RewriteCond %{REQUEST_URI} ^/staging/2972/?$ [NC]
+  RewriteCond %{QUERY_STRING} (^|&)rest_route= [NC]
+  RewriteRule ^staging/2972/?$ wp/index.php [QSA,L]
+
   # WooCommerce legacy callback/API compatibility from the root URL space.
   RewriteCond %{QUERY_STRING} (^|&)wc-api= [NC]
   RewriteRule ^$ wp/index.php [QSA,L]
@@ -145,6 +156,7 @@ ErrorDocument 511 /errors/511.html
 
   # Staging SPA deep-link fallback.
   RewriteCond %{REQUEST_URI} ^/staging/2972/ [NC]
+  RewriteCond %{REQUEST_URI} !^/staging/2972/(?:wp-json|dtb)(?:/|$) [NC]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^staging/2972/ /staging/2972/index.html [QSA,L]

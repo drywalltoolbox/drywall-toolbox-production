@@ -50,6 +50,18 @@ DirectoryIndex index.html index.php
 	RewriteEngine On
 	RewriteBase /staging/2972/
 
+	# Keep REST API requests on WordPress routes (JSON), never SPA HTML.
+	RewriteRule ^wp-json/?$ /wp/index.php?rest_route=/ [QSA,L]
+	RewriteRule ^wp-json/(.*)$ /wp/index.php?rest_route=/$1 [QSA,L]
+	RewriteRule ^dtb/(.*)$ /wp/index.php?rest_route=/dtb/$1 [QSA,L]
+
+	# Woo/diagnostic rest_route probes should resolve through WordPress.
+	RewriteCond %{QUERY_STRING} (^|&)rest_route= [NC]
+	RewriteRule ^(?:index\.php)?$ /wp/index.php [QSA,L]
+
+	# Checkout order-pay endpoints are WordPress endpoints, not SPA routes.
+	RewriteRule ^(?:checkout/order-pay/.*|order-pay/.*)$ /wp/index.php [QSA,L]
+
 	# Serve the React shell for app deep links before WordPress receives them.
 	RewriteRule ^(?:products|all-products|parts|product|category|schematics|repairs|faq|calculators|shipping-policy|returns|policies|preview|cart|checkout|order|order-tracking|contact|support|settings|login|register|forgot-password|reset-password|dashboard|orders|rewards|account-settings|addresses|notifications)(?:/.*)?$ index.html [QSA,L]
 </IfModule>
