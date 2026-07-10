@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: DTB Order Pay Express Checkout Top
- * Description: Places supported express checkout methods above the standard order-pay payment form.
- * Version: 1.0.0
+ * Description: Loads order-pay express checkout styling only. Runtime DOM rewrites are disabled to keep WooPayments stable.
+ * Version: 1.1.0
  * Author: Drywall Toolbox
  */
 
@@ -28,16 +28,11 @@ add_action(
 			);
 		}
 
-		$script_path = $asset_dir . '/payment-runtime-express-checkout-top.js';
-		if ( file_exists( $script_path ) ) {
-			wp_enqueue_script(
-				'dtb-payment-runtime-express-checkout-top',
-				$asset_url . '/payment-runtime-express-checkout-top.js',
-				[ 'dtb-payment-runtime' ],
-				(string) filemtime( $script_path ),
-				true
-			);
-		}
+		/*
+		 * Do not enqueue payment-runtime-express-checkout-top.js.
+		 * WooPayments owns the live payment-method DOM. Reclassifying/moving rows during
+		 * gateway updates causes method-switch flicker, scroll bounce, and duplicate rows.
+		 */
 	},
 	99
 );
