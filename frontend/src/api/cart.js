@@ -241,6 +241,56 @@ function normalizeShippingMethodTitle(rateId = '', explicitTitle = '') {
   return 'Shipping';
 }
 
+function normalizeIdempotencyValue(value) {
+  if ( value === null || value === undefined ) return '';
+  if ( typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' ) {
+    return String( value ).trim().toLowerCase();
+  }
+  if ( Array.isArray( value ) ) {
+    return value.map( normalizeIdempotencyValue );
+  }
+  if ( typeof value === 'object' ) {
+    return Object.keys( value )
+      .sort()
+      .reduce( ( acc, key ) => {
+        acc[ key ] = normalizeIdempotencyValue( value[ key ] );
+        return acc;
+      }, {} );
+  }
+  return '';
+}
+
+function stableHash(value) {
+  const input = JSON.stringify( normalizeIdempotencyValue( value ) );
+  let hash = 0x811c9dc5;
+  for ( let index = 0; index < input.length; index += 1 ) {
+    hash ^= input.charCodeAt( index );
+    hash = Math.imul( hash, 0x01000193 );
+  }
+  return ( hash >>> 0 ).toString( 36 );
+}
+
+function buildStableCheckoutIdempotencyKey({
+  lineItems,
+  billingAddress,
+  shippingAddress,
+  paymentMethod,
+  shippingRateId,
+  shippingLineTotal,
+  couponCodes,
+}) {
+  return `dtb-checkout-${ stableHash( {
+    lineItems,
+    billingEmail: billingAddress?.email || '',
+    billingAddress,
+    shippingAddress: shippingAddress || billingAddress,
+    paymentMethod,
+    shippingRateId,
+    shippingLineTotal,
+    couponCodes: Array.isArray( couponCodes ) ? couponCodes : [],
+  } ) }`;
+}
+
 /**
  * Synchronise CartContext items into the DTB backend checkout contract and
  * create a pending WooCommerce order for secure payment collection.
@@ -310,7 +360,15 @@ export async function syncAndPlace(
     } ]
     : [];
 
-  const finalIdempotencyKey = resolvedIdempotencyKey || `dtb-${ Date.now() }-${ Math.random().toString( 36 ).slice( 2, 10 ) }`;
+  const finalIdempotencyKey = resolvedIdempotencyKey || buildStableCheckoutIdempotencyKey( {
+    lineItems: line_items,
+    billingAddress,
+    shippingAddress: shippingAddress || billingAddress,
+    paymentMethod,
+    shippingRateId,
+    shippingLineTotal,
+    couponCodes: resolvedCouponCodes,
+  } );
   const gateway = 'woo_native';
 
   const session = await createCheckoutSession( {
