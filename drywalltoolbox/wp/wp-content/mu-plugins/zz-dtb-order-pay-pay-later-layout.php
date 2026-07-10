@@ -2,7 +2,7 @@
 /**
  * Plugin Name: DTB Order Pay Pay Later Layout
  * Description: CSS-only WooPayments order-pay layout for express wallets, BNPL, and card methods. No DOM mutation.
- * Version: 1.4.0
+ * Version: 1.4.1
  * Author: Drywall Toolbox
  */
 
@@ -16,6 +16,8 @@ add_action(
 		}
 		?>
 		<style id="dtb-order-pay-pay-later-layout">
+			@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+
 			body.dtb-payment-runtime {
 				--dtb-pay-bg: #f7f9fc;
 				--dtb-pay-panel: rgba(255, 255, 255, 0.92);
@@ -28,27 +30,28 @@ add_action(
 				--dtb-pay-blue: #2563eb;
 				--dtb-pay-blue-soft: #eff6ff;
 				--dtb-pay-shadow: 0 24px 70px rgba(15, 23, 42, 0.10), 0 4px 18px rgba(15, 23, 42, 0.06);
-				font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+				font-family: "Varela Round", ui-rounded, "SF Pro Rounded", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
 				background: linear-gradient(90deg, #ffffff 0%, #ffffff 50%, #f4f6fa 50%, #f4f6fa 100%) !important;
 				color: var(--dtb-pay-text) !important;
 				-webkit-font-smoothing: antialiased;
-				text-rendering: geometricPrecision;
+				text-rendering: optimizeLegibility;
 			}
 
+			body.dtb-payment-runtime *,
 			body.dtb-payment-runtime h1,
 			body.dtb-payment-runtime h2,
 			body.dtb-payment-runtime h3,
 			body.dtb-payment-runtime #payment,
 			body.dtb-payment-runtime #payment * {
-				font-family: inherit !important;
+				font-family: "Varela Round", ui-rounded, "SF Pro Rounded", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
 			}
 
 			body.dtb-payment-runtime .dtb-payment-runtime-title,
 			body.dtb-payment-runtime h1,
 			body.dtb-payment-runtime .entry-title {
-				letter-spacing: -0.055em !important;
-				line-height: 0.96 !important;
-				font-weight: 840 !important;
+				letter-spacing: -0.025em !important;
+				line-height: 1.02 !important;
+				font-weight: 400 !important;
 			}
 
 			body.dtb-payment-runtime form#order_review {
@@ -81,7 +84,6 @@ add_action(
 				background: transparent !important;
 			}
 
-			/* Section header: wallet methods above BNPL. */
 			body.dtb-payment-runtime #payment ul.payment_methods::before {
 				content: "Express Checkout" !important;
 				order: 0 !important;
@@ -90,12 +92,11 @@ add_action(
 				margin: 0 0 2px !important;
 				color: var(--dtb-pay-text) !important;
 				font-size: 17px !important;
-				font-weight: 790 !important;
-				letter-spacing: -0.035em !important;
-				line-height: 1.1 !important;
+				font-weight: 400 !important;
+				letter-spacing: -0.01em !important;
+				line-height: 1.2 !important;
 			}
 
-			/* Section header: BNPL methods. */
 			body.dtb-payment-runtime #payment ul.payment_methods::after {
 				content: "Pay Later\A Split your purchase with available financing options." !important;
 				white-space: pre-line !important;
@@ -107,9 +108,9 @@ add_action(
 				border-top: 1px solid var(--dtb-pay-line) !important;
 				color: var(--dtb-pay-text) !important;
 				font-size: 17px !important;
-				font-weight: 790 !important;
-				letter-spacing: -0.035em !important;
-				line-height: 1.25 !important;
+				font-weight: 400 !important;
+				letter-spacing: -0.01em !important;
+				line-height: 1.35 !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li {
@@ -122,7 +123,6 @@ add_action(
 				background: transparent !important;
 			}
 
-			/* Express checkout wallet method IDs/classes. Keep these above Pay Later. */
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_google_pay,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_apple_pay,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_paypal,
@@ -139,7 +139,6 @@ add_action(
 				width: 100% !important;
 			}
 
-			/* WooPayments BNPL method IDs. Do not move these nodes with JavaScript. */
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_affirm,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_afterpay_clearpay,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_klarna {
@@ -148,7 +147,6 @@ add_action(
 				width: 100% !important;
 			}
 
-			/* Primary WooPayments card method. */
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments {
 				order: 20 !important;
 				grid-column: 1 / -1 !important;
@@ -163,12 +161,11 @@ add_action(
 				margin: 0 0 10px !important;
 				color: var(--dtb-pay-text) !important;
 				font-size: 17px !important;
-				font-weight: 790 !important;
-				letter-spacing: -0.035em !important;
-				line-height: 1.1 !important;
+				font-weight: 400 !important;
+				letter-spacing: -0.01em !important;
+				line-height: 1.2 !important;
 			}
 
-			/* Other methods remain available below the card method. Cash App/Link stay out of Express unless WooPayments renders them as wallet rows above. */
 			body.dtb-payment-runtime #payment ul.payment_methods > li:not(.payment_method_woocommerce_payments_google_pay):not(.payment_method_woocommerce_payments_apple_pay):not(.payment_method_woocommerce_payments_paypal):not(.payment_method_ppcp-gateway):not(.payment_method_ppec_paypal):not([class*="google_pay"]):not([class*="google-pay"]):not([class*="gpay"]):not([class*="apple_pay"]):not([class*="apple-pay"]):not([class*="paypal"]):not(.payment_method_woocommerce_payments_affirm):not(.payment_method_woocommerce_payments_afterpay_clearpay):not(.payment_method_woocommerce_payments_klarna):not(.payment_method_woocommerce_payments) {
 				order: 30 !important;
 				grid-column: 1 / -1 !important;
@@ -201,9 +198,9 @@ add_action(
 				box-shadow: 0 1px 0 rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.84) !important;
 				color: var(--dtb-pay-text) !important;
 				font-size: 14px !important;
-				font-weight: 700 !important;
-				letter-spacing: -0.02em !important;
-				line-height: 1.2 !important;
+				font-weight: 400 !important;
+				letter-spacing: -0.005em !important;
+				line-height: 1.25 !important;
 				text-align: center !important;
 				cursor: pointer !important;
 				transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease, transform 150ms ease !important;
@@ -224,7 +221,6 @@ add_action(
 				box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.18), 0 12px 28px rgba(37, 99, 235, 0.10) !important;
 			}
 
-			/* Express wallet tiles. */
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_google_pay > label,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_apple_pay > label,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_paypal > label,
@@ -242,7 +238,6 @@ add_action(
 				padding-right: 14px !important;
 			}
 
-			/* Pay Later tiles. */
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_affirm > label,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_afterpay_clearpay > label,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_klarna > label {
@@ -252,7 +247,6 @@ add_action(
 				padding-right: 14px !important;
 			}
 
-			/* Card row: keep card brands centered and the full payment form aligned to the card shell. */
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments > label {
 				justify-content: center !important;
 				min-height: 64px !important;
@@ -288,7 +282,6 @@ add_action(
 				transform-origin: center !important;
 			}
 
-			/* Prevent BNPL explanatory panels from expanding/collapsing the page during method switching. */
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_affirm > .payment_box,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_afterpay_clearpay > .payment_box,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_klarna > .payment_box {
@@ -336,9 +329,9 @@ add_action(
 			body.dtb-payment-runtime #payment .place-order .woocommerce-terms-and-conditions-wrapper {
 				color: var(--dtb-pay-muted) !important;
 				font-size: 13px !important;
-				font-weight: 500 !important;
+				font-weight: 400 !important;
 				line-height: 1.55 !important;
-				letter-spacing: -0.012em !important;
+				letter-spacing: -0.005em !important;
 			}
 
 			body.dtb-payment-runtime #payment #place_order,
@@ -349,8 +342,8 @@ add_action(
 				background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 48%, #3b82f6 100%) !important;
 				box-shadow: 0 18px 34px rgba(37, 99, 235, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
 				font-size: 15px !important;
-				font-weight: 760 !important;
-				letter-spacing: -0.018em !important;
+				font-weight: 400 !important;
+				letter-spacing: -0.005em !important;
 				transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease !important;
 			}
 
@@ -362,20 +355,19 @@ add_action(
 				box-shadow: 0 22px 42px rgba(37, 99, 235, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
 			}
 
-			/* Right-side summary polish from the same runtime scope. */
 			body.dtb-payment-runtime .dtb-payment-runtime-summary,
 			body.dtb-payment-runtime .dtb-payment-summary,
 			body.dtb-payment-runtime .order-summary,
 			body.dtb-payment-runtime .shop_table {
-				font-family: inherit !important;
+				font-family: "Varela Round", ui-rounded, "SF Pro Rounded", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
 			}
 
 			body.dtb-payment-runtime .dtb-payment-runtime-summary h2,
 			body.dtb-payment-runtime .order-summary h2,
 			body.dtb-payment-runtime h2 {
-				font-weight: 790 !important;
-				letter-spacing: -0.04em !important;
-				line-height: 1.08 !important;
+				font-weight: 400 !important;
+				letter-spacing: -0.015em !important;
+				line-height: 1.16 !important;
 			}
 
 			body.dtb-payment-runtime .dtb-payment-runtime-summary,
@@ -388,16 +380,16 @@ add_action(
 			body.dtb-payment-runtime .order-summary small,
 			body.dtb-payment-runtime .order-summary .sku {
 				color: var(--dtb-pay-muted) !important;
-				font-weight: 650 !important;
-				letter-spacing: -0.015em !important;
+				font-weight: 400 !important;
+				letter-spacing: -0.005em !important;
 			}
 
 			body.dtb-payment-runtime .dtb-payment-runtime-summary strong,
 			body.dtb-payment-runtime .order-summary strong,
 			body.dtb-payment-runtime .shop_table strong,
 			body.dtb-payment-runtime .shop_table .amount {
-				font-weight: 760 !important;
-				letter-spacing: -0.025em !important;
+				font-weight: 400 !important;
+				letter-spacing: -0.005em !important;
 			}
 
 			@media (max-width: 860px) {
