@@ -159,3 +159,14 @@ require_once $_dtb_platform . '/CommandCenter/CommandCenterReadModel.php';
 require_once $_dtb_platform . '/CommandCenter/CommandCenterService.php';
 require_once $_dtb_platform . '/CommandCenter/CommandCenterPage.php';
 require_once $_dtb_platform . '/CommandCenter/Rest/CommandCenterController.php';
+
+// =============================================================================
+// 11. SYSTEM MANAGER
+// =============================================================================
+require_once $_dtb_platform . '/SystemManager/SystemHealthService.php';
+require_once $_dtb_platform . '/SystemManager/QueueHealthService.php';
+require_once $_dtb_platform . '/SystemManager/CronHealthService.php';
+require_once $_dtb_platform . '/SystemManager/IntegrationHealthService.php';
+require_once $_dtb_platform . '/SystemManager/WebhookHealthService.php';
+require_once $_dtb_platform . '/SystemManager/SystemManagerPage.php';
+require_once $_dtb_platform . '/SystemManager/Rest/SystemManagerController.php';
