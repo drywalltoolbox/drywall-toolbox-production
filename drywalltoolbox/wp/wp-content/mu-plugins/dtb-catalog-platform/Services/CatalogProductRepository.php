@@ -24,7 +24,7 @@ if ( class_exists( 'DTB_CatalogProductRepository' ) ) {
 final class DTB_CatalogProductRepository {
 
 	/** SKU/name/meta pattern for compound/mud/cam-lock tube tools. */
-	const COMPOUND_TUBE_PATTERN = '(compound[[:space:]_-]*tube|mud[[:space:]_-]*tube|cam[[:space:]_-]*lock[[:space:]_-]*tube|(^|[^A-Z0-9])(CMT[0-9]{2}|CLT[0-9]{2}|CLTBF)([^A-Z0-9]|$))';
+	const COMPOUND_TUBE_PATTERN = '(compound[[:space:]_-]*tube|mud[[:space:]_-]*tube|cam[[:space:]_-]*lock[[:space:]_-]*tube|(^|[^A-Z0-9])((CMT|CLT|CT)[0-9]{2,3}(TT)?|CLTBF)([^A-Z0-9]|$))';
 
 	/**
 	 * Return a paginated set of product IDs and totals for the current filter set.
@@ -260,7 +260,9 @@ final class DTB_CatalogProductRepository {
 
 	/** Return product IDs that are compound/mud/cam-lock tube tools. */
 	private static function compound_tube_product_ids(): array {
-		$query = new WP_Query( [
+		$ids       = [];
+		$raw_forms = self::compound_tube_raw_forms();
+		$base_args = [
 			'post_type'              => 'product',
 			'post_status'            => 'publish',
 			'fields'                 => 'ids',
@@ -269,11 +271,14 @@ final class DTB_CatalogProductRepository {
 			'ignore_sticky_posts'    => true,
 			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
-			'meta_query'             => [
+		];
+
+		self::merge_query_ids( $ids, array_merge( $base_args, [
+			'meta_query' => [
 				'relation' => 'OR',
 				[
 					'key'     => DTB_ProductMeta::DISPLAY_CATEGORY_KEY,
-					'value'   => DTB_CategoryNormalizer::display_category_raw_forms( 'compound_tubes' ),
+					'value'   => $raw_forms,
 					'compare' => 'IN',
 				],
 				[
@@ -292,9 +297,72 @@ final class DTB_CatalogProductRepository {
 					'compare' => 'REGEXP',
 				],
 			],
-		] );
+		] ) );
 
-		return array_values( array_map( 'absint', $query->posts ?? [] ) );
+		self::merge_query_ids( $ids, array_merge( $base_args, [
+			'tax_query' => [
+				[
+					'taxonomy'         => 'product_cat',
+					'field'            => 'slug',
+					'terms'            => self::compound_tube_taxonomy_slugs(),
+					'include_children' => true,
+					'operator'         => 'IN',
+				],
+			],
+		] ) );
+
+		foreach ( self::compound_tube_search_terms() as $term ) {
+			self::merge_query_ids( $ids, array_merge( $base_args, [ 's' => $term ] ) );
+		}
+
+		return array_values( array_unique( array_map( 'absint', $ids ) ) );
+	}
+
+	/** Merge WP_Query ID results into an existing ID accumulator. */
+	private static function merge_query_ids( array &$ids, array $args ): void {
+		$query = new WP_Query( $args );
+		$ids   = array_merge( $ids, array_map( 'absint', $query->posts ?? [] ) );
+	}
+
+	/** Return all raw display-category values that have represented compound tubes. */
+	private static function compound_tube_raw_forms(): array {
+		$known = DTB_CategoryNormalizer::display_category_raw_forms( 'compound_tubes' );
+		$extra = [
+			'compound-tubes', 'Compound-Tubes', 'compound-tube', 'Compound-Tube',
+			'mud-tubes', 'Mud-Tubes', 'mud-tube', 'Mud-Tube',
+			'cam-lock-tubes', 'Cam-Lock-Tubes', 'cam-lock-tube', 'Cam-Lock-Tube',
+			'camlock-tubes', 'Camlock-Tubes', 'camlock-tube', 'Camlock-Tube',
+		];
+
+		return array_values( array_unique( array_filter( array_merge( $known, $extra ) ) ) );
+	}
+
+	/** Return WooCommerce category slugs that should resolve to compound tubes. */
+	private static function compound_tube_taxonomy_slugs(): array {
+		return [
+			'compound-tubes',
+			'compound-tube',
+			'mud-tubes',
+			'mud-tube',
+			'cam-lock-tubes',
+			'cam-lock-tube',
+			'camlock-tubes',
+			'camlock-tube',
+		];
+	}
+
+	/** Return title/search phrases that identify compound tube tools across brands. */
+	private static function compound_tube_search_terms(): array {
+		return [
+			'compound tube',
+			'compound tubes',
+			'mud tube',
+			'mud tubes',
+			'cam lock tube',
+			'cam lock tubes',
+			'camlock tube',
+			'camlock tubes',
+		];
 	}
 
 	/**
