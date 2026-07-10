@@ -2,7 +2,7 @@
 /**
  * Plugin Name: DTB Order Pay Pay Later Layout
  * Description: CSS-only WooPayments order-pay layout for express wallets, BNPL, and card methods. No DOM mutation.
- * Version: 1.4.1
+ * Version: 1.5.0
  * Author: Drywall Toolbox
  */
 
@@ -15,49 +15,67 @@ add_action(
 			return;
 		}
 		?>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
 		<style id="dtb-order-pay-pay-later-layout">
-			@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
-
 			body.dtb-payment-runtime {
-				--dtb-pay-bg: #f7f9fc;
-				--dtb-pay-panel: rgba(255, 255, 255, 0.92);
-				--dtb-pay-panel-solid: #ffffff;
-				--dtb-pay-line: rgba(148, 163, 184, 0.32);
-				--dtb-pay-line-strong: rgba(100, 116, 139, 0.34);
+				--dtb-pay-bg-left: #ffffff;
+				--dtb-pay-bg-right: #f4f6fa;
+				--dtb-pay-panel: rgba(255, 255, 255, 0.94);
+				--dtb-pay-line: rgba(148, 163, 184, 0.30);
+				--dtb-pay-line-strong: rgba(100, 116, 139, 0.32);
 				--dtb-pay-text: #0f172a;
 				--dtb-pay-muted: #64748b;
-				--dtb-pay-soft: #f1f5f9;
 				--dtb-pay-blue: #2563eb;
-				--dtb-pay-blue-soft: #eff6ff;
-				--dtb-pay-shadow: 0 24px 70px rgba(15, 23, 42, 0.10), 0 4px 18px rgba(15, 23, 42, 0.06);
-				font-family: "Varela Round", ui-rounded, "SF Pro Rounded", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
-				background: linear-gradient(90deg, #ffffff 0%, #ffffff 50%, #f4f6fa 50%, #f4f6fa 100%) !important;
+				--dtb-pay-shadow: 0 26px 76px rgba(15, 23, 42, 0.10), 0 5px 20px rgba(15, 23, 42, 0.06);
+				font-family: "Varela Round", ui-rounded, "Arial Rounded MT Bold", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+				background: linear-gradient(90deg, var(--dtb-pay-bg-left) 0%, var(--dtb-pay-bg-left) 50%, var(--dtb-pay-bg-right) 50%, var(--dtb-pay-bg-right) 100%) !important;
 				color: var(--dtb-pay-text) !important;
-				-webkit-font-smoothing: antialiased;
-				text-rendering: optimizeLegibility;
+				-webkit-font-smoothing: antialiased !important;
+				text-rendering: geometricPrecision !important;
 			}
 
-			body.dtb-payment-runtime *,
+			body.dtb-payment-runtime,
+			body.dtb-payment-runtime *:not(svg):not(svg *) {
+				font-family: "Varela Round", ui-rounded, "Arial Rounded MT Bold", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+			}
+
 			body.dtb-payment-runtime h1,
 			body.dtb-payment-runtime h2,
 			body.dtb-payment-runtime h3,
+			body.dtb-payment-runtime h4,
+			body.dtb-payment-runtime p,
+			body.dtb-payment-runtime a,
+			body.dtb-payment-runtime span,
+			body.dtb-payment-runtime small,
+			body.dtb-payment-runtime label,
+			body.dtb-payment-runtime button,
+			body.dtb-payment-runtime input,
+			body.dtb-payment-runtime select,
+			body.dtb-payment-runtime textarea,
+			body.dtb-payment-runtime table,
+			body.dtb-payment-runtime th,
+			body.dtb-payment-runtime td,
+			body.dtb-payment-runtime strong,
+			body.dtb-payment-runtime b,
 			body.dtb-payment-runtime #payment,
-			body.dtb-payment-runtime #payment * {
-				font-family: "Varela Round", ui-rounded, "SF Pro Rounded", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+			body.dtb-payment-runtime #payment *:not(svg):not(svg *) {
+				font-family: "Varela Round", ui-rounded, "Arial Rounded MT Bold", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
 			}
 
 			body.dtb-payment-runtime .dtb-payment-runtime-title,
 			body.dtb-payment-runtime h1,
 			body.dtb-payment-runtime .entry-title {
-				letter-spacing: -0.025em !important;
-				line-height: 1.02 !important;
 				font-weight: 400 !important;
+				letter-spacing: -0.048em !important;
+				line-height: 1.02 !important;
 			}
 
 			body.dtb-payment-runtime form#order_review {
-				border-radius: 22px !important;
+				border-radius: 24px !important;
 				background: var(--dtb-pay-panel) !important;
-				border: 1px solid rgba(148, 163, 184, 0.26) !important;
+				border: 1px solid rgba(148, 163, 184, 0.24) !important;
 				box-shadow: var(--dtb-pay-shadow) !important;
 				backdrop-filter: blur(14px) !important;
 				-webkit-backdrop-filter: blur(14px) !important;
@@ -89,12 +107,12 @@ add_action(
 				order: 0 !important;
 				grid-column: 1 / -1 !important;
 				display: block !important;
-				margin: 0 0 2px !important;
+				margin: 0 0 4px !important;
 				color: var(--dtb-pay-text) !important;
 				font-size: 17px !important;
 				font-weight: 400 !important;
-				letter-spacing: -0.01em !important;
-				line-height: 1.2 !important;
+				letter-spacing: -0.024em !important;
+				line-height: 1.18 !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods::after {
@@ -103,14 +121,14 @@ add_action(
 				order: 10 !important;
 				grid-column: 1 / -1 !important;
 				display: block !important;
-				margin: 8px 0 2px !important;
-				padding-top: 16px !important;
+				margin: 8px 0 4px !important;
+				padding-top: 18px !important;
 				border-top: 1px solid var(--dtb-pay-line) !important;
 				color: var(--dtb-pay-text) !important;
 				font-size: 17px !important;
 				font-weight: 400 !important;
-				letter-spacing: -0.01em !important;
-				line-height: 1.35 !important;
+				letter-spacing: -0.018em !important;
+				line-height: 1.36 !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li {
@@ -162,8 +180,8 @@ add_action(
 				color: var(--dtb-pay-text) !important;
 				font-size: 17px !important;
 				font-weight: 400 !important;
-				letter-spacing: -0.01em !important;
-				line-height: 1.2 !important;
+				letter-spacing: -0.024em !important;
+				line-height: 1.18 !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li:not(.payment_method_woocommerce_payments_google_pay):not(.payment_method_woocommerce_payments_apple_pay):not(.payment_method_woocommerce_payments_paypal):not(.payment_method_ppcp-gateway):not(.payment_method_ppec_paypal):not([class*="google_pay"]):not([class*="google-pay"]):not([class*="gpay"]):not([class*="apple_pay"]):not([class*="apple-pay"]):not([class*="paypal"]):not(.payment_method_woocommerce_payments_affirm):not(.payment_method_woocommerce_payments_afterpay_clearpay):not(.payment_method_woocommerce_payments_klarna):not(.payment_method_woocommerce_payments) {
@@ -174,13 +192,15 @@ add_action(
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li > input[type="radio"] {
 				position: absolute !important;
-				left: 18px !important;
-				top: 31px !important;
-				z-index: 3 !important;
-				width: 18px !important;
-				height: 18px !important;
-				margin: -9px 0 0 !important;
-				accent-color: var(--dtb-pay-blue) !important;
+				inset: 0 auto auto 0 !important;
+				z-index: 2 !important;
+				width: 1px !important;
+				height: 1px !important;
+				margin: 0 !important;
+				opacity: 0 !important;
+				pointer-events: none !important;
+				appearance: none !important;
+				-webkit-appearance: none !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li > label {
@@ -188,37 +208,37 @@ add_action(
 				align-items: center !important;
 				justify-content: center !important;
 				gap: 12px !important;
-				min-height: 62px !important;
+				min-height: 66px !important;
 				width: 100% !important;
 				box-sizing: border-box !important;
-				padding: 13px 18px 13px 52px !important;
+				padding: 14px 18px !important;
 				border: 1px solid var(--dtb-pay-line-strong) !important;
-				border-radius: 18px !important;
-				background: rgba(255, 255, 255, 0.94) !important;
-				box-shadow: 0 1px 0 rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.84) !important;
+				border-radius: 19px !important;
+				background: rgba(255, 255, 255, 0.96) !important;
+				box-shadow: 0 1px 0 rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.88) !important;
 				color: var(--dtb-pay-text) !important;
 				font-size: 14px !important;
 				font-weight: 400 !important;
-				letter-spacing: -0.005em !important;
-				line-height: 1.25 !important;
+				letter-spacing: -0.008em !important;
+				line-height: 1.2 !important;
 				text-align: center !important;
 				cursor: pointer !important;
-				transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease, transform 150ms ease !important;
+				transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease, transform 150ms ease, filter 150ms ease !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li > label:hover {
-				border-color: rgba(37, 99, 235, 0.45) !important;
+				border-color: rgba(37, 99, 235, 0.52) !important;
 				background: #fbfdff !important;
-				box-shadow: 0 10px 26px rgba(37, 99, 235, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.92) !important;
+				box-shadow: 0 13px 28px rgba(37, 99, 235, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.94) !important;
 				transform: translateY(-1px) !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li input[type="radio"]:checked + label,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.wc_payment_method--selected > label,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.is-active > label {
-				border-color: rgba(37, 99, 235, 0.82) !important;
-				background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%) !important;
-				box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.18), 0 12px 28px rgba(37, 99, 235, 0.10) !important;
+				border-color: rgba(37, 99, 235, 0.92) !important;
+				background: linear-gradient(180deg, #f7fbff 0%, #ffffff 100%) !important;
+				box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.20), 0 16px 34px rgba(37, 99, 235, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.98) !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_google_pay > label,
@@ -231,43 +251,39 @@ add_action(
 			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="gpay"] > label,
 			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="apple_pay"] > label,
 			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="apple-pay"] > label,
-			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="paypal"] > label {
-				justify-content: center !important;
-				min-height: 64px !important;
-				padding-left: 48px !important;
-				padding-right: 14px !important;
-			}
-
+			body.dtb-payment-runtime #payment ul.payment_methods > li[class*="paypal"] > label,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_affirm > label,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_afterpay_clearpay > label,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_klarna > label {
 				justify-content: center !important;
-				min-height: 64px !important;
-				padding-left: 48px !important;
-				padding-right: 14px !important;
+				min-height: 66px !important;
+				padding-left: 18px !important;
+				padding-right: 18px !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments > label {
 				justify-content: center !important;
-				min-height: 64px !important;
-				padding-left: 58px !important;
-				padding-right: 22px !important;
-				border-radius: 18px 18px 0 0 !important;
+				min-height: 66px !important;
+				padding-left: 18px !important;
+				padding-right: 18px !important;
+				border-radius: 19px 19px 0 0 !important;
 			}
 
-			body.dtb-payment-runtime #payment ul.payment_methods > li img,
-			body.dtb-payment-runtime #payment ul.payment_methods > li svg {
-				max-width: 124px !important;
-				max-height: 32px !important;
+			body.dtb-payment-runtime #payment ul.payment_methods > li > label img,
+			body.dtb-payment-runtime #payment ul.payment_methods > li > label svg {
+				display: block !important;
+				max-width: 136px !important;
+				max-height: 34px !important;
 				width: auto !important;
 				height: auto !important;
 				object-fit: contain !important;
+				margin: 0 !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments > label img,
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments > label svg {
-				max-width: 142px !important;
-				max-height: 32px !important;
+				max-width: 156px !important;
+				max-height: 34px !important;
 			}
 
 			body.dtb-payment-runtime #payment ul.payment_methods > li.payment_method_woocommerce_payments_google_pay > label img,
@@ -297,7 +313,7 @@ add_action(
 				padding: 18px !important;
 				border: 1px solid rgba(148, 163, 184, 0.24) !important;
 				border-top: 0 !important;
-				border-radius: 0 0 18px 18px !important;
+				border-radius: 0 0 19px 19px !important;
 				background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%) !important;
 				overflow: visible !important;
 				box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05) !important;
@@ -330,20 +346,20 @@ add_action(
 				color: var(--dtb-pay-muted) !important;
 				font-size: 13px !important;
 				font-weight: 400 !important;
-				line-height: 1.55 !important;
-				letter-spacing: -0.005em !important;
+				line-height: 1.58 !important;
+				letter-spacing: -0.004em !important;
 			}
 
 			body.dtb-payment-runtime #payment #place_order,
 			body.dtb-payment-runtime #payment button[type="submit"],
 			body.dtb-payment-runtime #payment .button.alt {
 				min-height: 54px !important;
-				border-radius: 16px !important;
-				background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 48%, #3b82f6 100%) !important;
+				border-radius: 17px !important;
+				background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%) !important;
 				box-shadow: 0 18px 34px rgba(37, 99, 235, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
 				font-size: 15px !important;
 				font-weight: 400 !important;
-				letter-spacing: -0.005em !important;
+				letter-spacing: -0.004em !important;
 				transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease !important;
 			}
 
@@ -358,21 +374,17 @@ add_action(
 			body.dtb-payment-runtime .dtb-payment-runtime-summary,
 			body.dtb-payment-runtime .dtb-payment-summary,
 			body.dtb-payment-runtime .order-summary,
-			body.dtb-payment-runtime .shop_table {
-				font-family: "Varela Round", ui-rounded, "SF Pro Rounded", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+			body.dtb-payment-runtime .shop_table,
+			body.dtb-payment-runtime .shop_table *:not(svg):not(svg *) {
+				font-family: "Varela Round", ui-rounded, "Arial Rounded MT Bold", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
 			}
 
 			body.dtb-payment-runtime .dtb-payment-runtime-summary h2,
 			body.dtb-payment-runtime .order-summary h2,
 			body.dtb-payment-runtime h2 {
 				font-weight: 400 !important;
-				letter-spacing: -0.015em !important;
-				line-height: 1.16 !important;
-			}
-
-			body.dtb-payment-runtime .dtb-payment-runtime-summary,
-			body.dtb-payment-runtime .order-summary {
-				color: var(--dtb-pay-text) !important;
+				letter-spacing: -0.024em !important;
+				line-height: 1.12 !important;
 			}
 
 			body.dtb-payment-runtime .dtb-payment-runtime-summary small,
@@ -381,7 +393,7 @@ add_action(
 			body.dtb-payment-runtime .order-summary .sku {
 				color: var(--dtb-pay-muted) !important;
 				font-weight: 400 !important;
-				letter-spacing: -0.005em !important;
+				letter-spacing: -0.004em !important;
 			}
 
 			body.dtb-payment-runtime .dtb-payment-runtime-summary strong,
@@ -389,7 +401,7 @@ add_action(
 			body.dtb-payment-runtime .shop_table strong,
 			body.dtb-payment-runtime .shop_table .amount {
 				font-weight: 400 !important;
-				letter-spacing: -0.005em !important;
+				letter-spacing: -0.006em !important;
 			}
 
 			@media (max-width: 860px) {
