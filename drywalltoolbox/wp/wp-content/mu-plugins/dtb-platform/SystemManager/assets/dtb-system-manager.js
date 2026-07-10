@@ -1,17 +1,14 @@
 /**
- * DTB System Manager — operational observability runtime.
+ * DTB System Manager — manual operational snapshot runtime.
  *
- * System/queue/integration/webhook/log tabs stay snapshot based. The Audit Log
- * tab is intentionally live because it is the operator-facing event stream for
- * admin actions, order workflows, integration jobs, webhooks, and queue activity.
+ * All System Manager tabs, including Audit Log, are intentionally snapshot based.
+ * Updates occur only on page load, tab navigation, or explicit operator refresh.
  */
 ( function () {
 	'use strict';
 
 	const cfg = window.dtbAdminConfig || {};
 	const DtbAdmin = window.DtbAdmin || null;
-	const AUDIT_STREAM_INTERVAL_MS = 3000;
-	const ERROR_BACKOFF_MS = 12000;
 
 	function isSystemManagerPage() {
 		return cfg?.page?.slug === 'dtb-system-manager' || document.querySelector( '.dtb-admin[data-dtb-page="dtb-system-manager"]' );
@@ -50,7 +47,7 @@
 				url.searchParams.set( key, value );
 			}
 		} );
-		url.searchParams.set( '_dtb_live', String( Date.now() ) );
+		url.searchParams.set( '_dtb_snapshot', String( Date.now() ) );
 		return url.toString();
 	}
 
@@ -71,7 +68,7 @@
 		const toolbar = document.createElement( 'div' );
 		toolbar.className = 'dtb-system-live-toolbar';
 		toolbar.setAttribute( 'data-dtb-system-live-toolbar', '1' );
-		toolbar.setAttribute( 'data-state', isAuditTab() ? 'streaming' : 'ready' );
+		toolbar.setAttribute( 'data-state', 'ready' );
 		toolbar.innerHTML = [
 			'<div class="dtb-system-live-toolbar__left">',
 				'<span class="dtb-system-live-toolbar__status"><span class="dtb-system-live-toolbar__dot" aria-hidden="true"></span><span data-dtb-live-label></span></span>',
@@ -93,12 +90,12 @@
 		const meta = toolbar.querySelector( '[data-dtb-live-meta]' );
 		const button = toolbar.querySelector( '[data-dtb-system-refresh]' );
 		if ( label ) {
-			if ( state === 'error' ) label.textContent = isAuditTab() ? 'Live stream degraded' : 'Snapshot refresh failed';
-			else if ( state === 'refreshing' ) label.textContent = isAuditTab() ? 'Syncing observability stream' : 'Refreshing snapshot';
-			else label.textContent = isAuditTab() ? 'Live observability stream' : 'Manual snapshot mode';
+			if ( state === 'error' ) label.textContent = 'Snapshot refresh failed';
+			else if ( state === 'refreshing' ) label.textContent = 'Refreshing snapshot';
+			else label.textContent = isAuditTab() ? 'Manual audit snapshot mode' : 'Manual snapshot mode';
 		}
 		if ( meta && message ) meta.textContent = message;
-		if ( button ) button.textContent = isAuditTab() ? 'Refresh stream' : 'Refresh snapshot';
+		if ( button ) button.textContent = isAuditTab() ? 'Refresh audit snapshot' : 'Refresh snapshot';
 	}
 
 	function signatureForRegion( region ) {
@@ -128,9 +125,8 @@
 		if ( ! endpoint ) return;
 
 		state.inFlight = true;
-		state.lastAttemptAt = Date.now();
 		region.classList.add( 'is-refreshing' );
-		setToolbarState( toolbar, 'refreshing', isAuditTab() ? 'Checking live action, workflow, integration, queue, and order events…' : 'Loading latest snapshot…' );
+		setToolbarState( toolbar, 'refreshing', isAuditTab() ? 'Loading latest audit, workflow, integration, queue, and order events…' : 'Loading latest snapshot…' );
 
 		try {
 			if ( state.controller ) state.controller.abort();
@@ -163,16 +159,16 @@
 			const nowLabel = parsed.meta?.updated_at || new Date().toLocaleTimeString();
 			setToolbarState(
 				toolbar,
-				isAuditTab() ? 'streaming' : 'ready',
+				'ready',
 				isAuditTab()
-					? 'Live stream synced ' + nowLabel + ' · 3s cadence · source: audit + order events + queues.'
+					? 'Audit snapshot refreshed ' + nowLabel + '. No automatic polling is running.'
 					: 'Snapshot refreshed ' + nowLabel + '. No automatic polling is running.'
 			);
 		} catch ( error ) {
 			if ( error?.name === 'AbortError' ) return;
 			state.failures += 1;
-			setToolbarState( toolbar, 'error', isAuditTab() ? 'Live stream failed. Retrying with backoff.' : 'Refresh failed. Check the PHP error log if this repeats.' );
-			window.console.warn( '[DTB System Manager] observability refresh failed:', error, reason );
+			setToolbarState( toolbar, 'error', 'Refresh failed. Check the PHP error log if this repeats.' );
+			window.console.warn( '[DTB System Manager] snapshot refresh failed:', error, reason );
 		} finally {
 			state.inFlight = false;
 			region.classList.remove( 'is-refreshing' );
@@ -191,7 +187,6 @@
 			controller: null,
 			failures: 0,
 			inFlight: false,
-			lastAttemptAt: 0,
 			lastHtml: region.innerHTML,
 		};
 
@@ -203,10 +198,10 @@
 
 		setToolbarState(
 			toolbar,
-			isAuditTab() ? 'streaming' : 'ready',
+			'ready',
 			isAuditTab()
-				? 'Streaming audit, order workflow, integration, webhook, and queue events every 3 seconds.'
-				: 'Refresh manually, reload the page, or switch tabs to update this view.'
+				? 'Refresh manually, reload the page, or switch tabs to update the audit snapshot. No automatic polling is running.'
+				: 'Refresh manually, reload the page, or switch tabs to update this view. No automatic polling is running.'
 		);
 
 		region.addEventListener( 'dtb:live:navigated', () => {
@@ -214,19 +209,12 @@
 			state.failures = 0;
 			setToolbarState(
 				toolbar,
-				isAuditTab() ? 'streaming' : 'ready',
+				'ready',
 				isAuditTab()
-					? 'Live observability stream resumed after tab navigation.'
+					? 'Audit snapshot updated from tab navigation. No automatic polling is running.'
 					: 'Snapshot updated from tab navigation. No automatic polling is running.'
 			);
 		} );
-
-		window.setInterval( () => {
-			if ( ! isAuditTab() ) return;
-			const delay = state.failures > 0 ? ERROR_BACKOFF_MS : AUDIT_STREAM_INTERVAL_MS;
-			if ( Date.now() - state.lastAttemptAt < delay ) return;
-			refresh( 'audit-stream' );
-		}, 1000 );
 	}
 
 	suppressGlobalAutoPolling();
