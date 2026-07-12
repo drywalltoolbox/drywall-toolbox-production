@@ -33,6 +33,7 @@ import { useCheckoutController } from '../features/checkout/hooks/useCheckoutCon
 import { useCheckoutQuote } from '../features/checkout/hooks/useCheckoutQuote.js';
 import { useCheckoutRecovery } from '../features/checkout/hooks/useCheckoutRecovery.js';
 import { makeCheckoutAttemptId } from '../utils/checkoutRecovery.js';
+import { normalizePaymentUrl } from '../utils/paymentUrl.js';
 
 const WOO_NATIVE_GATEWAY_ID = 'woo_native';
 const WOO_PAYMENTS_METHOD_ID = '';
@@ -181,18 +182,7 @@ function getPaymentBaseUrl() {
 
 function normalizeWooPaymentUrl(value) {
   if (typeof value !== 'string' || !value.trim()) return '';
-  const fallbackBase = getPaymentBaseUrl() || 'https://drywalltoolbox.com';
-  try {
-    const url = new URL(value.trim(), fallbackBase);
-    if (/^\/wp\/checkout\/order-pay(?:\/|$)/.test(url.pathname)) {
-      url.pathname = url.pathname.replace(/^\/wp/, '');
-    } else if (/^\/order-pay(?:\/|$)/.test(url.pathname)) {
-      url.pathname = `/checkout${url.pathname}`;
-    }
-    return url.toString();
-  } catch {
-    return value.trim();
-  }
+  return normalizePaymentUrl(value);
 }
 
 function makeCartSnapshot(cartItems) {
@@ -291,7 +281,7 @@ function TaxSummaryValue({ status, amount }) {
   return <span className="dtb-co-total-row__value dtb-co-total-row__value--muted">By address</span>;
 }
 
-function MobileSummaryStrip({ cartItems, subtotal, shipping, total, taxAmount, taxStatus }) {
+function MobileSummaryStrip({ cartItems, subtotal, shipping, total, taxAmount, taxStatus, quoteReady }) {
   const [open, setOpen] = useState(true);
   const totalQty = cartItems.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
   const displayTotal = total + taxAmount;
@@ -354,9 +344,9 @@ function MobileSummaryStrip({ cartItems, subtotal, shipping, total, taxAmount, t
                 <span>Subtotal</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
-              <div className={`dtb-co-msummary__total-row${shipping === 0 ? ' dtb-co-msummary__total-row--free' : ''}`}>
+              <div className={`dtb-co-msummary__total-row${quoteReady && shipping === 0 ? ' dtb-co-msummary__total-row--free' : ''}`}>
                 <span>Shipping</span>
-                <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+                <span>{quoteReady ? (shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`) : 'By address'}</span>
               </div>
               <div className="dtb-co-msummary__total-row">
                 <span>Tax</span>
@@ -437,12 +427,19 @@ export default function Checkout() {
 
   const quoteTotals = checkoutQuote?.totals || {};
   const quoteReady = Boolean(checkoutQuote?.quote_id);
-  const subtotal = toMoney(quoteTotals.subtotal);
+  const cartSubtotal = useMemo(
+    () => safeCartItems.reduce(
+      (sum, item) => sum + (toMoney(item.price) * Math.max(1, Number(item.quantity || 1))),
+      0,
+    ),
+    [safeCartItems],
+  );
+  const subtotal = quoteReady ? toMoney(quoteTotals.subtotal) : cartSubtotal;
   const shipping = toMoney(quoteTotals.shipping);
   const taxAmount = toMoney(quoteTotals.tax);
-  const displayTotal = toMoney(quoteTotals.total);
+  const displayTotal = quoteReady ? toMoney(quoteTotals.total) : cartSubtotal;
   const total = Math.max(0, displayTotal - taxAmount);
-  const taxPreview = { status: quoteReady ? 'ready' : 'idle', amount: taxAmount };
+  const taxPreview = { status: quoteReady ? 'ready' : (ratesLoading ? 'loading' : 'idle'), amount: taxAmount };
   const activeSelectedRateId = shippingRates.some((rate) => String(rate.id) === String(selectedRateId))
     ? String(selectedRateId)
     : String(checkoutQuote?.selected_rate_id || shippingRates[0]?.id || '');
@@ -747,6 +744,7 @@ export default function Checkout() {
               total={total}
               taxAmount={taxAmount}
               taxStatus={taxPreview.status}
+              quoteReady={quoteReady}
             />
 
             {/* Pending payment recovery */}
@@ -1134,8 +1132,8 @@ export default function Checkout() {
             </div>
             <div className="dtb-co-total-row">
               <span className="dtb-co-total-row__label">Shipping</span>
-              <span className={`dtb-co-total-row__value${shipping === 0 ? ' dtb-co-total-row__value--free' : ''}`}>
-                {shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}
+              <span className={`dtb-co-total-row__value${quoteReady && shipping === 0 ? ' dtb-co-total-row__value--free' : ''}`}>
+                {quoteReady ? (shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`) : 'By address'}
               </span>
             </div>
             <div className="dtb-co-total-row">
@@ -1143,7 +1141,7 @@ export default function Checkout() {
               <TaxSummaryValue status={taxPreview.status} amount={taxAmount} />
             </div>
             <div className="dtb-co-total-row dtb-co-total-row--final">
-              <span className="dtb-co-total-row__label">Total</span>
+              <span className="dtb-co-total-row__label">Est. Total</span>
               <span className="dtb-co-total-row__value">
                 <span className="dtb-co-total-currency">USD</span>
                 ${displayTotal.toFixed(2)}

@@ -3,7 +3,7 @@
 defined( 'ABSPATH' ) || exit;
 
 defined( 'DTB_SHIPPING_METHOD_ID' ) || define( 'DTB_SHIPPING_METHOD_ID', 'dtb_veeqo_rates' );
-defined( 'DTB_SHIPPING_ZONE_BOOTSTRAP_VERSION' ) || define( 'DTB_SHIPPING_ZONE_BOOTSTRAP_VERSION', '2' );
+defined( 'DTB_SHIPPING_ZONE_BOOTSTRAP_VERSION' ) || define( 'DTB_SHIPPING_ZONE_BOOTSTRAP_VERSION', '3' );
 
 // =============================================================================
 // SERVER-AUTHORITATIVE WOOCOMMERCE SHIPPING METHOD
@@ -104,14 +104,14 @@ function dtb_commerce_register_shipping_method(): void {
 				$is_domestic = ( 'US' === $country );
 
 				if ( $is_domestic ) {
-					$standard = $subtotal >= 500.0 ? 0.00
+					$standard = $subtotal >= 50.0 ? 0.00
 						: ( $total_weight <= 1.0 ? 7.99
 							: ( $total_weight <= 5.0 ? 12.99
 								: ( $total_weight <= 15.0 ? 19.99 : 29.99 ) ) );
 
 					$this->add_rate( [
 						'id'    => $this->get_rate_id( 'standard' ),
-						'label' => $subtotal >= 500.0
+						'label' => $subtotal >= 50.0
 							? __( 'Free Standard Shipping (5–7 business days)', 'woocommerce' )
 							: __( 'Standard Shipping (5–7 business days)', 'woocommerce' ),
 						'cost'  => $standard,
@@ -255,19 +255,36 @@ function dtb_commerce_zone_matches_us( WC_Shipping_Zone $zone ): bool {
 /**
  * Bootstrap and repair the required persisted policy instances.
  *
- * This deterministic versioned migration is independent of request payloads.
- * In-memory package-rate fallback protects checkout if a zone is later added
- * or reordered, while an explicitly disabled DTB instance remains disabled.
+ * Runs on woocommerce_init (covers all request types) and admin_init (ensures
+ * zones are created on first admin visit even if woocommerce_init ran too
+ * early during a non-WC request).
+ *
+ * The version gate prevents repeated DB writes on every request.  When the
+ * constant version is bumped the migration re-runs once and updates the option.
+ *
+ * SELF-HEALING: Even when the version matches, we do a lightweight check for
+ * the Rest-of-World zone (zone 0) having a DTB method.  This catches the case
+ * where an admin accidentally removed the method without triggering a version
+ * bump.
  */
 add_action( 'woocommerce_init', 'dtb_bootstrap_shipping_zones', 20 );
+add_action( 'admin_init',       'dtb_bootstrap_shipping_zones'       );
 
 function dtb_bootstrap_shipping_zones(): void {
-	if ( DTB_SHIPPING_ZONE_BOOTSTRAP_VERSION === (string) get_option( 'dtb_shipping_zones_bootstrapped' ) ) {
+	// WooCommerce shipping zone classes must be available.
+	if ( ! class_exists( 'WC_Shipping_Zones' ) || ! class_exists( 'WC_Shipping_Zone' ) ) {
 		return;
 	}
 
-	if ( ! class_exists( 'WC_Shipping_Zones' ) || ! class_exists( 'WC_Shipping_Zone' ) ) {
-		return;
+	$version_match = DTB_SHIPPING_ZONE_BOOTSTRAP_VERSION === (string) get_option( 'dtb_shipping_zones_bootstrapped' );
+
+	// Fast-path: version matches and the Rest-of-World zone already has the method.
+	if ( $version_match ) {
+		$row_zone = new WC_Shipping_Zone( 0 );
+		if ( dtb_commerce_zone_has_shipping_method( $row_zone ) ) {
+			return;
+		}
+		// Fall through to self-heal.
 	}
 
 	$has_us_zone = false;
@@ -283,6 +300,7 @@ function dtb_bootstrap_shipping_zones(): void {
 		}
 	}
 
+	// Create a US zone if none exists.
 	if ( ! $has_us_zone ) {
 		$us_zone = new WC_Shipping_Zone();
 		$us_zone->set_zone_name( 'United States' );
@@ -292,6 +310,7 @@ function dtb_bootstrap_shipping_zones(): void {
 		$us_zone->add_shipping_method( DTB_SHIPPING_METHOD_ID );
 	}
 
+	// Always ensure the Rest-of-World (zone 0) catch-all has the DTB method.
 	$row_zone = new WC_Shipping_Zone( 0 );
 	if ( ! dtb_commerce_zone_has_shipping_method( $row_zone ) ) {
 		$row_zone->add_shipping_method( DTB_SHIPPING_METHOD_ID );

@@ -334,6 +334,23 @@ function dtb_force_react_template( string $template ): string {
 	) {
 		return $template;
 	}
+
+	// WooCommerce order-pay is a native WC server-rendered page.
+	// Return WC's resolved template so the payment gateway renders correctly.
+	if ( function_exists( 'is_checkout_pay_page' ) && is_checkout_pay_page() ) {
+		return $template;
+	}
+	if ( function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'order-pay' ) ) {
+		return $template;
+	}
+	// Path-based guard for cases where WC query vars haven't been set yet.
+	$request_uri = isset( $_SERVER['REQUEST_URI'] )
+		? (string) wp_unslash( $_SERVER['REQUEST_URI'] )
+		: '';
+	if ( false !== strpos( $request_uri, '/checkout/order-pay/' ) && false !== strpos( $request_uri, 'key=wc_order_' ) ) {
+		return $template;
+	}
+
 	return get_template_directory() . '/index.php';
 }
 
@@ -344,6 +361,21 @@ function dtb_force_react_template( string $template ): string {
  */
 add_action( 'wp_enqueue_scripts', 'dtb_dequeue_non_react_assets', 9999 );
 function dtb_dequeue_non_react_assets(): void {
+	// Order-pay is a native WC server-rendered payment page.
+	// All WC payment gateway scripts must load — do not strip anything.
+	if ( function_exists( 'is_checkout_pay_page' ) && is_checkout_pay_page() ) {
+		return;
+	}
+	if ( function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'order-pay' ) ) {
+		return;
+	}
+	$request_uri = isset( $_SERVER['REQUEST_URI'] )
+		? (string) wp_unslash( $_SERVER['REQUEST_URI'] )
+		: '';
+	if ( false !== strpos( $request_uri, '/checkout/order-pay/' ) && false !== strpos( $request_uri, 'key=wc_order_' ) ) {
+		return;
+	}
+
 	global $wp_scripts, $wp_styles;
 
 	// Whitelist of asset handles enqueued by our own dtb_enqueue_react_app().

@@ -6,6 +6,7 @@ import SEOHead from '../components/shared/SEOHead.jsx';
 import { getCheckoutStatus, resumeCheckoutPayment } from '../api/checkout.js';
 import { useCart } from '../context/CartContext.jsx';
 import { clearPendingCheckoutPayment, readPendingCheckoutPayment } from '../utils/checkoutRecovery.js';
+import { normalizePaymentUrl } from '../utils/paymentUrl.js';
 
 const PAID_STATUSES = new Set(['processing', 'completed']);
 const FAILED_STATUSES = new Set(['failed', 'cancelled', 'refunded']);
@@ -64,7 +65,7 @@ export default function CheckoutReturn({ fallbackState = 'complete' }) {
 		try {
 			const response = await resumeCheckoutPayment( resumeToken );
 			if ( !response?.payment_url ) throw new Error( 'Secure payment is no longer available for this checkout.' );
-			window.location.assign( response.payment_url );
+			window.location.assign( normalizePaymentUrl( response.payment_url ) );
 		} catch ( requestError ) {
 			setError( requestError?.message || 'Unable to resume secure payment.' );
 		} finally {

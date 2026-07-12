@@ -7,6 +7,7 @@ import {
 	readPendingCheckoutPayment,
 	writePendingCheckoutPayment,
 } from '../../../utils/checkoutRecovery.js';
+import { normalizePaymentUrl } from '../../../utils/paymentUrl.js';
 
 export function useCheckoutRecovery() {
 	const [pendingPayment, setPendingPayment] = useState( () => readPendingCheckoutPayment() );
@@ -26,7 +27,7 @@ export function useCheckoutRecovery() {
 		if ( !pendingPayment?.resumeToken ) throw new Error( 'No resumable payment session is available.' );
 		const response = await resumeCheckoutPayment( pendingPayment.resumeToken );
 		if ( !response?.payment_url ) throw new Error( 'Secure payment is no longer available for this checkout.' );
-		window.location.assign( response.payment_url );
+		window.location.assign( normalizePaymentUrl( response.payment_url ) );
 		return response;
 	}, [pendingPayment] );
 
