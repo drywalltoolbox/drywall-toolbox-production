@@ -175,7 +175,7 @@ if ( ! function_exists( 'dtb_veeqo_normalize_cart_availability_items' ) ) {
 			}
 
 			$sku        = trim( sanitize_text_field( (string) ( $raw['sku'] ?? $raw['sku_code'] ?? '' ) ) );
-			$product_id = absint( $raw['product_id'] ?? $raw['variation_id'] ?? $raw['id'] ?? 0 );
+			$product_id = absint( $raw['variation_id'] ?? $raw['product_id'] ?? $raw['id'] ?? 0 );
 			$raw_qty    = $raw['quantity'] ?? $raw['qty'] ?? 1;
 			$quantity   = is_numeric( $raw_qty ) ? max( 1, absint( $raw_qty ) ) : 1;
 
