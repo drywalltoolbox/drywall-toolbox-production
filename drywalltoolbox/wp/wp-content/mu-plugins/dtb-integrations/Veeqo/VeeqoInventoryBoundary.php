@@ -14,6 +14,9 @@ defined( 'ABSPATH' ) || exit;
 if ( ! defined( 'DTB_VEEQO_CART_AVAILABILITY_RATE_LIMIT' ) ) {
 	define( 'DTB_VEEQO_CART_AVAILABILITY_RATE_LIMIT', 60 );
 }
+if ( ! defined( 'DTB_VEEQO_CART_AVAILABILITY_IP_RATE_LIMIT' ) ) {
+	define( 'DTB_VEEQO_CART_AVAILABILITY_IP_RATE_LIMIT', 600 );
+}
 if ( ! defined( 'DTB_VEEQO_CART_AVAILABILITY_RATE_WINDOW' ) ) {
 	define( 'DTB_VEEQO_CART_AVAILABILITY_RATE_WINDOW', MINUTE_IN_SECONDS );
 }
@@ -30,6 +33,39 @@ if ( ! function_exists( 'dtb_veeqo_inventory_boundary_client_ip' ) ) {
 	}
 }
 
+if ( ! function_exists( 'dtb_veeqo_inventory_boundary_client_token' ) ) {
+	/**
+	 * Build a privacy-safe identity token for per-shopper rate limiting.
+	 *
+	 * Logged-in users and WooCommerce sessions receive isolated buckets. The
+	 * user-agent fallback is intentionally combined with IP and is only used
+	 * before WooCommerce has issued a session cookie.
+	 */
+	function dtb_veeqo_inventory_boundary_client_token(): string {
+		$user_id = function_exists( 'get_current_user_id' ) ? get_current_user_id() : 0;
+		if ( $user_id > 0 ) {
+			return 'user:' . $user_id;
+		}
+
+		$woocommerce = function_exists( 'WC' ) ? WC() : null;
+		if ( is_object( $woocommerce ) && isset( $woocommerce->session ) && is_object( $woocommerce->session ) && method_exists( $woocommerce->session, 'get_customer_id' ) ) {
+			$customer_id = trim( (string) $woocommerce->session->get_customer_id() );
+			if ( '' !== $customer_id ) {
+				return 'wc-session:' . hash( 'sha256', $customer_id );
+			}
+		}
+
+		foreach ( (array) $_COOKIE as $cookie_name => $cookie_value ) {
+			if ( str_starts_with( (string) $cookie_name, 'wp_woocommerce_session_' ) && '' !== (string) $cookie_value ) {
+				return 'wc-cookie:' . hash( 'sha256', (string) $cookie_value );
+			}
+		}
+
+		$user_agent = substr( sanitize_text_field( (string) ( $_SERVER['HTTP_USER_AGENT'] ?? 'anonymous' ) ), 0, 240 );
+		return 'anonymous:' . hash( 'sha256', $user_agent );
+	}
+}
+
 if ( ! function_exists( 'dtb_veeqo_inventory_boundary_rate_limited' ) ) {
 	function dtb_veeqo_inventory_boundary_rate_limited( string $bucket, int $limit, int $window ): bool {
 		$key   = 'dtb_veeqo_inv_rl_' . md5( $bucket );
@@ -39,6 +75,34 @@ if ( ! function_exists( 'dtb_veeqo_inventory_boundary_rate_limited' ) ) {
 		}
 		set_transient( $key, $count + 1, max( 30, $window ) );
 		return false;
+	}
+}
+
+if ( ! function_exists( 'dtb_veeqo_inventory_boundary_request_rate_limited' ) ) {
+	/**
+	 * Apply a shopper/session limit plus a higher shared-IP safety ceiling.
+	 *
+	 * The composite bucket avoids throttling unrelated shoppers behind the same
+	 * NAT, while the IP ceiling prevents trivial cookie rotation from fully
+	 * bypassing abuse protection.
+	 */
+	function dtb_veeqo_inventory_boundary_request_rate_limited(): bool {
+		$ip       = dtb_veeqo_inventory_boundary_client_ip();
+		$identity = dtb_veeqo_inventory_boundary_client_token();
+		$window   = (int) DTB_VEEQO_CART_AVAILABILITY_RATE_WINDOW;
+
+		$identity_limited = dtb_veeqo_inventory_boundary_rate_limited(
+			'identity:' . $ip . ':' . $identity,
+			(int) DTB_VEEQO_CART_AVAILABILITY_RATE_LIMIT,
+			$window
+		);
+		$ip_limited = dtb_veeqo_inventory_boundary_rate_limited(
+			'ip:' . $ip,
+			(int) DTB_VEEQO_CART_AVAILABILITY_IP_RATE_LIMIT,
+			$window
+		);
+
+		return $identity_limited || $ip_limited;
 	}
 }
 
@@ -102,25 +166,36 @@ if ( ! function_exists( 'dtb_veeqo_normalize_cart_availability_items' ) ) {
 			if ( ! is_array( $raw ) ) {
 				continue;
 			}
-			$sku = trim( sanitize_text_field( (string) ( $raw['sku'] ?? '' ) ) );
-			$qty = max( 1, absint( $raw['quantity'] ?? 1 ) );
-			if ( '' === $sku ) {
+
+			$sku        = trim( sanitize_text_field( (string) ( $raw['sku'] ?? $raw['sku_code'] ?? '' ) ) );
+			$product_id = absint( $raw['product_id'] ?? $raw['variation_id'] ?? $raw['id'] ?? 0 );
+			$raw_qty    = $raw['quantity'] ?? $raw['qty'] ?? 1;
+			$quantity   = is_numeric( $raw_qty ) ? max( 1, absint( $raw_qty ) ) : 1;
+
+			if ( '' === $sku && $product_id <= 0 ) {
 				continue;
 			}
+
 			$normalized[] = [
 				'sku'        => $sku,
-				'quantity'   => $qty,
-				'product_id' => absint( $raw['product_id'] ?? $raw['id'] ?? 0 ),
-				'name'       => sanitize_text_field( (string) ( $raw['name'] ?? '' ) ),
+				'quantity'   => $quantity,
+				'product_id' => $product_id,
+				'name'       => sanitize_text_field( (string) ( $raw['name'] ?? $raw['productName'] ?? '' ) ),
 			];
 		}
+
 		return array_slice( $normalized, 0, max( 1, (int) DTB_VEEQO_CART_AVAILABILITY_MAX_ITEMS ) );
 	}
 }
 
 if ( ! function_exists( 'dtb_veeqo_check_projected_stock_for_sku' ) ) {
+	/**
+	 * Check WooCommerce's Veeqo-synchronized stock projection by SKU or product ID.
+	 */
 	function dtb_veeqo_check_projected_stock_for_sku( string $sku, int $requested, int $fallback_product_id = 0, string $name = '' ): array {
-		$product_id = function_exists( 'wc_get_product_id_by_sku' ) ? absint( wc_get_product_id_by_sku( $sku ) ) : 0;
+		$product_id = '' !== $sku && function_exists( 'wc_get_product_id_by_sku' )
+			? absint( wc_get_product_id_by_sku( $sku ) )
+			: 0;
 		if ( $product_id <= 0 && $fallback_product_id > 0 ) {
 			$product_id = $fallback_product_id;
 		}
@@ -128,22 +203,23 @@ if ( ! function_exists( 'dtb_veeqo_check_projected_stock_for_sku' ) ) {
 		$product = $product_id > 0 && function_exists( 'wc_get_product' ) ? wc_get_product( $product_id ) : null;
 		if ( ! $product instanceof WC_Product ) {
 			return [
-				'sku'          => $sku,
-				'productId'    => $fallback_product_id ?: null,
-				'productName'  => $name,
-				'requested'    => $requested,
-				'available'    => null,
-				'inStock'      => true,
-				'status'       => 'unknown',
-				'message'      => 'SKU is not mapped in WooCommerce projection; checkout will rely on server-side WooCommerce validation.',
+				'sku'         => $sku,
+				'productId'   => $fallback_product_id ?: null,
+				'productName' => $name,
+				'requested'   => $requested,
+				'available'   => null,
+				'inStock'     => true,
+				'status'      => 'unknown',
+				'message'     => 'Product is not mapped in the WooCommerce stock projection; checkout will rely on server-side WooCommerce validation.',
 			];
 		}
 
-		$available = $product->managing_stock() ? $product->get_stock_quantity() : null;
-		$in_stock  = $product->is_in_stock() && ( null === $available || (int) $available >= $requested );
+		$resolved_sku = trim( (string) $product->get_sku() );
+		$available    = $product->managing_stock() ? $product->get_stock_quantity() : null;
+		$in_stock     = $product->is_in_stock() && ( null === $available || (int) $available >= $requested );
 
 		return [
-			'sku'         => $sku,
+			'sku'         => '' !== $resolved_sku ? $resolved_sku : $sku,
 			'productId'   => $product->get_id(),
 			'productName' => $product->get_name(),
 			'requested'   => $requested,
@@ -156,17 +232,16 @@ if ( ! function_exists( 'dtb_veeqo_check_projected_stock_for_sku' ) ) {
 
 if ( ! function_exists( 'dtb_veeqo_route_cart_availability' ) ) {
 	function dtb_veeqo_route_cart_availability( WP_REST_Request $request ): WP_REST_Response {
-		$ip = dtb_veeqo_inventory_boundary_client_ip();
-		if ( dtb_veeqo_inventory_boundary_rate_limited( $ip, (int) DTB_VEEQO_CART_AVAILABILITY_RATE_LIMIT, (int) DTB_VEEQO_CART_AVAILABILITY_RATE_WINDOW ) ) {
+		if ( dtb_veeqo_inventory_boundary_request_rate_limited() ) {
 			$response = new WP_REST_Response( [ 'code' => 'rate_limited', 'message' => 'Too many availability checks. Please try again shortly.' ], 429 );
 			$response->header( 'Retry-After', (string) DTB_VEEQO_CART_AVAILABILITY_RATE_WINDOW );
 			return $response;
 		}
 
 		$body  = $request->get_json_params();
-		$items = dtb_veeqo_normalize_cart_availability_items( is_array( $body['items'] ?? null ) ? $body['items'] : [] );
+		$items = dtb_veeqo_normalize_cart_availability_items( is_array( $body ) && is_array( $body['items'] ?? null ) ? $body['items'] : [] );
 		if ( empty( $items ) ) {
-			return new WP_REST_Response( [ 'code' => 'invalid_items', 'message' => 'Request body must include at least one item with sku and quantity.' ], 400 );
+			return new WP_REST_Response( [ 'code' => 'invalid_items', 'message' => 'Request body must include at least one item with a SKU or product ID and quantity.' ], 400 );
 		}
 
 		$checks = [];
