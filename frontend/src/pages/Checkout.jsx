@@ -364,9 +364,10 @@ function MobileSummaryStrip({ cartItems, subtotal, shipping, total, taxAmount, t
 
 export default function Checkout() {
   const navigate = useNavigate();
-  const { cartItems, clearCart } = useCart();
+  const { cartItems, clearCart, isLoading: cartLoading, lastSyncedAt } = useCart();
   const { isAuthenticated } = useAuthContext();
   const safeCartItems = useMemo(() => (Array.isArray(cartItems) ? cartItems : []), [cartItems]);
+  const cartReady = !cartLoading && lastSyncedAt !== null;
 
   const [formData, setFormData] = useState({
     firstName: '', lastName: '', email: '', phone: '',
@@ -411,6 +412,7 @@ export default function Checkout() {
     selectedRateId,
     cartItems: safeCartItems,
     isAddressComplete,
+    cartReady,
   });
 
   const quoteTotals = checkoutQuote?.totals || {};

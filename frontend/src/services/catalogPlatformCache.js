@@ -6,6 +6,10 @@ const STALE_CACHE_TTL = 24 * 60 * 60 * 1000;
 const CACHE_VERSION = 'v8';
 const PRODUCT_STORAGE_PREFIX = `dtb:catalog-products:${CACHE_VERSION}:`;
 const FACETS_STORAGE_PREFIX = `dtb:catalog-facets:${CACHE_VERSION}:`;
+const CATALOG_SNAPSHOTS_ENABLED = /^(1|true|yes|on)$/i.test(
+  String(process.env.REACT_APP_CATALOG_SNAPSHOTS_ENABLED || '').trim(),
+);
+const PUBLIC_ASSET_BASE = String(process.env.PUBLIC_URL || '').replace(/\/+$/, '');
 
 const productCache = new Map();
 const productInflight = new Map();
@@ -200,6 +204,8 @@ export function buildCatalogProductsUrl(query = {}) {
 }
 
 function buildCatalogSnapshotUrl(query = {}) {
+  if (!CATALOG_SNAPSHOTS_ENABLED) return '';
+
   const params = buildCatalogProductParams(query);
   if (params.search || params.tool_family || params.builder_slot || params.workflow_scope || params.product_kind) {
     return '';
@@ -217,25 +223,25 @@ function buildCatalogSnapshotUrl(query = {}) {
   const suffix = sort ? `-${sort}` : '';
 
   if (params.is_parts === 1 || params.is_parts === '1') {
-    return `/catalog-snapshots/parts/page-${page}${suffix}.json`;
+    return `${PUBLIC_ASSET_BASE}/catalog-snapshots/parts/page-${page}${suffix}.json`;
   }
 
   const brand = normalizePathSegment(params.brand || '');
   const category = normalizePathSegment(params.display_category || params.category || '');
 
   if (brand && category) {
-    return `/catalog-snapshots/brands/${brand}/categories/${category}/page-${page}${suffix}.json`;
+    return `${PUBLIC_ASSET_BASE}/catalog-snapshots/brands/${brand}/categories/${category}/page-${page}${suffix}.json`;
   }
 
   if (brand) {
-    return `/catalog-snapshots/brands/${brand}/page-${page}${suffix}.json`;
+    return `${PUBLIC_ASSET_BASE}/catalog-snapshots/brands/${brand}/page-${page}${suffix}.json`;
   }
 
   if (category) {
-    return `/catalog-snapshots/categories/${category}/page-${page}${suffix}.json`;
+    return `${PUBLIC_ASSET_BASE}/catalog-snapshots/categories/${category}/page-${page}${suffix}.json`;
   }
 
-  return `/catalog-snapshots/products/page-${page}${suffix}.json`;
+  return `${PUBLIC_ASSET_BASE}/catalog-snapshots/products/page-${page}${suffix}.json`;
 }
 
 async function fetchJsonIfPresent(url) {

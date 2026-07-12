@@ -25,15 +25,16 @@ function isStaleShippingRateError( error ) {
 	return Number( error?.status || 0 ) === 409 && error?.code === 'dtb_checkout_shipping_rate_changed';
 }
 
-export function useCheckoutQuote({ formData, couponCodes = [], selectedRateId = '', cartItems = [], isAddressComplete = false }) {
+export function useCheckoutQuote({ formData, couponCodes = [], selectedRateId = '', cartItems = [], isAddressComplete = false, cartReady = true }) {
 	const [state, dispatch] = useReducer( checkoutReducer, checkoutInitialState );
 	const [loading, setLoading] = useState( false );
 	const requestSeq = useRef( 0 );
+	const canQuote = cartReady && isAddressComplete && Array.isArray( cartItems ) && cartItems.length > 0;
 
 	const refreshQuote = useCallback( async ( preferredRateId ) => {
 		const requestId = requestSeq.current + 1;
 		requestSeq.current = requestId;
-		if ( !isAddressComplete ) {
+		if ( !canQuote ) {
 			dispatch( { type: 'QUOTE_RESET', requestId } );
 			return null;
 		}
@@ -65,10 +66,10 @@ export function useCheckoutQuote({ formData, couponCodes = [], selectedRateId = 
 		} finally {
 			if ( requestId === requestSeq.current ) setLoading( false );
 		}
-	}, [couponCodes, formData, isAddressComplete, selectedRateId] );
+	}, [canQuote, couponCodes, formData, selectedRateId] );
 
 	useEffect( () => {
-		if ( !isAddressComplete ) {
+		if ( !canQuote ) {
 			requestSeq.current += 1;
 			dispatch( { type: 'QUOTE_RESET', requestId: requestSeq.current } );
 			return undefined;
@@ -78,7 +79,7 @@ export function useCheckoutQuote({ formData, couponCodes = [], selectedRateId = 
 			window.clearTimeout( timer );
 			requestSeq.current += 1;
 		};
-	}, [cartItems, isAddressComplete, refreshQuote, selectedRateId] );
+	}, [canQuote, cartItems, refreshQuote, selectedRateId] );
 
 	return {
 		quote: state.quote,

@@ -152,6 +152,7 @@ module.exports = (envFlags, argv) => {
     'process.env.REACT_APP_JWT_AUTH_ENDPOINT':          JSON.stringify(env('REACT_APP_JWT_AUTH_ENDPOINT')),
     'process.env.REACT_APP_ENV':                        JSON.stringify(env('REACT_APP_ENV') || appEnv),
     'process.env.REACT_APP_REWARDS_ENABLED':            JSON.stringify(env('REACT_APP_REWARDS_ENABLED')),
+    'process.env.REACT_APP_CATALOG_SNAPSHOTS_ENABLED':  JSON.stringify(env('REACT_APP_CATALOG_SNAPSHOTS_ENABLED')),
 
     // Build timestamp — set once at config evaluation time (not per-module).
     'process.env.BUILD_TIMESTAMP':                      JSON.stringify(new Date().toISOString()),

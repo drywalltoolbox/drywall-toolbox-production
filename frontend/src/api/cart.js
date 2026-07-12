@@ -9,6 +9,7 @@ const runtimeOrigin = typeof window !== 'undefined' ? window.location.origin : '
 const envApiBase = ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' );
 const resolvedApiBase = envApiBase || ( /github\.io$/i.test( runtimeHost ) ? 'https://drywalltoolbox.com' : runtimeOrigin );
 const configuredStorePath = ( process.env.REACT_APP_STORE_API_BASE || '/wp-json/wc/store/v1' ).replace( /\/+$/, '' );
+const CART_TOKEN_STORAGE_KEY = 'dtb:store-api-cart-token:v1';
 
 const STORE_BASE_CANDIDATES = Array.from( new Set( [
 	`${ resolvedApiBase.replace( /\/+$/, '' ) }${ configuredStorePath }`,
@@ -19,6 +20,42 @@ let activeStoreBaseIndex = 0;
 let storeNonce = '';
 let cartToken = '';
 
+function shouldUseCartTokenSession() {
+	if ( !runtimeOrigin ) return false;
+	try {
+		return new URL( resolvedApiBase, runtimeOrigin ).origin !== runtimeOrigin;
+	} catch {
+		return false;
+	}
+}
+
+const useCartTokenSession = shouldUseCartTokenSession();
+
+function readPersistedCartToken() {
+	if ( !useCartTokenSession || typeof window === 'undefined' ) return '';
+	try {
+		return String( window.sessionStorage.getItem( CART_TOKEN_STORAGE_KEY ) || '' );
+	} catch {
+		return '';
+	}
+}
+
+function persistCartToken( token = '' ) {
+	cartToken = String( token || '' );
+	if ( !useCartTokenSession || typeof window === 'undefined' ) return;
+	try {
+		if ( cartToken ) {
+			window.sessionStorage.setItem( CART_TOKEN_STORAGE_KEY, cartToken );
+		} else {
+			window.sessionStorage.removeItem( CART_TOKEN_STORAGE_KEY );
+		}
+	} catch {
+		// Session storage is optional; the current page keeps the token in memory.
+	}
+}
+
+cartToken = readPersistedCartToken();
+
 function currentStoreBase() {
 	return STORE_BASE_CANDIDATES[ activeStoreBaseIndex ] || STORE_BASE_CANDIDATES[0] || '';
 }
@@ -27,18 +64,23 @@ function updateStoreSessionHeaders( response ) {
 	const nonce = response.headers.get( 'Nonce' ) || response.headers.get( 'X-WC-Store-API-Nonce' );
 	if ( nonce ) storeNonce = nonce;
 	const token = response.headers.get( 'Cart-Token' );
-	if ( token ) cartToken = token;
+	if ( token && useCartTokenSession ) persistCartToken( token );
+}
+
+function mutationSessionHeaders() {
+	if ( useCartTokenSession && cartToken ) return { 'Cart-Token': cartToken };
+	return storeNonce ? { 'X-WC-Store-API-Nonce': storeNonce } : {};
 }
 
 async function storeFetch( path, options = {}, isRetry = false ) {
 	const url = `${ currentStoreBase() }${ path }`;
 	const response = await fetch( url, {
 		credentials: 'include',
+		cache: 'no-store',
 		...options,
 		headers: {
 			'Content-Type': 'application/json',
-			...( storeNonce ? { 'X-WC-Store-API-Nonce': storeNonce } : {} ),
-			...( cartToken ? { 'Cart-Token': cartToken } : {} ),
+			...mutationSessionHeaders(),
 			...( options.headers || {} ),
 		},
 	} );
@@ -50,6 +92,8 @@ async function storeFetch( path, options = {}, isRetry = false ) {
 	}
 	if ( response.status === 401 ) {
 		if ( isRetry ) throw new Error( `Store API 401: ${ url }` );
+		storeNonce = '';
+		if ( useCartTokenSession ) persistCartToken( '' );
 		await initCart();
 		return storeFetch( path, options, true );
 	}
@@ -69,7 +113,11 @@ export async function initCart() {
 	const url = `${ currentStoreBase() }/cart`;
 	const response = await fetch( url, {
 		credentials: 'include',
-		headers: { 'Content-Type': 'application/json' },
+		cache: 'no-store',
+		headers: {
+			'Content-Type': 'application/json',
+			...( useCartTokenSession && cartToken ? { 'Cart-Token': cartToken } : {} ),
+		},
 	} );
 	updateStoreSessionHeaders( response );
 	if ( response.status === 404 && activeStoreBaseIndex < STORE_BASE_CANDIDATES.length - 1 ) {
