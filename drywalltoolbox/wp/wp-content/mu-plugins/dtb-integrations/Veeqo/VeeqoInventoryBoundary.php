@@ -37,11 +37,11 @@ if ( ! function_exists( 'dtb_veeqo_inventory_boundary_client_token' ) ) {
 	/**
 	 * Build a privacy-safe identity token for per-shopper rate limiting.
 	 *
-	 * Logged-in users and WooCommerce sessions receive isolated buckets. The
-	 * user-agent fallback is intentionally combined with IP and is only used
-	 * before WooCommerce has issued a session cookie.
+	 * Logged-in users, WooCommerce sessions, and storefront-generated client
+	 * tokens receive isolated buckets. The user-agent fallback is only used when
+	 * none of those stronger identifiers is available.
 	 */
-	function dtb_veeqo_inventory_boundary_client_token(): string {
+	function dtb_veeqo_inventory_boundary_client_token( ?WP_REST_Request $request = null ): string {
 		$user_id = function_exists( 'get_current_user_id' ) ? get_current_user_id() : 0;
 		if ( $user_id > 0 ) {
 			return 'user:' . $user_id;
@@ -59,6 +59,13 @@ if ( ! function_exists( 'dtb_veeqo_inventory_boundary_client_token' ) ) {
 			if ( str_starts_with( (string) $cookie_name, 'wp_woocommerce_session_' ) && '' !== (string) $cookie_value ) {
 				return 'wc-cookie:' . hash( 'sha256', (string) $cookie_value );
 			}
+		}
+
+		$client_token = $request instanceof WP_REST_Request
+			? trim( sanitize_text_field( (string) $request->get_header( 'x-dtb-client-token' ) ) )
+			: '';
+		if ( preg_match( '/^[A-Za-z0-9._:-]{16,128}$/', $client_token ) ) {
+			return 'client:' . hash( 'sha256', $client_token );
 		}
 
 		$user_agent = substr( sanitize_text_field( (string) ( $_SERVER['HTTP_USER_AGENT'] ?? 'anonymous' ) ), 0, 240 );
@@ -86,9 +93,9 @@ if ( ! function_exists( 'dtb_veeqo_inventory_boundary_request_rate_limited' ) ) 
 	 * NAT, while the IP ceiling prevents trivial cookie rotation from fully
 	 * bypassing abuse protection.
 	 */
-	function dtb_veeqo_inventory_boundary_request_rate_limited(): bool {
+	function dtb_veeqo_inventory_boundary_request_rate_limited( WP_REST_Request $request ): bool {
 		$ip       = dtb_veeqo_inventory_boundary_client_ip();
-		$identity = dtb_veeqo_inventory_boundary_client_token();
+		$identity = dtb_veeqo_inventory_boundary_client_token( $request );
 		$window   = (int) DTB_VEEQO_CART_AVAILABILITY_RATE_WINDOW;
 
 		$identity_limited = dtb_veeqo_inventory_boundary_rate_limited(
@@ -232,7 +239,7 @@ if ( ! function_exists( 'dtb_veeqo_check_projected_stock_for_sku' ) ) {
 
 if ( ! function_exists( 'dtb_veeqo_route_cart_availability' ) ) {
 	function dtb_veeqo_route_cart_availability( WP_REST_Request $request ): WP_REST_Response {
-		if ( dtb_veeqo_inventory_boundary_request_rate_limited() ) {
+		if ( dtb_veeqo_inventory_boundary_request_rate_limited( $request ) ) {
 			$response = new WP_REST_Response( [ 'code' => 'rate_limited', 'message' => 'Too many availability checks. Please try again shortly.' ], 429 );
 			$response->header( 'Retry-After', (string) DTB_VEEQO_CART_AVAILABILITY_RATE_WINDOW );
 			return $response;
