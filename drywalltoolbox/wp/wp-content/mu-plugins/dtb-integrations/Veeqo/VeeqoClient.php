@@ -331,169 +331,19 @@ function dtb_veeqo_route_status( WP_REST_Request $request ): WP_REST_Response {
  * }
  */
 function dtb_veeqo_route_shipping_rates( WP_REST_Request $request ): WP_REST_Response {
-	// This compatibility route must use the current Woo cart. Browser-supplied
-	// price, weight, category, and quantity values are never accepted for policy.
-	if ( class_exists( 'DTB_CheckoutValidator' ) ) {
-		$body  = $request->get_json_params();
-		$rates = DTB_CheckoutValidator::shipping_rates_for_current_cart( is_array( $body['destination'] ?? null ) ? $body['destination'] : [] );
-		if ( is_wp_error( $rates ) ) {
-			$status = (int) ( $rates->get_error_data()['status'] ?? 422 );
-			return new WP_REST_Response( dtb_error_envelope( $rates->get_error_code(), $rates->get_error_message(), $status ), $status );
-		}
-		return new WP_REST_Response( [ 'rates' => $rates, 'source' => 'woocommerce-cart' ], 200 );
+	$body  = $request->get_json_params();
+	$rates = class_exists( 'DTB_CheckoutValidator' )
+		? DTB_CheckoutValidator::shipping_rates_for_current_cart( is_array( $body['destination'] ?? null ) ? $body['destination'] : [] )
+		: new WP_Error( 'dtb_checkout_validator_unavailable', 'Authoritative checkout shipping policy is unavailable.', [ 'status' => 503 ] );
+	if ( is_wp_error( $rates ) ) {
+		$status = (int) ( $rates->get_error_data()['status'] ?? 422 );
+		return new WP_REST_Response( dtb_error_envelope( $rates->get_error_code(), $rates->get_error_message(), $status ), $status );
 	}
-
-	// Rate-limit: 30 requests per 60 s per IP.
-	$ip  = dtb_get_client_ip();
-	$key = 'dtb_veeqo_rates_rl_' . md5( $ip );
-	$cnt = (int) get_transient( $key );
-	if ( $cnt >= 30 ) {
-		$resp = new WP_REST_Response(
-			dtb_error_envelope( 'rate_limited', 'Too many requests. Please try again shortly.', 429 ),
-			429
-		);
-		$resp->header( 'Retry-After', '60' );
-		return $resp;
-	}
-	set_transient( $key, $cnt + 1, 60 );
-
-	$body = $request->get_json_params();
-	if ( empty( $body ) || empty( $body['items'] ) ) {
-		return new WP_REST_Response(
-			dtb_error_envelope( 'invalid_body', 'Request body must include "items".', 400 ),
-			400
-		);
-	}
-
-	$destination = $body['destination'] ?? [];
-	$items       = (array) $body['items'];
-
-	// ── Calculate order metrics ───────────────────────────────────────────────
-	$subtotal        = 0.0;
-	$total_weight    = 0.0;
-	$has_repair      = false;
-	$has_product     = false;
-
-	foreach ( $items as $item ) {
-		$qty       = max( 1, (int) ( $item['quantity'] ?? 1 ) );
-		$price     = (float) ( $item['price'] ?? 0 );
-		$weight    = (float) ( $item['weight'] ?? 0.5 );
-		$category  = strtolower( (string) ( $item['category'] ?? 'product' ) );
-
-		$subtotal     += $price * $qty;
-		$total_weight += $weight * $qty;
-
-		if ( str_contains( $category, 'repair' ) || str_contains( $category, 'service' ) ) {
-			$has_repair = true;
-		} else {
-			$has_product = true;
-		}
-	}
-
-	// ── Determine country / zone ──────────────────────────────────────────────
-	$country = strtoupper( sanitize_text_field( $destination['country'] ?? 'US' ) );
-	$state   = strtoupper( sanitize_text_field( $destination['state']   ?? ''   ) );
-
-	$is_domestic      = ( 'US' === $country );
-	$is_international = ! $is_domestic;
-
-	// ── Repair-service rate logic ─────────────────────────────────────────────
-	// Repair services are drop-shipped to our repair facility; a flat
-	// two-way shipping allowance is included in the service quote.
-	if ( $has_repair && ! $has_product ) {
-		$rates = [
-			[
-				'id'       => 'repair_standard',
-				'name'     => 'Repair Service — Prepaid Shipping Label',
-				'price'    => 0.00,
-				'currency' => 'USD',
-				'eta'      => 'We will email a prepaid shipping label within 24 hours.',
-			],
-		];
-
-		return new WP_REST_Response( [ 'rates' => $rates ], 200 );
-	}
-
-	// ── Product rate logic ────────────────────────────────────────────────────
-	// Free shipping threshold: orders ≥ $500 ship free (domestic, standard).
-	// Otherwise rates are tiered by total order weight.
-
-	$rates = [];
-
-	if ( $is_domestic ) {
-		if ( $subtotal >= 500.0 ) {
-			$standard_price = 0.00;
-		} elseif ( $total_weight <= 1.0 ) {
-			$standard_price = 7.99;
-		} elseif ( $total_weight <= 5.0 ) {
-			$standard_price = 12.99;
-		} elseif ( $total_weight <= 15.0 ) {
-			$standard_price = 19.99;
-		} else {
-			$standard_price = 29.99;
-		}
-
-		$rates[] = [
-			'id'       => 'standard',
-			'name'     => 'Standard Shipping (5–7 business days)',
-			'price'    => round( $standard_price, 2 ),
-			'currency' => 'USD',
-		];
-
-		$express_price = max( 0.00, $standard_price + 10.00 );
-		$rates[]       = [
-			'id'       => 'express',
-			'name'     => 'Express Shipping (2–3 business days)',
-			'price'    => round( $express_price, 2 ),
-			'currency' => 'USD',
-		];
-
-		$overnight_price = max( 0.00, $standard_price + 30.00 );
-		$rates[]         = [
-			'id'       => 'overnight',
-			'name'     => 'Overnight Shipping (next business day)',
-			'price'    => round( $overnight_price, 2 ),
-			'currency' => 'USD',
-		];
-	} else {
-		// International: flat-rate tiers.
-		if ( $total_weight <= 2.0 ) {
-			$intl_base = 29.99;
-		} elseif ( $total_weight <= 10.0 ) {
-			$intl_base = 49.99;
-		} else {
-			$intl_base = 79.99;
-		}
-
-		$rates[] = [
-			'id'       => 'intl_standard',
-			'name'     => 'International Standard (10–15 business days)',
-			'price'    => round( $intl_base, 2 ),
-			'currency' => 'USD',
-		];
-		$rates[] = [
-			'id'       => 'intl_express',
-			'name'     => 'International Express (5–7 business days)',
-			'price'    => round( $intl_base + 30.00, 2 ),
-			'currency' => 'USD',
-		];
-	}
-
-	// Allow Veeqo-aware overrides when configured — log the sync, return computed rates.
-	if ( dtb_veeqo_enabled() ) {
-		dtb_veeqo_log( 'debug', 'shipping_rates_calculated', 'Rates computed for request.', [
-			'subtotal'     => $subtotal,
-			'weight'       => $total_weight,
-			'country'      => $country,
-			'rate_count'   => count( $rates ),
-		] );
-	}
-
-	return new WP_REST_Response( [ 'rates' => $rates ], 200 );
+	return new WP_REST_Response( [ 'rates' => $rates, 'source' => 'woocommerce-cart' ], 200 );
 }
 
 /**
- * GET /dtb/v1/veeqo/inventory
+* GET /dtb/v1/veeqo/inventory
  *
  * Returns Veeqo inventory levels for all (or filtered) products.
  * Requires a valid JWT.
