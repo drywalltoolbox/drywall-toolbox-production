@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -39,6 +42,14 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Validate MU-plugin composition and security boundaries
+        shell: pwsh
+        run: ./scripts/smoke-dtb-mu-modules.ps1
+
+      - name: Validate catalog platform structure
+        shell: pwsh
+        run: ./scripts/smoke-dtb-catalog-api.ps1
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -55,8 +66,6 @@ jobs:
       - name: Build frontend for drywalltoolbox.com
         run: cd frontend && npm run build
         env:
-          REACT_APP_WC_AUTH_USER: ${{ secrets.REACT_APP_WC_AUTH_USER }}
-          REACT_APP_WC_AUTH_PASS: ${{ secrets.REACT_APP_WC_AUTH_PASS }}
           REACT_APP_STRIPE_PUBLISHABLE_KEY: ${{ secrets.REACT_APP_STRIPE_PUBLISHABLE_KEY }}
 
       - name: Assemble deployment payload
