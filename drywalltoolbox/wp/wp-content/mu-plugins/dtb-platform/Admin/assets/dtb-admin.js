@@ -763,7 +763,7 @@
 	};
 
 	// =========================================================================
-	// LIVE INTERACTION LAYER  (P0 — documented in mu-plugins-rebuild.md)
+	// LIVE INTERACTION LAYER  (P0 — documented in docs/plans/mu-plugins-rebuild.md)
 	// =========================================================================
 
 	/** Tracks region IDs that have unsaved user input. */

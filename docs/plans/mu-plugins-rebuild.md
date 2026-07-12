@@ -1,3 +1,5 @@
+# DTB MU-Plugins Admin Rebuild Plan
+
 ## Architecture / Approach
 
 Drywall Toolbox is correctly shaped for this work: WordPress/WooCommerce is the backend/admin system of record, custom logic belongs in MU-plugins, and operator-facing admin tooling is explicitly part of the product operating model.  The implementation should therefore **not** build a separate admin SPA. It should upgrade the existing MU-plugin admin surfaces with a shared workbench pattern: same modal shell, same command bar, same action/audit model, and module-specific intelligence panels.

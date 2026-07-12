@@ -4,7 +4,7 @@
 > **Entity:** Drywall Toolbox LLC  
 > **Jurisdiction:** Minnesota  
 > **Governing statute:** Minnesota Revised Uniform Limited Liability Company Act, Minn. Stat. Chapter 322C  
-> **Filename:** `docs/dtb-operaring.md`  
+> **Filename:** `docs/company/dtb-operating-agreement.md`  
 > **Last updated:** 2026-07-04
 
 ---
