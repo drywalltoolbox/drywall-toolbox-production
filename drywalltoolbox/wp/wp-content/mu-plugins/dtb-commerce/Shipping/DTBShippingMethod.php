@@ -146,3 +146,72 @@ add_filter( 'woocommerce_shipping_methods', function ( array $methods ): array {
 	$methods['dtb_veeqo_rates'] = 'DTB_Shipping_Method';
 	return $methods;
 } );
+
+/**
+ * Bootstrap the DTB shipping method into WooCommerce shipping zones on first
+ * activation if no zone already contains an instance of it.
+ *
+ * Creates a "Rest of World" zone (zone_id=0) instance and a dedicated US zone
+ * so domestic and international policy rates are always available without
+ * manual WooCommerce admin configuration.
+ *
+ * This runs once on 'woocommerce_init' and marks completion via an option so
+ * it does not re-run on every request.
+ */
+add_action( 'woocommerce_init', 'dtb_bootstrap_shipping_zones', 20 );
+
+function dtb_bootstrap_shipping_zones(): void {
+	if ( get_option( 'dtb_shipping_zones_bootstrapped' ) ) {
+		return;
+	}
+
+	if ( ! class_exists( 'WC_Shipping_Zones' ) || ! class_exists( 'WC_Shipping_Zone' ) ) {
+		return;
+	}
+
+	$method_id = 'dtb_veeqo_rates';
+
+	// Check whether the method is already in any zone (including zone 0 = Rest of World).
+	$already_installed = false;
+	foreach ( WC_Shipping_Zones::get_zones() as $zone_data ) {
+		$zone    = WC_Shipping_Zones::get_zone( $zone_data['zone_id'] );
+		$methods = $zone->get_shipping_methods( false, 'values' );
+		foreach ( $methods as $m ) {
+			if ( isset( $m->id ) && $m->id === $method_id ) {
+				$already_installed = true;
+				break 2;
+			}
+		}
+	}
+
+	// Also check zone 0 (Rest of World) which is not returned by get_zones().
+	if ( ! $already_installed ) {
+		$zone_0  = new WC_Shipping_Zone( 0 );
+		$methods = $zone_0->get_shipping_methods( false, 'values' );
+		foreach ( $methods as $m ) {
+			if ( isset( $m->id ) && $m->id === $method_id ) {
+				$already_installed = true;
+				break;
+			}
+		}
+	}
+
+	if ( $already_installed ) {
+		update_option( 'dtb_shipping_zones_bootstrapped', '1' );
+		return;
+	}
+
+	// Create a United States zone.
+	$us_zone = new WC_Shipping_Zone();
+	$us_zone->set_zone_name( 'United States' );
+	$us_zone->set_zone_order( 1 );
+	$us_zone->add_location( 'US', 'country' );
+	$us_zone->save();
+	$us_zone->add_shipping_method( $method_id );
+
+	// Add to Rest of World (zone 0) to catch all other destinations.
+	$row_zone = new WC_Shipping_Zone( 0 );
+	$row_zone->add_shipping_method( $method_id );
+
+	update_option( 'dtb_shipping_zones_bootstrapped', '1' );
+}
