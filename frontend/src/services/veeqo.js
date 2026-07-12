@@ -26,6 +26,9 @@ const resolvedApiBase = envApiBase || ( /github\.io$/i.test( runtimeHost ) ? 'ht
 
 const DTB_PROXY_BASE = `${ resolvedApiBase.replace( /\/+$/, '' ) }/wp-json/dtb/v1`;
 const FREE_SHIPPING_EXCLUDED_STATES = new Set( [ 'AK', 'ALASKA', 'HI', 'HAWAII' ] );
+const AVAILABILITY_CLIENT_TOKEN_KEY = 'dtb_availability_client_token';
+
+let availabilityClientToken = '';
 
 function normalizeStateCode( value = '' ) {
   return String( value || '' ).trim().toUpperCase().replace( /\./g, '' );
@@ -46,6 +49,37 @@ function normalizePositiveInteger( value, fallback = 1 ) {
 function normalizeProductId( value ) {
   const parsed = Number( value );
   return Number.isFinite( parsed ) && parsed > 0 ? Math.trunc( parsed ) : null;
+}
+
+function getAvailabilityClientToken() {
+  if ( availabilityClientToken ) return availabilityClientToken;
+
+  if ( typeof window === 'undefined' ) {
+    return '';
+  }
+
+  try {
+    const stored = window.sessionStorage.getItem( AVAILABILITY_CLIENT_TOKEN_KEY );
+    if ( stored ) {
+      availabilityClientToken = stored;
+      return availabilityClientToken;
+    }
+  } catch {
+    // Storage may be unavailable in hardened/private browser contexts.
+  }
+
+  const generated = typeof window.crypto?.randomUUID === 'function'
+    ? window.crypto.randomUUID()
+    : `dtb-${ Date.now().toString( 36 ) }-${ Math.random().toString( 36 ).slice( 2 ) }-${ Math.random().toString( 36 ).slice( 2 ) }`;
+
+  availabilityClientToken = generated;
+  try {
+    window.sessionStorage.setItem( AVAILABILITY_CLIENT_TOKEN_KEY, generated );
+  } catch {
+    // The in-memory token still isolates requests for the current page runtime.
+  }
+
+  return availabilityClientToken;
 }
 
 function calculateItemsSubtotal( items = [] ) {
@@ -166,10 +200,14 @@ class VeeqoService {
       }
 
       const url = `${ DTB_PROXY_BASE }/veeqo/cart-availability`;
+      const clientToken = getAvailabilityClientToken();
       const res = await fetch( url, {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...( clientToken ? { 'X-DTB-Client-Token': clientToken } : {} ),
+        },
         body: JSON.stringify( { items } ),
       } );
 
