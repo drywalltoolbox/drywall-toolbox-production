@@ -385,20 +385,11 @@ export default function Checkout() {
   const [selectedRateId, setSelectedRateId] = useState('');
   const { pendingPayment, rememberPayment, dismissPayment, resumePayment } = useCheckoutRecovery();
 
-  const checkoutAttemptIdRef = useRef(pendingPayment?.attemptId || makeCheckoutAttemptId());
+  const [checkoutAttemptId, setCheckoutAttemptId] = useState(
+    () => pendingPayment?.attemptId || makeCheckoutAttemptId(),
+  );
   const isSubmittingRef = useRef(false);
   const processing = submitStatus !== 'idle';
-  const quoteTotals = checkoutQuote?.totals || {};
-  const quoteReady = Boolean(checkoutQuote?.quote_id);
-  const subtotal = toMoney(quoteTotals.subtotal);
-  const shipping = toMoney(quoteTotals.shipping);
-  const taxAmount = toMoney(quoteTotals.tax);
-  const displayTotal = toMoney(quoteTotals.total);
-  const total = Math.max(0, displayTotal - taxAmount);
-  const taxPreview = useMemo(
-    () => ({ status: quoteReady ? 'ready' : 'idle', amount: taxAmount }),
-    [quoteReady, taxAmount],
-  );
 
   const isContactComplete = useMemo(
     () => formData.firstName.trim() !== '' && formData.lastName.trim() !== '' && formData.email.trim() !== '' && formData.phone.trim() !== '',
@@ -422,12 +413,17 @@ export default function Checkout() {
     isAddressComplete,
   });
 
-  useEffect(() => {
-    if ( !checkoutQuote || !shippingRates.length ) return;
-    if ( !shippingRates.some( ( rate ) => String( rate.id ) === String( selectedRateId ) ) ) {
-      setSelectedRateId( String( checkoutQuote.selected_rate_id || shippingRates[0].id ) );
-    }
-  }, [checkoutQuote, selectedRateId, shippingRates]);
+  const quoteTotals = checkoutQuote?.totals || {};
+  const quoteReady = Boolean(checkoutQuote?.quote_id);
+  const subtotal = toMoney(quoteTotals.subtotal);
+  const shipping = toMoney(quoteTotals.shipping);
+  const taxAmount = toMoney(quoteTotals.tax);
+  const displayTotal = toMoney(quoteTotals.total);
+  const total = Math.max(0, displayTotal - taxAmount);
+  const taxPreview = { status: quoteReady ? 'ready' : 'idle', amount: taxAmount };
+  const activeSelectedRateId = shippingRates.some((rate) => String(rate.id) === String(selectedRateId))
+    ? String(selectedRateId)
+    : String(checkoutQuote?.selected_rate_id || shippingRates[0]?.id || '');
 
   const canSubmitCheckout = useMemo(
     () => !processing && !capabilitiesLoading && !paymentSetupError && quoteReady && isFormComplete && safeCartItems.length > 0 && Boolean(paymentMethod) && !isManualPaymentMethod(paymentMethod),
@@ -498,7 +494,7 @@ export default function Checkout() {
 
   const dismissPendingPayment = useCallback(() => {
     dismissPayment();
-    checkoutAttemptIdRef.current = makeCheckoutAttemptId();
+    setCheckoutAttemptId(makeCheckoutAttemptId());
   }, [dismissPayment]);
 
   const resumePendingPayment = useCallback(() => {
@@ -510,7 +506,7 @@ export default function Checkout() {
     const paymentUrl = normalizeWooPaymentUrl(result?.paymentUrl || '');
     setOrderDetails({ order: { ...orderPayload, payment_url: paymentUrl, payment_required: true } });
     rememberPayment({
-      attemptId: checkoutAttemptIdRef.current,
+      attemptId: checkoutAttemptId,
       resumeToken: result?.session?.resume_token,
       sessionId: result?.session?.session_id,
       expiresAt: result?.session?.expires_at,
@@ -519,14 +515,14 @@ export default function Checkout() {
     setSubmitStatus('ready');
     isSubmittingRef.current = false;
     window.setTimeout(() => window.location.assign(paymentUrl), 250);
-  }, [rememberPayment, safeCartItems]);
+  }, [checkoutAttemptId, rememberPayment, safeCartItems]);
 
   const handleCheckoutComplete = useCallback((result) => {
     const orderPayload = result?.order || {};
     setOrderDetails({ order: orderPayload });
     dismissPayment();
     setOrderComplete(true);
-    checkoutAttemptIdRef.current = makeCheckoutAttemptId();
+    setCheckoutAttemptId(makeCheckoutAttemptId());
     void clearCart().catch(() => {});
     setSubmitStatus('idle');
     isSubmittingRef.current = false;
@@ -537,8 +533,8 @@ export default function Checkout() {
     formData,
     couponCodes: manualCoupons,
     paymentMethod,
-    selectedRateId,
-    idempotencyKey: checkoutAttemptIdRef.current,
+    selectedRateId: activeSelectedRateId,
+    idempotencyKey: checkoutAttemptId,
     onPaymentRequired: handlePaymentRequired,
     onComplete: handleCheckoutComplete,
   });
@@ -927,13 +923,13 @@ export default function Checkout() {
                   {shippingRates.map((rate) => (
                     <label
                       key={rate.id}
-                      className={`dtb-co-rate-option${selectedRateId === rate.id ? ' dtb-co-rate-option--selected' : ''}`}
+                      className={`dtb-co-rate-option${activeSelectedRateId === String(rate.id) ? ' dtb-co-rate-option--selected' : ''}`}
                     >
                       <input
                         type="radio"
                         name="shippingRate"
                         value={rate.id}
-                        checked={selectedRateId === rate.id}
+                        checked={activeSelectedRateId === String(rate.id)}
                         onChange={() => setSelectedRateId(String(rate.id))}
                       />
                       <div className="dtb-co-rate-meta">

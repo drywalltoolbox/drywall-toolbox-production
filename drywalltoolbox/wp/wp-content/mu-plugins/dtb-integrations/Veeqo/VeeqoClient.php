@@ -303,10 +303,10 @@ function dtb_veeqo_route_status( WP_REST_Request $request ): WP_REST_Response {
 /**
  * POST /dtb/v1/veeqo/shipping-rates
  *
- * Calculates real-time shipping rates for a destination address and cart.
- * Rate logic: tiered by order value and total weight, with separate tiers for
- * repair services (identified by product category). Falls back gracefully when
- * Veeqo is not configured by returning sensible static rates.
+ * Compatibility endpoint for the server-authoritative WooCommerce shipping
+ * policy. It reads the current authenticated/session cart; request item
+ * prices, weights, categories, and totals are ignored. This endpoint does not
+ * call Veeqo and does not provide live carrier quotes.
  *
  * Request body:
  * {
@@ -316,9 +316,7 @@ function dtb_veeqo_route_status( WP_REST_Request $request ): WP_REST_Response {
  *     "state":      "...", "zip": "...",
  *     "country":    "US"
  *   },
- *   "items": [
- *     { "id": 123, "sku": "...", "name": "...", "quantity": 2, "price": 49.99, "weight": 0.5, "category": "product" }
- *   ]
+ *   "items": []
  * }
  *
  * Response:

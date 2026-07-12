@@ -239,6 +239,7 @@ function dtb_api_security_relax_admin_background_nonce_failures( $result ) {
 		'/wp-json/wp/v2/users/me',
 		'/wp-json/newfold-notifications/v1/notifications',
 		'/wp-json/newfold-ctb/v2/ctb/url',
+		'/wp-json/dtb/v1/admin/', // DTB admin live-region background polling.
 	];
 
 	$route_allowed = false;
@@ -253,12 +254,25 @@ function dtb_api_security_relax_admin_background_nonce_failures( $result ) {
 		return $result;
 	}
 
-	$referrer = wp_get_raw_referer();
-	$site_host = wp_parse_url( home_url(), PHP_URL_HOST );
-	$ref_host  = $referrer ? wp_parse_url( $referrer, PHP_URL_HOST ) : '';
-	$ref_path  = $referrer ? (string) wp_parse_url( $referrer, PHP_URL_PATH ) : '';
+	// Accept same-site requests via either the HTTP Origin header (reliable for
+	// same-origin fetch() calls) or the HTTP Referer pointing to /wp-admin/.
+	// Some hosting reverse-proxies strip Referer; accepting Origin handles that case.
+	$raw_origin = isset( $_SERVER['HTTP_ORIGIN'] )
+		? (string) wp_unslash( $_SERVER['HTTP_ORIGIN'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		: '';
+	$referrer   = wp_get_raw_referer();
+	$site_host  = wp_parse_url( home_url(), PHP_URL_HOST );
 
-	if ( ! $site_host || ! $ref_host || strtolower( $site_host ) !== strtolower( $ref_host ) || false === strpos( $ref_path, '/wp-admin/' ) ) {
+	$origin_host = $raw_origin ? wp_parse_url( $raw_origin, PHP_URL_HOST ) : '';
+	$ref_host    = $referrer ? wp_parse_url( $referrer, PHP_URL_HOST ) : '';
+	$ref_path    = $referrer ? (string) wp_parse_url( $referrer, PHP_URL_PATH ) : '';
+
+	$same_site_origin   = $site_host && $origin_host && strtolower( $site_host ) === strtolower( $origin_host );
+	$admin_referer      = $site_host && $ref_host
+		&& strtolower( $site_host ) === strtolower( $ref_host )
+		&& false !== strpos( $ref_path, '/wp-admin/' );
+
+	if ( ! $same_site_origin && ! $admin_referer ) {
 		return $result;
 	}
 
@@ -360,4 +374,29 @@ function dtb_route_cors_test(): WP_REST_Response {
 			'origin_allowed'  => dtb_check_origin(),
 		]
 	);
+}
+
+// ── Admin-ajax nonce refresh ─────────────────────────────────────────────────
+
+/**
+ * Admin-ajax action: return a fresh wp_rest nonce for authenticated admin users.
+ *
+ * REST nonce refresh cannot be done via the REST API itself because
+ * rest_cookie_check_errors() calls wp_set_current_user(0) for nonce-less
+ * requests, causing wp_create_nonce() to generate a user-0 token that cannot
+ * authenticate the real admin user.  admin-ajax.php preserves the auth cookie
+ * user across the request without requiring a REST nonce, making it the
+ * correct transport for this operation.
+ *
+ * Called by DtbAdmin._refreshNonce() in dtb-admin.js when a background REST
+ * request receives a 403 (stale nonce or lost session).
+ */
+add_action( 'wp_ajax_dtb_refresh_nonce', 'dtb_api_security_ajax_refresh_nonce' );
+
+function dtb_api_security_ajax_refresh_nonce(): void {
+	if ( ! is_user_logged_in() || get_current_user_id() <= 0 ) {
+		wp_send_json_error( [ 'code' => 'not_authenticated' ], 401 );
+	}
+
+	wp_send_json_success( [ 'nonce' => wp_create_nonce( 'wp_rest' ) ] );
 }

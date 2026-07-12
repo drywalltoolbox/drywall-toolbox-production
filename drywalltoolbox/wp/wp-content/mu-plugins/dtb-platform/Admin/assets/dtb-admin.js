@@ -503,6 +503,37 @@
 	};
 
 	// =========================================================================
+	// NONCE REFRESH
+	// =========================================================================
+
+	/**
+	 * Silently fetch a fresh wp_rest nonce via admin-ajax.
+	 *
+	 * Uses the admin-ajax transport (not REST) so the auth cookie user is
+	 * preserved without needing a valid REST nonce.  Updates cfg.nonce in-place
+	 * so subsequent REST requests carry the new token.
+	 *
+	 * @returns {Promise<boolean>} Resolves true when nonce was refreshed successfully.
+	 */
+	DtbAdmin._refreshNonce = function () {
+		const ajaxUrl = ( cfg.ajaxUrl || '/wp-admin/admin-ajax.php' ).replace( /\/$/, '' );
+		return fetch( ajaxUrl + '?action=dtb_refresh_nonce', {
+			method:      'GET',
+			credentials: 'same-origin',
+			headers:     { Accept: 'application/json' },
+		} )
+			.then( function ( r ) { return r.ok ? r.json() : null; } )
+			.then( function ( data ) {
+				if ( data && data.success && data.data && data.data.nonce ) {
+					cfg.nonce = data.data.nonce;
+					return true;
+				}
+				return false;
+			} )
+			.catch( function () { return false; } );
+	};
+
+	// =========================================================================
 	// AJAX HELPER
 	// =========================================================================
 
@@ -848,7 +879,7 @@
 	 * @param {boolean}          [opts.history]  - Push state to history (default true)
 	 */
 	DtbAdmin.liveNavigate = function ( opts ) {
-		const { target, endpoint, query = {}, history: pushHistory = true } = opts;
+		const { target, endpoint, query = {}, history: pushHistory = true, silent = false } = opts;
 		if ( ! target || ! endpoint ) return;
 
 		const regionId = target.getAttribute( 'data-dtb-live-region' );
@@ -872,13 +903,28 @@
 			}
 		} );
 
-		fetch( url.toString(), {
-			signal:  controller.signal,
-			headers: {
-				'X-WP-Nonce': cfg.nonce || '',
-				'Accept':     'text/html',
-			},
-		} )
+		// Captures current url/signal so the retry closure can re-use the same request.
+		function doFetch() {
+			return fetch( url.toString(), {
+				signal:  controller.signal,
+				headers: {
+					'X-WP-Nonce': cfg.nonce || '',
+					'Accept':     'application/json',
+				},
+			} );
+		}
+
+		doFetch()
+			.then( function ( res ) {
+				// On 403: attempt a nonce refresh then retry once before giving up.
+				if ( res.status === 403 ) {
+					return DtbAdmin._refreshNonce().then( function ( refreshed ) {
+						if ( ! refreshed ) throw new Error( 'HTTP 403' );
+						return doFetch();
+					} );
+				}
+				return res;
+			} )
 			.then( function ( res ) {
 				if ( ! res.ok ) throw new Error( 'HTTP ' + res.status );
 				const ct = res.headers.get( 'Content-Type' ) || '';
@@ -923,7 +969,11 @@
 				if ( err.name === 'AbortError' ) return; // superseded request
 				DtbAdmin.setRegionLoading( target, false );
 				console.warn( '[DtbAdmin] liveNavigate failed:', err );
-				DtbAdmin.toast( 'Failed to load content. Please try again.', 'danger', 'Load Error' );
+				// Suppress toast for background auto-refresh polls (silent=true) so
+				// transient 403s from stale nonces don't interrupt the admin UI.
+				if ( ! silent ) {
+					DtbAdmin.toast( 'Failed to load content. Please try again.', 'danger', 'Load Error' );
+				}
 			} );
 	};
 
@@ -944,7 +994,7 @@
 		const endpoint = regionEl.getAttribute( 'data-dtb-endpoint' );
 		if ( ! endpoint ) return;
 
-		DtbAdmin.liveNavigate( { target: regionEl, endpoint, history: false } );
+		DtbAdmin.liveNavigate( { target: regionEl, endpoint, history: false, silent: true } );
 	};
 
 	// ── initLiveControls ─────────────────────────────────────────────────────

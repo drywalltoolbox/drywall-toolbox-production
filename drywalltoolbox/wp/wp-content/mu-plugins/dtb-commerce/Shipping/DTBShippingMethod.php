@@ -5,12 +5,12 @@ defined( 'ABSPATH' ) || exit;
 // =============================================================================
 // SERVER-AUTHORITATIVE WOOCOMMERCE SHIPPING METHOD
 //
-// Registers "Drywall Toolbox / Veeqo Rates" as a WooCommerce shipping method
+// Registers the server-authoritative Drywall Toolbox shipping policy as a
+// WooCommerce shipping method
 // available in WooCommerce → Settings → Shipping → Shipping zones.
 //
-// The method calls the server-side dtb_veeqo_calculate_rates() helper
-// to determine rates rather than calling Veeqo's API on every page load,
-// keeping latency low and avoiding unnecessary API calls.
+// The method derives its inputs from WooCommerce's server-side cart package.
+// It is a policy method, not a live Veeqo carrier-rating adapter.
 // =============================================================================
 
 add_action( 'woocommerce_shipping_init', 'dtb_commerce_register_shipping_method' );
@@ -19,7 +19,7 @@ function dtb_commerce_register_shipping_method(): void {
 	if ( ! class_exists( 'DTB_Shipping_Method' ) ) {
 
 		/**
-		 * WooCommerce shipping method: DTB / Veeqo Rates
+		 * WooCommerce shipping method: DTB Shipping Policy
 		 *
 		 * Shows Standard, Express, and Overnight options calculated from the
 		 * cart total and total weight.  Free shipping is applied automatically

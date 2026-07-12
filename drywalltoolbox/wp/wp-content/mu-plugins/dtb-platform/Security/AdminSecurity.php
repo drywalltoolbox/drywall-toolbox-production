@@ -87,7 +87,7 @@ function dtb_admin_security_log_rest_denials( $response, WP_REST_Server $server,
 }
 
 function dtb_admin_security_is_admin_route( string $route ): bool {
-	foreach ( [ '/wp/v2/users/me', '/wc-admin/', '/wc-analytics/', '/wc/v3/', '/newfold-ctb/' ] as $prefix ) {
+	foreach ( [ '/wp/v2/users/me', '/wc-admin/', '/wc-analytics/', '/wc/v3/', '/newfold-ctb/', '/dtb/v1/admin/' ] as $prefix ) {
 		if ( 0 === strpos( $route, $prefix ) ) {
 			return true;
 		}
