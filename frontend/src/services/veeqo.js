@@ -186,7 +186,7 @@ class VeeqoService {
    * Falls back to available=true on any error so checkout is never blocked by
    * an availability-check outage; WooCommerce still enforces stock server-side.
    *
-   * @param {Array<{ id?: number, product_id?: number, variation_id?: number, sku?: string, name: string, quantity: number }>} cartItems
+   * @param {Array<{ id?: number, product_id?: number, variation_id?: number, sku?: string, name?: string, quantity?: number }>} cartItems
    * @returns {Promise<{ available: boolean, items: Array, outOfStock: Array }>}
    */
   async checkInventoryAvailability( cartItems ) {
