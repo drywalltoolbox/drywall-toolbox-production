@@ -25,30 +25,22 @@ import {
 import DOMPurify from 'dompurify';
 
 import LogoWhite from '/logo-white.svg';
-import { getCheckoutCapabilities, previewCheckoutTax } from '../api/checkout.js';
-import { buildCheckoutLineItems, syncAndPlace } from '../api/cart.js';
+import { getCheckoutCapabilities } from '../api/checkout.js';
 import { useAuthContext } from '../auth/AuthContext.js';
 import { useCart } from '../context/CartContext';
-import { ESTIMATED_SHIP_RATE, FREE_SHIP_THRESHOLD } from '../constants/shipping';
-import veeqoService from '../services/veeqo';
 import SEOHead from '../components/shared/SEOHead';
-import {
-  clearPendingCheckoutPayment,
-  makeCheckoutAttemptId,
-  readPendingCheckoutPayment,
-  writePendingCheckoutPayment,
-} from '../utils/checkoutRecovery.js';
+import { useCheckoutController } from '../features/checkout/hooks/useCheckoutController.js';
+import { useCheckoutQuote } from '../features/checkout/hooks/useCheckoutQuote.js';
+import { useCheckoutRecovery } from '../features/checkout/hooks/useCheckoutRecovery.js';
+import { makeCheckoutAttemptId } from '../utils/checkoutRecovery.js';
 
 const WOO_NATIVE_GATEWAY_ID = 'woo_native';
-const WOO_PAYMENTS_METHOD_ID = 'woocommerce_payments';
+const WOO_PAYMENTS_METHOD_ID = '';
 const MANUAL_PAYMENT_METHOD_IDS = new Set(['cod', 'bacs', 'cheque']);
 const PREFERRED_ONLINE_PAYMENT_IDS = [WOO_PAYMENTS_METHOD_ID, 'stripe', 'ppcp-gateway'];
 const PUBLIC_PAYMENT_LABEL = 'Secure card payment';
 const PUBLIC_PAYMENT_TITLE = 'Secure Card Payment';
 const PAYMENT_LOGO_BASE = `${process.env.PUBLIC_URL || ''}/payment_logos`;
-const SHIPPING_DEBOUNCE_MS = 650;
-const TAX_PREVIEW_DEBOUNCE_MS = 700;
-const TAX_PREVIEW_TIMEOUT_MS = 12000;
 const US_STATES = [
   ['AL', 'Alabama'], ['AK', 'Alaska'], ['AZ', 'Arizona'], ['AR', 'Arkansas'],
   ['CA', 'California'], ['CO', 'Colorado'], ['CT', 'Connecticut'], ['DE', 'Delaware'],
@@ -101,14 +93,6 @@ const fadeSlide = {
 function toMoney(value) {
   const n = Number(value);
   return Number.isFinite(n) ? n : 0;
-}
-
-function withTimeout(promise, timeoutMs) {
-  let timeoutId;
-  const timeout = new Promise((_, reject) => {
-    timeoutId = window.setTimeout(() => reject(new Error('Tax preview timed out.')), timeoutMs);
-  });
-  return Promise.race([promise, timeout]).finally(() => window.clearTimeout(timeoutId));
 }
 
 function isManualPaymentMethod(method) {
@@ -185,21 +169,6 @@ function normalizeWooPaymentUrl(value) {
   }
 }
 
-function resolvePaymentUrl(orderPayload) {
-  const order = orderPayload?.finalize || orderPayload?.order || orderPayload || {};
-  const direct = order.payment_url || order.paymentUrl || order.pay_url || order.payUrl || order.checkout_payment_url;
-  if (typeof direct === 'string' && direct.trim()) return normalizeWooPaymentUrl(direct);
-  const id = order.order_id || order.id || order.orderId;
-  const key = order.order_key || order.key || order.orderKey;
-  const base = getPaymentBaseUrl();
-  if (!id || !key || !base) return '';
-  return normalizeWooPaymentUrl(`${base}/checkout/order-pay/${encodeURIComponent(id)}/?pay_for_order=true&key=${encodeURIComponent(key)}`);
-}
-
-function resolveOrderPayload(response) {
-  return response?.finalize || response?.order || response || null;
-}
-
 function makeCartSnapshot(cartItems) {
   return (Array.isArray(cartItems) ? cartItems : []).map((item) => ({
     id: item.id,
@@ -209,7 +178,6 @@ function makeCartSnapshot(cartItems) {
     sku: item.sku,
     name: item.name,
     quantity: item.quantity,
-    price: item.price,
     image: resolveCartItemImage(item),
   }));
 }
@@ -396,7 +364,7 @@ function MobileSummaryStrip({ cartItems, subtotal, shipping, total, taxAmount, t
 
 export default function Checkout() {
   const navigate = useNavigate();
-  const { cartItems, getCartTotal, clearCart } = useCart();
+  const { cartItems, clearCart } = useCart();
   const { isAuthenticated } = useAuthContext();
   const safeCartItems = useMemo(() => (Array.isArray(cartItems) ? cartItems : []), [cartItems]);
 
@@ -410,31 +378,27 @@ export default function Checkout() {
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(WOO_PAYMENTS_METHOD_ID);
-  const [paymentMethodTitle, setPaymentMethodTitle] = useState(PUBLIC_PAYMENT_TITLE);
   const [paymentSetupError, setPaymentSetupError] = useState(null);
   const [capabilitiesLoading, setCapabilitiesLoading] = useState(true);
   const [couponInput, setCouponInput] = useState('');
   const [manualCoupons, setManualCoupons] = useState([]);
-  const [shippingRates, setShippingRates] = useState([]);
-  const [selectedRate, setSelectedRate] = useState(null);
-  const [ratesLoading, setRatesLoading] = useState(false);
-  const [ratesError, setRatesError] = useState(null);
-  const [taxPreview, setTaxPreview] = useState({ status: 'idle', amount: 0 });
-  const [pendingPayment, setPendingPayment] = useState(() => readPendingCheckoutPayment());
+  const [selectedRateId, setSelectedRateId] = useState('');
+  const { pendingPayment, rememberPayment, dismissPayment, resumePayment } = useCheckoutRecovery();
 
-  const selectedRateRef = useRef(selectedRate);
   const checkoutAttemptIdRef = useRef(pendingPayment?.attemptId || makeCheckoutAttemptId());
-  const shippingRequestSeq = useRef(0);
-  const taxRequestSeq = useRef(0);
   const isSubmittingRef = useRef(false);
-  selectedRateRef.current = selectedRate;
-
   const processing = submitStatus !== 'idle';
-  const subtotal = toMoney(getCartTotal());
-  const shipping = selectedRate ? toMoney(selectedRate.price) : (subtotal >= FREE_SHIP_THRESHOLD ? 0 : ESTIMATED_SHIP_RATE);
-  const total = toMoney(subtotal + shipping);
-  const taxAmount = taxPreview.status === 'ready' ? toMoney(taxPreview.amount) : 0;
-  const displayTotal = total + taxAmount;
+  const quoteTotals = checkoutQuote?.totals || {};
+  const quoteReady = Boolean(checkoutQuote?.quote_id);
+  const subtotal = toMoney(quoteTotals.subtotal);
+  const shipping = toMoney(quoteTotals.shipping);
+  const taxAmount = toMoney(quoteTotals.tax);
+  const displayTotal = toMoney(quoteTotals.total);
+  const total = Math.max(0, displayTotal - taxAmount);
+  const taxPreview = useMemo(
+    () => ({ status: quoteReady ? 'ready' : 'idle', amount: taxAmount }),
+    [quoteReady, taxAmount],
+  );
 
   const isContactComplete = useMemo(
     () => formData.firstName.trim() !== '' && formData.lastName.trim() !== '' && formData.email.trim() !== '' && formData.phone.trim() !== '',
@@ -445,9 +409,29 @@ export default function Checkout() {
     [formData],
   );
   const isFormComplete = isContactComplete && isAddressComplete;
+  const {
+    quote: checkoutQuote,
+    rates: shippingRates,
+    loading: ratesLoading,
+    quoteError: ratesError,
+  } = useCheckoutQuote({
+    formData,
+    couponCodes: manualCoupons,
+    selectedRateId,
+    cartItems: safeCartItems,
+    isAddressComplete,
+  });
+
+  useEffect(() => {
+    if ( !checkoutQuote || !shippingRates.length ) return;
+    if ( !shippingRates.some( ( rate ) => String( rate.id ) === String( selectedRateId ) ) ) {
+      setSelectedRateId( String( checkoutQuote.selected_rate_id || shippingRates[0].id ) );
+    }
+  }, [checkoutQuote, selectedRateId, shippingRates]);
+
   const canSubmitCheckout = useMemo(
-    () => !processing && !capabilitiesLoading && !paymentSetupError && isFormComplete && safeCartItems.length > 0 && Boolean(paymentMethod) && !isManualPaymentMethod(paymentMethod),
-    [capabilitiesLoading, isFormComplete, paymentMethod, paymentSetupError, processing, safeCartItems.length],
+    () => !processing && !capabilitiesLoading && !paymentSetupError && quoteReady && isFormComplete && safeCartItems.length > 0 && Boolean(paymentMethod) && !isManualPaymentMethod(paymentMethod),
+    [capabilitiesLoading, isFormComplete, paymentMethod, paymentSetupError, processing, quoteReady, safeCartItems.length],
   );
 
   useEffect(() => {
@@ -457,93 +441,16 @@ export default function Checkout() {
         if (!mounted) return;
         const selection = resolvePaymentSelection(caps);
         setPaymentMethod(selection.methodId);
-        setPaymentMethodTitle(selection.orderTitle);
         setPaymentSetupError(selection.setupError);
       })
       .catch(() => {
         if (!mounted) return;
-        setPaymentMethod(WOO_PAYMENTS_METHOD_ID);
-        setPaymentMethodTitle(PUBLIC_PAYMENT_TITLE);
-        setPaymentSetupError(null);
+        setPaymentMethod('');
+        setPaymentSetupError('Secure payment capabilities could not be verified. Please try again before placing the order.');
       })
       .finally(() => { if (mounted) setCapabilitiesLoading(false); });
     return () => { mounted = false; };
   }, []);
-
-  const fetchShippingRates = useCallback(async (data, items) => {
-    const requestId = shippingRequestSeq.current + 1;
-    shippingRequestSeq.current = requestId;
-    setRatesLoading(true);
-    setRatesError(null);
-    try {
-      const destination = { address: data.address, city: data.city, state: data.state, zip: data.zip, country: data.country || 'US' };
-      const lineItems = items.map((item) => ({
-        id: item.id, sku: item.sku || '', name: item.name || '',
-        quantity: item.quantity, price: item.price || 0,
-        weight: item.weight || 0.5, category: 'product',
-      }));
-      const rates = await veeqoService.getShippingRates(destination, lineItems);
-      if (requestId !== shippingRequestSeq.current) return;
-      const normalizedRates = Array.isArray(rates) ? rates : [];
-      setShippingRates(normalizedRates);
-      if (normalizedRates.length > 0 && !selectedRateRef.current) setSelectedRate(normalizedRates[0]);
-    } catch (err) {
-      if (requestId !== shippingRequestSeq.current) return;
-      setRatesError('Could not load shipping options. Rates will be calculated at payment.');
-      console.warn('Shipping rate fetch failed:', err.message);
-    } finally {
-      if (requestId === shippingRequestSeq.current) setRatesLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!isAddressComplete) return undefined;
-    const timer = window.setTimeout(() => { fetchShippingRates(formData, safeCartItems); }, SHIPPING_DEBOUNCE_MS);
-    return () => window.clearTimeout(timer);
-  }, [fetchShippingRates, formData, isAddressComplete, safeCartItems]);
-
-  useEffect(() => {
-    if (!isAddressComplete) {
-      taxRequestSeq.current += 1;
-      setTaxPreview({ status: 'idle', amount: 0 });
-      return undefined;
-    }
-    const requestId = taxRequestSeq.current + 1;
-    taxRequestSeq.current = requestId;
-    const timer = window.setTimeout(async () => {
-      const address = {
-        first_name: formData.firstName, last_name: formData.lastName,
-        address_1: formData.address, address_2: '',
-        city: formData.city, state: formData.state,
-        postcode: formData.zip, country: formData.country || 'US',
-        email: formData.email, phone: formData.phone,
-      };
-      setTaxPreview((current) => ({ status: 'loading', amount: current.status === 'ready' ? current.amount : 0 }));
-      try {
-        const shippingLines = selectedRate ? [{
-          method_id: `dtb_veeqo_rates`,
-          method_title: selectedRate.name || 'Shipping',
-          total: String(toMoney(selectedRate.price)),
-        }] : [];
-        const preview = await withTimeout(
-          previewCheckoutTax({
-            billing: address, shipping: address,
-            line_items: buildCheckoutLineItems(safeCartItems),
-            shipping_lines: shippingLines,
-            coupon_codes: manualCoupons,
-          }),
-          TAX_PREVIEW_TIMEOUT_MS,
-        );
-        if (requestId !== taxRequestSeq.current) return;
-        setTaxPreview({ status: 'ready', amount: toMoney(preview?.tax) });
-      } catch (error) {
-        if (requestId !== taxRequestSeq.current) return;
-        console.warn('Tax preview fetch failed:', error?.message || error);
-        setTaxPreview({ status: 'error', amount: 0 });
-      }
-    }, TAX_PREVIEW_DEBOUNCE_MS);
-    return () => window.clearTimeout(timer);
-  }, [formData, isAddressComplete, manualCoupons, safeCartItems, selectedRate]);
 
   const sanitize = (value) => DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
 
@@ -590,17 +497,51 @@ export default function Checkout() {
   }
 
   const dismissPendingPayment = useCallback(() => {
-    clearPendingCheckoutPayment();
-    setPendingPayment(null);
+    dismissPayment();
     checkoutAttemptIdRef.current = makeCheckoutAttemptId();
-  }, []);
+  }, [dismissPayment]);
 
   const resumePendingPayment = useCallback(() => {
-    if (pendingPayment?.paymentUrl) {
-      const paymentUrl = normalizeWooPaymentUrl(pendingPayment.paymentUrl);
-      window.location.assign(paymentUrl);
-    }
-  }, [pendingPayment]);
+    resumePayment().catch((error) => setCheckoutError(error?.message || 'Unable to resume secure payment.'));
+  }, [resumePayment]);
+
+  const handlePaymentRequired = useCallback((result) => {
+    const orderPayload = result?.order || {};
+    const paymentUrl = normalizeWooPaymentUrl(result?.paymentUrl || '');
+    setOrderDetails({ order: { ...orderPayload, payment_url: paymentUrl, payment_required: true } });
+    rememberPayment({
+      attemptId: checkoutAttemptIdRef.current,
+      resumeToken: result?.session?.resume_token,
+      sessionId: result?.session?.session_id,
+      expiresAt: result?.session?.expires_at,
+      cartSnapshot: makeCartSnapshot(safeCartItems),
+    });
+    setSubmitStatus('ready');
+    isSubmittingRef.current = false;
+    window.setTimeout(() => window.location.assign(paymentUrl), 250);
+  }, [rememberPayment, safeCartItems]);
+
+  const handleCheckoutComplete = useCallback((result) => {
+    const orderPayload = result?.order || {};
+    setOrderDetails({ order: orderPayload });
+    dismissPayment();
+    setOrderComplete(true);
+    checkoutAttemptIdRef.current = makeCheckoutAttemptId();
+    void clearCart().catch(() => {});
+    setSubmitStatus('idle');
+    isSubmittingRef.current = false;
+  }, [clearCart, dismissPayment]);
+
+  const { submitCheckout } = useCheckoutController({
+    quote: checkoutQuote,
+    formData,
+    couponCodes: manualCoupons,
+    paymentMethod,
+    selectedRateId,
+    idempotencyKey: checkoutAttemptIdRef.current,
+    onPaymentRequired: handlePaymentRequired,
+    onComplete: handleCheckoutComplete,
+  });
 
   const handlePlaceOrder = useCallback(async () => {
     if (processing || isSubmittingRef.current) return;
@@ -620,56 +561,26 @@ export default function Checkout() {
       return;
     }
 
-    const billingAddress = {
-      first_name: formData.firstName, last_name: formData.lastName,
-      address_1: formData.address, address_2: '',
-      city: formData.city, state: formData.state,
-      postcode: formData.zip, country: formData.country,
-      email: formData.email, phone: formData.phone,
-    };
-    const wcRateId = selectedRate ? `dtb_veeqo_rates:${selectedRate.id}` : '';
+    if (!checkoutQuote?.quote_id) {
+      setCheckoutError('Your server checkout quote is not ready. Enter or review your address and try again.');
+      setSubmitStatus('idle');
+      isSubmittingRef.current = false;
+      return;
+    }
 
     try {
       setSubmitStatus('creating');
-      const response = await syncAndPlace(
-        safeCartItems, billingAddress, billingAddress,
-        paymentMethod, [], formData.customerNote,
-        wcRateId, selectedRate ? selectedRate.price : '',
-        manualCoupons, paymentMethodTitle, checkoutAttemptIdRef.current,
-      );
-      const orderPayload = resolveOrderPayload(response);
-      const paymentUrl = resolvePaymentUrl(orderPayload);
-      const orderId = orderPayload?.order_id || orderPayload?.id || orderPayload?.orderId || '';
-      const orderKey = orderPayload?.order_key || orderPayload?.key || orderPayload?.orderKey || '';
-      setOrderDetails({ order: { ...orderPayload, payment_url: paymentUrl, payment_required: Boolean(paymentUrl) } });
-
-      if (paymentUrl) {
-        const recovery = writePendingCheckoutPayment({
-          attemptId: checkoutAttemptIdRef.current,
-          orderId, orderKey, paymentUrl,
-          status: orderPayload?.status || 'pending',
-          total: orderPayload?.total, currency: orderPayload?.currency,
-          cartSnapshot: makeCartSnapshot(safeCartItems),
-        });
-        setPendingPayment(recovery);
-        setSubmitStatus('ready');
-        window.setTimeout(() => window.location.assign(paymentUrl), 250);
-        return;
+      const result = await submitCheckout(validateForm);
+      if (result?.blocked) {
+        setSubmitStatus('idle');
+        isSubmittingRef.current = false;
       }
-
-      clearPendingCheckoutPayment();
-      setPendingPayment(null);
-      setOrderComplete(true);
-      checkoutAttemptIdRef.current = makeCheckoutAttemptId();
-      await clearCart();
-      setSubmitStatus('idle');
-      isSubmittingRef.current = false;
     } catch (error) {
       setCheckoutError(error?.message || 'Checkout failed. Please try again.');
       setSubmitStatus('idle');
       isSubmittingRef.current = false;
     }
-  }, [clearCart, formData, manualCoupons, paymentMethod, paymentMethodTitle, paymentSetupError, processing, safeCartItems, selectedRate, validateForm]);
+  }, [checkoutQuote, paymentMethod, paymentSetupError, processing, submitCheckout, validateForm]);
 
   /* ─── Derived helpers ────────────────────────────────── */
   const inputCls = (field) =>
@@ -692,12 +603,12 @@ export default function Checkout() {
             <ShoppingCart size={32} strokeWidth={1.5} />
           </div>
           <h2>Your cart is empty</h2>
-          {pendingPayment?.paymentUrl ? (
+          {pendingPayment?.resumeToken ? (
             <>
               <p>A previous order still has an incomplete secure payment step.</p>
               <button
                 type="button"
-                onClick={resumePendingPayment}
+                onClick={() => { void resumePendingPayment(); }}
                 className="dtb-co-btn-primary dtb-co-btn-primary--wide"
                 style={{ marginBottom: '12px' }}
               >
@@ -785,7 +696,7 @@ export default function Checkout() {
       {/* Trust bar */}
       <div className="dtb-co-trustbar">
         <span className="dtb-co-trustbar__item">
-          Free shipping on orders ${FREE_SHIP_THRESHOLD}+
+          Server-calculated shipping for your delivery address
         </span>
         <span className="dtb-co-trustbar__sep" aria-hidden="true">|</span>
         <span className="dtb-co-trustbar__item">
@@ -815,7 +726,7 @@ export default function Checkout() {
             />
 
             {/* Pending payment recovery */}
-            {pendingPayment?.paymentUrl && (
+            {pendingPayment?.resumeToken && (
               <Motion.div
                 className="dtb-co-alert dtb-co-alert--warning dtb-co-recovery"
                 variants={fadeSlide}
@@ -829,7 +740,7 @@ export default function Checkout() {
                     <button
                       type="button"
                       className="dtb-co-recovery__btn dtb-co-recovery__btn--primary"
-                      onClick={resumePendingPayment}
+                      onClick={() => { void resumePendingPayment(); }}
                     >
                       Resume Payment <ExternalLink size={11} style={{ display: 'inline', marginLeft: 3 }} />
                     </button>
@@ -979,11 +890,6 @@ export default function Checkout() {
                 </div>
               </div>
 
-              {subtotal > 0 && subtotal < FREE_SHIP_THRESHOLD && (
-                <div className="dtb-co-ship-nudge">
-                  Spend <strong>${(FREE_SHIP_THRESHOLD - subtotal).toFixed(2)}</strong> more for free shipping
-                </div>
-              )}
             </Motion.section>
 
             {/* ── Shipping Method section ── */}
@@ -1021,14 +927,14 @@ export default function Checkout() {
                   {shippingRates.map((rate) => (
                     <label
                       key={rate.id}
-                      className={`dtb-co-rate-option${selectedRate?.id === rate.id ? ' dtb-co-rate-option--selected' : ''}`}
+                      className={`dtb-co-rate-option${selectedRateId === rate.id ? ' dtb-co-rate-option--selected' : ''}`}
                     >
                       <input
                         type="radio"
                         name="shippingRate"
                         value={rate.id}
-                        checked={selectedRate?.id === rate.id}
-                        onChange={() => setSelectedRate(rate)}
+                        checked={selectedRateId === rate.id}
+                        onChange={() => setSelectedRateId(String(rate.id))}
                       />
                       <div className="dtb-co-rate-meta">
                         <p className="dtb-co-rate-name">{rate.name}</p>

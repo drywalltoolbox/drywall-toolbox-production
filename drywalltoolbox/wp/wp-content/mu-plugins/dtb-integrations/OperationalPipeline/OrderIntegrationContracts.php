@@ -111,7 +111,8 @@ if ( ! function_exists( 'dtb_veeqo_sync_order' ) ) {
 			return [ 'status' => 'not_configured', 'veeqo_order_id' => null, 'tracking_number' => null, 'carrier' => null, 'inventory_reserved' => false, 'message' => 'Veeqo is not configured.', 'retryable' => false ];
 		}
 
-		$existing_id = absint( $order->get_meta( '_veeqo_order_id', true ) ?: $order->get_meta( '_dtb_veeqo_order_id', true ) );
+		$existing_id = absint( $order->get_meta( '_dtb_veeqo_order_id', true ) ?: $order->get_meta( '_veeqo_order_id', true ) );
+		$correlation_key = 'veeqo-order:' . $order_id . ':v1';
 		if ( $existing_id > 0 ) {
 			dtb_order_integration_set_meta_state( $order, 'veeqo', 'already_synced', [ 'order_id' => $existing_id ] );
 			return [ 'status' => 'already_synced', 'veeqo_order_id' => $existing_id, 'tracking_number' => (string) $order->get_meta( '_tracking_number', true ), 'carrier' => (string) $order->get_meta( '_tracking_carrier', true ), 'inventory_reserved' => true, 'message' => 'Order already has a Veeqo order ID.', 'retryable' => false ];
@@ -126,12 +127,19 @@ if ( ! function_exists( 'dtb_veeqo_sync_order' ) ) {
 				throw new DTB_Order_Integration_Exception( 'Veeqo order sync functions are unavailable.', false, 0 );
 			}
 
+			$order->update_meta_data( '_dtb_veeqo_correlation_key', $correlation_key );
+			$order->save_meta_data();
 			$payload = dtb_veeqo_build_order_payload( $order );
 			if ( null === $payload ) {
 				throw new DTB_Order_Integration_Exception( 'Veeqo order payload could not be built. Check order line items, SKUs, and shipping address.', false, 422 );
 			}
 
-			$result = dtb_veeqo_request( 'POST', '/orders', [], $payload );
+			$payload['order']['channel_order_number'] = $correlation_key;
+			if ( $existing_id > 0 ) {
+				$result = dtb_veeqo_request( 'PUT', '/orders/' . $existing_id, [], $payload );
+			} else {
+				$result = dtb_veeqo_request( 'POST', '/orders', [], $payload );
+			}
 			if ( empty( $result['ok'] ) ) {
 				$status = (int) ( $result['status'] ?? 0 );
 				$error  = sanitize_text_field( (string) ( $result['error'] ?? 'Veeqo API error.' ) );
@@ -153,7 +161,7 @@ if ( ! function_exists( 'dtb_veeqo_sync_order' ) ) {
 			}
 
 			$data     = is_array( $result['data'] ?? null ) ? $result['data'] : [];
-			$veeqo_id = absint( $data['id'] ?? $data['order']['id'] ?? 0 );
+			$veeqo_id = $existing_id > 0 ? $existing_id : absint( $data['id'] ?? $data['order']['id'] ?? 0 );
 			if ( $veeqo_id <= 0 ) {
 				throw new DTB_Order_Integration_Exception( 'Veeqo API response did not include an order ID.', false, 502 );
 			}
@@ -169,7 +177,7 @@ if ( ! function_exists( 'dtb_veeqo_sync_order' ) ) {
 				DTB_VeeqoSyncJob::log_timestamp( 'order_queue' );
 			}
 
-			return [ 'status' => 'synced', 'veeqo_order_id' => $veeqo_id, 'tracking_number' => null, 'carrier' => null, 'inventory_reserved' => true, 'message' => 'Order synced to Veeqo.', 'retryable' => false ];
+			return [ 'status' => $existing_id > 0 ? 'updated' : 'synced', 'veeqo_order_id' => $veeqo_id, 'tracking_number' => null, 'carrier' => null, 'inventory_reserved' => true, 'message' => $existing_id > 0 ? 'Existing Veeqo order reconciled.' : 'Order synced to Veeqo.', 'retryable' => false ];
 		} catch ( DTB_Order_Integration_Exception $e ) {
 			dtb_order_integration_set_meta_state( $order, 'veeqo', 'failed', [ 'error' => $e->getMessage() ] );
 			throw $e;

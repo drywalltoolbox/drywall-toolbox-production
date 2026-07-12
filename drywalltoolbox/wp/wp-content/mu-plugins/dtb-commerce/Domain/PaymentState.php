@@ -1,4 +1,39 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
-// Architecture placeholder for bounded module extraction: dtb-commerce/Domain/PaymentState.php.
+function dtb_checkout_handoff_is_order( $order ): bool {
+	return $order instanceof WC_Order && (
+		'woo_native' === (string) $order->get_meta( '_dtb_checkout_gateway', true )
+		|| '' !== (string) $order->get_meta( '_dtb_checkout_contract_version', true )
+		|| '' !== (string) $order->get_meta( '_dtb_checkout_session_id', true )
+		|| '' !== (string) $order->get_meta( '_dtb_checkout_idempotency_key', true )
+	);
+}
+
+function dtb_checkout_handoff_has_gateway_reference( WC_Order $order ): bool {
+	if ( '' !== trim( (string) $order->get_transaction_id() ) ) {
+		return true;
+	}
+	foreach ( [ '_wcpay_intent_id', '_wcpay_charge_id', '_stripe_intent_id', '_stripe_charge_id', '_payment_intent_id', '_paypal_order_id', '_paypal_transaction_id' ] as $meta_key ) {
+		if ( '' !== trim( (string) $order->get_meta( $meta_key, true ) ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function dtb_checkout_handoff_has_captured_payment( WC_Order $order ): bool {
+	return null !== $order->get_date_paid() && dtb_checkout_handoff_has_gateway_reference( $order );
+}
+
+function dtb_checkout_handoff_is_order_unpaid( WC_Order $order ): bool {
+	return dtb_checkout_handoff_is_order( $order )
+		&& (float) $order->get_total() > 0
+		&& ! dtb_checkout_handoff_has_captured_payment( $order )
+		&& ! in_array( (string) $order->get_status(), [ 'completed', 'cancelled', 'refunded', 'trash' ], true )
+		&& ! in_array( sanitize_key( (string) $order->get_payment_method() ), [ 'cod', 'bacs', 'cheque' ], true );
+}
+
+function dtb_checkout_handoff_is_unpaid_order( $order ): bool {
+	return $order instanceof WC_Order && dtb_checkout_handoff_is_order_unpaid( $order );
+}

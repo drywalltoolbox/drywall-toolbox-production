@@ -95,10 +95,6 @@ if ( ! function_exists( 'dtb_order_write_boundary_remove_legacy_hooks' ) ) {
 			return;
 		}
 
-		if ( dtb_order_write_boundary_bool_constant( 'DTB_ORDER_WRITE_BOUNDARY_DISABLE_LEGACY_VEEQO_DIRECT_SYNC', true ) ) {
-			remove_action( 'woocommerce_order_status_changed', 'dtb_veeqo_sync_order_status', 20 );
-		}
-
 		if ( dtb_order_write_boundary_bool_constant( 'DTB_ORDER_WRITE_BOUNDARY_DISABLE_MARKETPLACE_MATERIALIZATION', true ) ) {
 			remove_action( 'dtb_marketplace_materialize_unlinked', 'dtb_marketplace_materialize_unlinked_orders' );
 			remove_action( 'dtb_marketplace_reconcile', 'dtb_marketplace_materialize_unlinked_orders', 20 );

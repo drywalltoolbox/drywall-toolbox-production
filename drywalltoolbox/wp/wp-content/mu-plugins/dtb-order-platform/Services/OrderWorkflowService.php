@@ -58,11 +58,15 @@ function dtb_order_dispatch_processing_jobs( int $order_id ): void {
 	if ( $order instanceof WC_Order && function_exists( 'dtb_checkout_handoff_is_unpaid_order' ) && dtb_checkout_handoff_is_unpaid_order( $order ) ) {
 		return;
 	}
+	if ( ! add_option( 'dtb_order_processing_dispatch_' . $order_id, current_time( 'mysql', true ), '', 'no' ) ) {
+		return;
+	}
 
 	dtb_order_append_event( $order_id, 'order.fulfillment_queued', [
 		'source'     => 'system',
 		'actor_type' => 'system',
 		'visibility' => 'operator',
+		'idempotency_key' => 'order-processing-dispatch:' . $order_id,
 	] );
 
 	dtb_order_enqueue_job( 'dtb_order_sync_veeqo',                  $order_id );

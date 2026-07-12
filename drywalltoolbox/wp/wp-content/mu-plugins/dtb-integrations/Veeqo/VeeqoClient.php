@@ -128,6 +128,9 @@ function dtb_veeqo_request( string $method, string $path, array $params = [], ar
 	if ( ! empty( $body ) ) {
 		$args['body'] = wp_json_encode( $body );
 	}
+	if ( 'POST' === strtoupper( $method ) && '/orders' === $path && ! empty( $body['order']['channel_order_number'] ) ) {
+		$args['headers']['Idempotency-Key'] = sanitize_text_field( (string) $body['order']['channel_order_number'] );
+	}
 
 	$raw = wp_remote_request( $url, $args );
 
@@ -193,13 +196,6 @@ function dtb_veeqo_register_routes(): void {
 	register_rest_route( $ns, '/veeqo/inventory', [
 		'methods'             => 'GET',
 		'callback'            => 'dtb_veeqo_route_inventory',
-		'permission_callback' => '__return_true',
-	] );
-
-	// ── POST /dtb/v1/veeqo/webhooks/order — receive Veeqo order status events ─
-	register_rest_route( $ns, '/veeqo/webhooks/order', [
-		'methods'             => 'POST',
-		'callback'            => 'dtb_veeqo_route_webhook_order',
 		'permission_callback' => '__return_true',
 	] );
 
@@ -335,6 +331,18 @@ function dtb_veeqo_route_status( WP_REST_Request $request ): WP_REST_Response {
  * }
  */
 function dtb_veeqo_route_shipping_rates( WP_REST_Request $request ): WP_REST_Response {
+	// This compatibility route must use the current Woo cart. Browser-supplied
+	// price, weight, category, and quantity values are never accepted for policy.
+	if ( class_exists( 'DTB_CheckoutValidator' ) ) {
+		$body  = $request->get_json_params();
+		$rates = DTB_CheckoutValidator::shipping_rates_for_current_cart( is_array( $body['destination'] ?? null ) ? $body['destination'] : [] );
+		if ( is_wp_error( $rates ) ) {
+			$status = (int) ( $rates->get_error_data()['status'] ?? 422 );
+			return new WP_REST_Response( dtb_error_envelope( $rates->get_error_code(), $rates->get_error_message(), $status ), $status );
+		}
+		return new WP_REST_Response( [ 'rates' => $rates, 'source' => 'woocommerce-cart' ], 200 );
+	}
+
 	// Rate-limit: 30 requests per 60 s per IP.
 	$ip  = dtb_get_client_ip();
 	$key = 'dtb_veeqo_rates_rl_' . md5( $ip );
@@ -547,175 +555,6 @@ function dtb_veeqo_route_inventory( WP_REST_Request $request ): WP_REST_Response
 	return new WP_REST_Response( [ 'inventory' => $inventory ], 200 );
 }
 
-/**
- * POST /dtb/v1/veeqo/webhooks/order
- *
- * Receives Veeqo order-status webhook events and propagates them to
- * the matching WooCommerce order.
- *
- * Veeqo signs webhook requests with an HMAC-SHA256 of the raw body keyed with
- * DTB_VEEQO_WEBHOOK_SECRET and delivers the signature as a lowercase hex digest
- * in the X-Veeqo-Signature header (no base64 encoding, no binary prefix).
- *
- * Supported Veeqo status → WC status mappings:
- *   awaiting_fulfillment → processing
- *   allocated            → processing
- *   printed              → processing
- *   shipped              → completed
- *   cancelled            → cancelled
- *   refunded             → refunded
- */
-function dtb_veeqo_route_webhook_order( WP_REST_Request $request ): WP_REST_Response {
-	$cfg    = dtb_veeqo_config();
-	$secret = $cfg['webhook_secret'];
-
-	// Validate HMAC signature when secret is configured.
-	if ( '' !== $secret ) {
-		$raw_body = $request->get_body();
-		$sig      = $request->get_header( 'x_veeqo_signature' );
-
-		if ( ! $sig ) {
-			dtb_veeqo_log( 'warn', 'webhook_no_signature', 'Veeqo webhook received without signature.' );
-			return new WP_REST_Response(
-				dtb_error_envelope( 'missing_signature', 'Webhook signature is required.', 401 ),
-				401
-			);
-		}
-
-		$expected = hash_hmac( 'sha256', $raw_body, $secret ); // hex digest — matches Veeqo's X-Veeqo-Signature format
-		if ( ! hash_equals( $expected, $sig ) ) {
-			dtb_veeqo_log( 'warn', 'webhook_bad_signature', 'Veeqo webhook HMAC mismatch.' );
-			return new WP_REST_Response(
-				dtb_error_envelope( 'invalid_signature', 'Webhook signature mismatch.', 401 ),
-				401
-			);
-		}
-	}
-
-	$payload = $request->get_json_params();
-	if ( empty( $payload ) ) {
-		return new WP_REST_Response(
-			dtb_error_envelope( 'invalid_body', 'Empty or invalid JSON payload.', 400 ),
-			400
-		);
-	}
-
-	$veeqo_status   = strtolower( sanitize_text_field( $payload['status']   ?? '' ) );
-	$veeqo_order_id = absint( $payload['id'] ?? 0 );
-
-	// Veeqo stores the WooCommerce order number in the channel_order_number field.
-	$wc_order_number = sanitize_text_field( $payload['channel_order_number'] ?? '' );
-
-	if ( ! $wc_order_number ) {
-		dtb_veeqo_log( 'warn', 'webhook_no_wc_order', 'Veeqo webhook missing channel_order_number.', [
-			'veeqo_order_id' => $veeqo_order_id,
-		] );
-		return new WP_REST_Response( [ 'success' => true, 'note' => 'No WC order number; skipped.' ], 200 );
-	}
-
-	// Map Veeqo status to WooCommerce order status.
-	$status_map = [
-		'awaiting_fulfillment' => 'processing',
-		'allocated'            => 'processing',
-		'printed'              => 'processing',
-		'shipped'              => 'completed',
-		'cancelled'            => 'cancelled',
-		'refunded'             => 'refunded',
-	];
-
-	$wc_status = $status_map[ $veeqo_status ] ?? null;
-
-	if ( null === $wc_status ) {
-		dtb_veeqo_log( 'debug', 'webhook_unmapped_status', 'Veeqo status has no WC mapping.', [
-			'veeqo_status'   => $veeqo_status,
-			'veeqo_order_id' => $veeqo_order_id,
-		] );
-		return new WP_REST_Response( [ 'success' => true, 'note' => 'Status not mapped; skipped.' ], 200 );
-	}
-
-	// Find the WC order by order number.
-	$orders = wc_get_orders( [
-		'order_number' => $wc_order_number,
-		'limit'        => 1,
-		'return'       => 'objects',
-	] );
-
-	if ( empty( $orders ) ) {
-		dtb_veeqo_log( 'warn', 'webhook_wc_order_not_found', 'WC order not found for Veeqo webhook.', [
-			'wc_order_number' => $wc_order_number,
-			'veeqo_order_id'  => $veeqo_order_id,
-		] );
-		return new WP_REST_Response(
-			dtb_error_envelope( 'order_not_found', 'WooCommerce order not found.', 404 ),
-			404
-		);
-	}
-
-	/** @var WC_Order $wc_order */
-	$wc_order = $orders[0];
-
-	// ── Extract tracking information when Veeqo marks the order as shipped ────
-	// Veeqo delivers tracking at the root of the payload or inside shipments[].
-	$tracking_number  = '';
-	$tracking_carrier = '';
-
-	if ( 'shipped' === $veeqo_status ) {
-		$tracking_number = sanitize_text_field(
-			$payload['tracking_number']
-			?? ( $payload['shipments'][0]['tracking_number'] ?? '' )
-		);
-		$tracking_carrier = sanitize_text_field(
-			$payload['carrier']
-			?? $payload['tracking_carrier']
-			?? ( $payload['shipments'][0]['tracking_carrier'] ?? '' )
-		);
-
-		if ( '' !== $tracking_number ) {
-			$wc_order->update_meta_data( '_tracking_number', $tracking_number );
-			if ( '' !== $tracking_carrier ) {
-				$wc_order->update_meta_data( '_tracking_carrier', $tracking_carrier );
-			}
-		}
-	}
-
-	// ── Build the order note (append tracking when present) ───────────────────
-	$status_note = sprintf( '[Veeqo] Status synced from Veeqo order #%d (%s).', $veeqo_order_id, $veeqo_status );
-	if ( '' !== $tracking_number ) {
-		$status_note .= sprintf(
-			' Tracking: %s%s.',
-			$tracking_number,
-			'' !== $tracking_carrier ? ' (' . $tracking_carrier . ')' : ''
-		);
-	}
-
-	$prev_status = $wc_order->get_status();
-	$wc_order->update_status( $wc_status, $status_note );
-
-	dtb_veeqo_log( 'info', 'webhook_status_synced', 'WC order status updated from Veeqo webhook.', [
-		'wc_order_id'      => $wc_order->get_id(),
-		'prev_status'      => $prev_status,
-		'new_status'       => $wc_status,
-		'veeqo_order_id'   => $veeqo_order_id,
-		'veeqo_status'     => $veeqo_status,
-		'tracking_number'  => $tracking_number  ?: null,
-		'tracking_carrier' => $tracking_carrier ?: null,
-	] );
-
-	// Optionally store the Veeqo order ID on the WC order for cross-reference.
-	if ( $veeqo_order_id > 0 ) {
-		$wc_order->update_meta_data( '_veeqo_order_id', $veeqo_order_id );
-		$wc_order->save_meta_data();
-	}
-
-	dtb_veeqo_log_sync_timestamp( 'order_webhook' );
-
-	return new WP_REST_Response( [
-		'success'     => true,
-		'wc_order_id' => $wc_order->get_id(),
-		'new_status'  => $wc_status,
-	], 200 );
-}
-
 
 // =============================================================================
 // SECTION 3b — ADMIN-ONLY ROUTE CALLBACKS
@@ -724,10 +563,10 @@ function dtb_veeqo_route_webhook_order( WP_REST_Request $request ): WP_REST_Resp
 /**
  * POST /dtb/v1/veeqo/sync-order/{order_id}
  *
- * Force a fresh Veeqo sync for the given WooCommerce order.
- * Uses the canonical dtb_veeqo_sync_order() contract when available so that
- * integration state meta and order event ledger entries are written correctly.
- * Falls back to the legacy direct-API path for compatibility.
+ * Queue a canonical Veeqo retry for the given WooCommerce order.
+ *
+ * The existing external ID is deliberately retained. The queued integration
+ * contract decides whether the provider object is created or reconciled.
  *
  * Requires: manage_woocommerce capability (admin/shop manager only).
  */
@@ -749,77 +588,47 @@ function dtb_veeqo_route_admin_sync_order( WP_REST_Request $request ): WP_REST_R
 		);
 	}
 
-	// Clear any stale Veeqo order ID so the canonical sync will create a fresh order.
-	// Only do this when the admin explicitly requests a resync and the previous sync is in an error state.
-	$sync_status = (string) $order->get_meta( '_dtb_veeqo_sync_status', true );
-	$force       = (bool) ( $request->get_param( 'force' ) ?? false );
-	if ( $force ) {
-		$order->delete_meta_data( '_veeqo_order_id' );
-		$order->delete_meta_data( '_dtb_veeqo_order_id' );
-		$order->save_meta_data();
+	if ( ! function_exists( 'dtb_order_enqueue_job' ) ) {
+		return new WP_REST_Response( dtb_error_envelope( 'queue_unavailable', 'The canonical order queue is unavailable.', 503 ), 503 );
 	}
 
-	// Use canonical contract when available (preferred path).
-	if ( function_exists( 'dtb_veeqo_sync_order' ) ) {
-		try {
-			$result = dtb_veeqo_sync_order( $order_id, $order );
-			return new WP_REST_Response( [
-				'success'        => true,
-				'status'         => $result['status'],
-				'veeqo_order_id' => $result['veeqo_order_id'],
-				'message'        => $result['message'],
-			], 200 );
-		} catch ( DTB_Order_Integration_Exception $e ) {
-			return new WP_REST_Response(
-				dtb_error_envelope( 'sync_failed', $e->getMessage(), $e->status_code() ?: 500 ),
-				$e->status_code() ?: 500
-			);
-		}
-	}
-
-	// Legacy fallback: direct API call.
-	$payload = dtb_veeqo_build_order_payload( $order );
-	if ( null === $payload ) {
-		return new WP_REST_Response(
-			dtb_error_envelope( 'payload_error', 'Could not build Veeqo order payload. Verify all variation SKUs are set.', 422 ),
-			422
-		);
-	}
-
-	$result = dtb_veeqo_request( 'POST', '/orders', [], $payload );
-
-	if ( ! $result['ok'] ) {
-		return new WP_REST_Response(
-			dtb_error_envelope( 'veeqo_error', $result['error'], $result['status'] ?: 500 ),
-			$result['status'] ?: 500
-		);
-	}
-
-	$veeqo_id = absint( $result['data']['id'] ?? $result['data']['order']['id'] ?? 0 );
-	if ( $veeqo_id <= 0 ) {
-		return new WP_REST_Response(
-			dtb_error_envelope( 'veeqo_missing_order_id', 'Veeqo accepted the request but did not return an order ID.', 502 ),
-			502
-		);
-	}
-
-	$order->update_meta_data( '_veeqo_order_id', $veeqo_id );
-	$order->update_meta_data( '_dtb_veeqo_order_id', $veeqo_id );
-	$order->add_order_note( sprintf( '[Veeqo] Admin re-sync: Veeqo order #%d created.', $veeqo_id ) );
-	$order->save_meta_data();
-
-	dtb_veeqo_log( 'info', 'admin_sync_order', 'Admin manually synced WC order to Veeqo.', [
-		'wc_order_id'    => $order_id,
-		'veeqo_order_id' => $veeqo_id,
-		'admin_user_id'  => get_current_user_id(),
+	$reason = sanitize_text_field( (string) ( $request->get_param( 'reason' ) ?: 'admin_retry' ) );
+	$job_id = dtb_order_enqueue_job( 'dtb_order_sync_veeqo', $order_id, [
+		'trigger'      => 'admin_retry',
+		'retry_reason' => substr( $reason, 0, 160 ),
+		'operator_id'  => get_current_user_id(),
 	] );
+	if ( false === $job_id ) {
+		return new WP_REST_Response( dtb_error_envelope( 'queue_failed', 'The Veeqo retry could not be queued.', 503 ), 503 );
+	}
+
+	$existing_id = absint( $order->get_meta( '_dtb_veeqo_order_id', true ) ?: $order->get_meta( '_veeqo_order_id', true ) );
+	if ( function_exists( 'dtb_order_update_integration_state' ) ) {
+		dtb_order_update_integration_state( $order_id, 'veeqo', [
+			'status'       => 'queued',
+			'order_id'     => $existing_id ?: null,
+			'retry_reason' => substr( $reason, 0, 160 ),
+			'operator_id'  => get_current_user_id(),
+		] );
+	}
+	if ( function_exists( 'dtb_order_append_event' ) ) {
+		dtb_order_append_event( $order_id, 'integration.veeqo.retry_queued', [
+			'source'          => 'wp_admin',
+			'actor_type'      => 'admin',
+			'actor_id'        => get_current_user_id(),
+			'visibility'      => 'operator',
+			'idempotency_key' => 'veeqo-admin-retry:' . $order_id . ':' . get_current_user_id() . ':' . gmdate( 'Y-m-d-H-i' ),
+			'payload'         => [ 'retry_reason' => substr( $reason, 0, 160 ), 'existing_veeqo_order_id' => $existing_id ?: null ],
+		] );
+	}
 
 	return new WP_REST_Response( [
 		'success'        => true,
-		'status'         => 'synced',
-		'veeqo_order_id' => $veeqo_id,
-		'message'        => sprintf( 'Order #%d synced to Veeqo (#%d).', $order_id, $veeqo_id ),
-	], 200 );
+		'status'         => 'queued',
+		'job_id'         => $job_id,
+		'veeqo_order_id' => $existing_id ?: null,
+		'message'        => sprintf( 'Veeqo retry queued for order #%d.', $order_id ),
+	], 202 );
 }
 
 /**
@@ -903,135 +712,6 @@ function dtb_veeqo_route_admin_reset_webhook( WP_REST_Request $request ): WP_RES
 }
 
 
-// =============================================================================
-// SECTION 4 — WOOCOMMERCE → VEEQO ORDER SYNC
-//
-// When a WooCommerce order's status transitions to "processing" (i.e. payment
-// confirmed), the order is pushed to Veeqo for fulfilment.
-//
-// dtb_veeqo_sync_new_order() is the helper that creates the Veeqo order.
-// It is invoked by dtb_veeqo_sync_order_status() below, which is bound to
-// woocommerce_order_status_changed and handles both cases:
-//   • New order reaching "processing" for the first time (creates it in Veeqo).
-//   • Already-synced order changing status (updates Veeqo status to match).
-//
-// We intentionally do NOT hook woocommerce_checkout_order_processed or
-// woocommerce_store_api_checkout_order_processed because those fire before
-// payment is confirmed (status = "pending").  Veeqo should only receive orders
-// that are confirmed and ready for fulfilment.
-// =============================================================================
-
-function dtb_veeqo_sync_new_order( int $order_id, array $posted_data, WC_Order $order ): void {
-	if ( ! dtb_veeqo_enabled() ) {
-		return;
-	}
-
-	// Avoid double-sync if Veeqo order was already created (e.g. duplicate hook).
-	if ( $order->get_meta( '_veeqo_order_id' ) ) {
-		return;
-	}
-
-	$veeqo_order = dtb_veeqo_build_order_payload( $order );
-	if ( null === $veeqo_order ) {
-		return;
-	}
-
-	$result = dtb_veeqo_request( 'POST', '/orders', [], $veeqo_order );
-
-	if ( $result['ok'] ) {
-		$veeqo_id = absint( $result['data']['id'] ?? $result['data']['order']['id'] ?? 0 );
-		if ( $veeqo_id <= 0 ) {
-			$order->add_order_note( '[Veeqo] Order sync failed: response did not include a Veeqo order ID.' );
-			dtb_veeqo_log( 'error', 'order_sync_missing_id', 'Veeqo order create response did not include an order ID.', [
-				'wc_order_id' => $order_id,
-				'response'    => $result['data'],
-			] );
-			return;
-		}
-		$order->update_meta_data( '_veeqo_order_id', $veeqo_id );
-		$order->add_order_note( sprintf( '[Veeqo] Order created in Veeqo: #%d.', $veeqo_id ) );
-		$order->save_meta_data();
-
-		dtb_veeqo_log( 'info', 'order_synced', 'New WC order synced to Veeqo.', [
-			'wc_order_id'    => $order_id,
-			'veeqo_order_id' => $veeqo_id,
-		] );
-	} else {
-		$order->add_order_note( sprintf( '[Veeqo] Order sync failed: %s', $result['error'] ) );
-		dtb_veeqo_log( 'error', 'order_sync_failed', 'Failed to create Veeqo order.', [
-			'wc_order_id' => $order_id,
-			'error'       => $result['error'],
-		] );
-	}
-}
-
-/**
- * Hook: when a WC order transitions to "processing" (payment complete),
- * ensure the Veeqo order is also updated to awaiting_fulfillment.
- */
-add_action( 'woocommerce_order_status_changed', 'dtb_veeqo_sync_order_status', 20, 4 );
-
-function dtb_veeqo_sync_order_status( int $order_id, string $old_status, string $new_status, WC_Order $order ): void {
-	if ( ! dtb_veeqo_enabled() ) {
-		return;
-	}
-
-	$veeqo_order_id = (int) $order->get_meta( '_veeqo_order_id' );
-	if ( ! $veeqo_order_id ) {
-		// If we never synced the order to Veeqo, try now (e.g. order was created before plugin was active).
-		if ( 'processing' === $new_status ) {
-			dtb_veeqo_sync_new_order( $order_id, [], $order );
-		}
-		return;
-	}
-
-	// Map WC status to Veeqo status.
-	// 'completed' maps to 'shipped' ONLY when a tracking number is present on
-	// the order.  If WC marks the order complete without a tracking number
-	// (e.g. a manual admin click), push 'awaiting_fulfillment' instead so
-	// Veeqo can still perform fulfillment and generate a shipment record.
-	$tracking_number = trim( (string) $order->get_meta( '_tracking_number' ) );
-	$completed_veeqo = ( '' !== $tracking_number ) ? 'shipped' : 'awaiting_fulfillment';
-
-	$wc_to_veeqo = [
-		'processing' => 'awaiting_fulfillment',
-		'on-hold'    => 'awaiting_fulfillment',
-		'completed'  => $completed_veeqo,
-		'cancelled'  => 'cancelled',
-		'refunded'   => 'refunded',
-	];
-
-	$veeqo_status = $wc_to_veeqo[ $new_status ] ?? null;
-	if ( null === $veeqo_status ) {
-		return;
-	}
-
-	// Log a debug notice when WC "completed" is mapped to awaiting_fulfillment
-	// due to missing tracking — makes it easy to spot in the Veeqo log.
-	if ( 'completed' === $new_status && 'awaiting_fulfillment' === $veeqo_status ) {
-		dtb_veeqo_log( 'debug', 'completed_no_tracking', 'WC order completed without tracking number; Veeqo status set to awaiting_fulfillment.', [
-			'wc_order_id'    => $order_id,
-			'veeqo_order_id' => $veeqo_order_id,
-		] );
-	}
-
-	$result = dtb_veeqo_request( 'PUT', '/orders/' . $veeqo_order_id, [], [ 'status' => $veeqo_status ] );
-
-	if ( $result['ok'] ) {
-		dtb_veeqo_log( 'info', 'order_status_synced', 'WC order status synced to Veeqo.', [
-			'wc_order_id'    => $order_id,
-			'veeqo_order_id' => $veeqo_order_id,
-			'wc_status'      => $new_status,
-			'veeqo_status'   => $veeqo_status,
-		] );
-	} else {
-		dtb_veeqo_log( 'warn', 'order_status_sync_failed', 'Failed to sync WC order status to Veeqo.', [
-			'wc_order_id'    => $order_id,
-			'veeqo_order_id' => $veeqo_order_id,
-			'error'          => $result['error'],
-		] );
-	}
-}
 
 /**
  * Resolve a Veeqo sellable ID for a Woo product SKU and cache it on the product.
@@ -2366,39 +2046,14 @@ function dtb_veeqo_route_repair_request( WP_REST_Request $request ): WP_REST_Res
 		'priority'        => $priority,
 	] );
 
-	// ── Optional: sync to Veeqo ───────────────────────────────────────────────
-	$veeqo_order_id = null;
-	if ( dtb_veeqo_enabled() ) {
-		$veeqo_payload = dtb_veeqo_build_order_payload( $wc_order );
-		if ( $veeqo_payload ) {
-			$vresult = dtb_veeqo_request( 'POST', '/orders', [], $veeqo_payload );
-			if ( $vresult['ok'] ) {
-				$veeqo_order_id = absint( $vresult['data']['id'] ?? $vresult['data']['order']['id'] ?? 0 );
-				if ( $veeqo_order_id <= 0 ) {
-					dtb_veeqo_log( 'warn', 'repair_veeqo_sync_missing_id', 'Repair Veeqo sync response did not include an order ID.', [
-						'wc_order_id' => $wc_order_id,
-						'response'    => $vresult['data'],
-					] );
-					$veeqo_order_id = null;
-				}
-			}
-
-			if ( $veeqo_order_id ) {
-				$wc_order->update_meta_data( '_veeqo_order_id', $veeqo_order_id );
-				$wc_order->add_order_note( sprintf( '[Veeqo] Repair order created: #%d.', $veeqo_order_id ) );
-				$wc_order->save_meta_data();
-				dtb_veeqo_log( 'info', 'repair_veeqo_synced', 'Repair order synced to Veeqo.', [
-					'wc_order_id'    => $wc_order_id,
-					'veeqo_order_id' => $veeqo_order_id,
-				] );
-			} else {
-				// Non-fatal: WC order was already created; log but continue.
-				dtb_veeqo_log( 'warn', 'repair_veeqo_sync_failed', 'Could not sync repair order to Veeqo.', [
-					'wc_order_id' => $wc_order_id,
-					'error'       => $vresult['error'],
-				] );
-			}
-		}
+	// Repair-service orders are a separate lifecycle domain and are not
+	// eligible for the product fulfillment writer. They remain in WooCommerce
+	// for the repair workflow; no direct Veeqo order writer runs here.
+	if ( function_exists( 'dtb_order_update_integration_state' ) ) {
+		dtb_order_update_integration_state( $wc_order_id, 'veeqo', [
+			'status' => 'not_applicable',
+			'error'  => 'Repair-service orders use the repair workflow, not product fulfillment synchronization.',
+		] );
 	}
 
 	// ── Send customer confirmation email ──────────────────────────────────────

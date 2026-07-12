@@ -32,7 +32,7 @@ final class DTB_VeeqoHealthCheck {
 			'configured'            => $config,
 			'request_function'       => function_exists( 'dtb_veeqo_request' ),
 			'route_registration'     => function_exists( 'dtb_veeqo_register_routes' ),
-			'webhook_controller'     => function_exists( 'dtb_veeqo_route_webhook_order' ),
+			'webhook_controller'     => function_exists( 'dtb_operational_pipeline_veeqo_webhook_order' ),
 			'shipping_rate_handler'  => function_exists( 'dtb_veeqo_route_shipping_rates' ),
 			'inventory_handler'      => function_exists( 'dtb_veeqo_route_inventory' ),
 		];

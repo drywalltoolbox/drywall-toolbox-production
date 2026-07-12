@@ -10,9 +10,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-// VeeqoClient.php registers an inline Woo status hook at priority 20. Remove it
-// after the Veeqo module loads and replace it with queue-routed orchestration.
-remove_action( 'woocommerce_order_status_changed', 'dtb_veeqo_sync_order_status', 20 );
+// Woo-to-Veeqo status writes are routed through the queued job below.
 add_action( 'woocommerce_order_status_changed', 'dtb_operational_pipeline_route_veeqo_status_change', 20, 4 );
 
 // QuickBooksClient.php registers a daily direct batch sync. Route the daily cron
