@@ -35,7 +35,7 @@ if ( ! function_exists( 'dtb_payment_handoff_order_pay_id' ) ) {
 			: '';
 		$path = (string) wp_parse_url( $request_uri, PHP_URL_PATH );
 
-		if ( preg_match( '#/(?:staging/\d+/)?(?:wp/)?checkout/order-pay/(\d+)/?#', $path, $matches ) ) {
+		if ( preg_match( '#/(?:wp/)?checkout/order-pay/(\d+)/?#', $path, $matches ) ) {
 			return absint( $matches[1] ?? 0 );
 		}
 
@@ -378,5 +378,3 @@ add_filter(
 	PHP_INT_MAX,
 	2
 );
-
-
