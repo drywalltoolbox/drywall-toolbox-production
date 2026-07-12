@@ -14,7 +14,7 @@
  *   stock projection. The storefront must never fetch the bulk Veeqo inventory
  *   endpoint directly.
  */
- 
+
 import { FREE_SHIP_THRESHOLD } from '../constants/shipping.js';
 import { submitRepair } from '../api/repairs.js';
 
@@ -26,6 +26,9 @@ const resolvedApiBase = envApiBase || ( /github\.io$/i.test( runtimeHost ) ? 'ht
 
 const DTB_PROXY_BASE = `${ resolvedApiBase.replace( /\/+$/, '' ) }/wp-json/dtb/v1`;
 const FREE_SHIPPING_EXCLUDED_STATES = new Set( [ 'AK', 'ALASKA', 'HI', 'HAWAII' ] );
+const AVAILABILITY_CLIENT_TOKEN_KEY = 'dtb_availability_client_token';
+
+let availabilityClientToken = '';
 
 function normalizeStateCode( value = '' ) {
   return String( value || '' ).trim().toUpperCase().replace( /\./g, '' );
@@ -38,10 +41,51 @@ function isContiguousUsDestination( destination = {} ) {
     && ! FREE_SHIPPING_EXCLUDED_STATES.has( state );
 }
 
+function normalizePositiveInteger( value, fallback = 1 ) {
+  const parsed = Number( value );
+  return Number.isFinite( parsed ) ? Math.max( 1, Math.trunc( parsed ) ) : fallback;
+}
+
+function normalizeProductId( value ) {
+  const parsed = Number( value );
+  return Number.isFinite( parsed ) && parsed > 0 ? Math.trunc( parsed ) : null;
+}
+
+function getAvailabilityClientToken() {
+  if ( availabilityClientToken ) return availabilityClientToken;
+
+  if ( typeof window === 'undefined' ) {
+    return '';
+  }
+
+  try {
+    const stored = window.sessionStorage.getItem( AVAILABILITY_CLIENT_TOKEN_KEY );
+    if ( stored ) {
+      availabilityClientToken = stored;
+      return availabilityClientToken;
+    }
+  } catch {
+    // Storage may be unavailable in hardened/private browser contexts.
+  }
+
+  const generated = typeof window.crypto?.randomUUID === 'function'
+    ? window.crypto.randomUUID()
+    : `dtb-${ Date.now().toString( 36 ) }-${ Math.random().toString( 36 ).slice( 2 ) }-${ Math.random().toString( 36 ).slice( 2 ) }`;
+
+  availabilityClientToken = generated;
+  try {
+    window.sessionStorage.setItem( AVAILABILITY_CLIENT_TOKEN_KEY, generated );
+  } catch {
+    // The in-memory token still isolates requests for the current page runtime.
+  }
+
+  return availabilityClientToken;
+}
+
 function calculateItemsSubtotal( items = [] ) {
   return ( Array.isArray( items ) ? items : [] ).reduce( ( total, item ) => {
     const price = Number( item?.price || 0 );
-    const quantity = Math.max( 1, Number( item?.quantity || 1 ) );
+    const quantity = normalizePositiveInteger( item?.quantity, 1 );
     return total + ( Number.isFinite( price ) ? price * quantity : 0 );
   }, 0 );
 }
@@ -75,12 +119,16 @@ function normalizeFreeShippingRates( rates = [], destination = {}, items = [] ) 
 }
 
 function normalizeAvailabilityItem( item = {} ) {
+  const productId = normalizeProductId(
+    item.variation_id || item.variationId || item.product_id || item.productId || item.id,
+  );
+
   return {
-    id: item.id || item.product_id || item.productId || null,
-    product_id: item.product_id || item.productId || item.id || null,
+    id: productId,
+    product_id: productId,
     sku: String( item.sku || item.sku_code || '' ).trim(),
     name: item.name || item.productName || '',
-    quantity: Math.max( 1, Number( item.quantity || item.qty || 1 ) ),
+    quantity: normalizePositiveInteger( item.quantity ?? item.qty, 1 ),
   };
 }
 
@@ -138,24 +186,28 @@ class VeeqoService {
    * Falls back to available=true on any error so checkout is never blocked by
    * an availability-check outage; WooCommerce still enforces stock server-side.
    *
-   * @param {Array<{ id: number, sku: string, name: string, quantity: number }>} cartItems
+   * @param {Array<{ id?: number, product_id?: number, variation_id?: number, sku?: string, name?: string, quantity?: number }>} cartItems
    * @returns {Promise<{ available: boolean, items: Array, outOfStock: Array }>}
    */
   async checkInventoryAvailability( cartItems ) {
     try {
       const items = ( Array.isArray( cartItems ) ? cartItems : [] )
         .map( normalizeAvailabilityItem )
-        .filter( ( item ) => item.sku );
+        .filter( ( item ) => item.sku || item.product_id );
 
       if ( items.length === 0 ) {
         return { available: true, items: [], outOfStock: [] };
       }
 
       const url = `${ DTB_PROXY_BASE }/veeqo/cart-availability`;
+      const clientToken = getAvailabilityClientToken();
       const res = await fetch( url, {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...( clientToken ? { 'X-DTB-Client-Token': clientToken } : {} ),
+        },
         body: JSON.stringify( { items } ),
       } );
 
