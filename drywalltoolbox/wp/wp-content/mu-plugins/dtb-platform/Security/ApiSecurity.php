@@ -257,6 +257,14 @@ function dtb_api_security_relax_admin_background_nonce_failures( $result ) {
 	// Accept same-site requests via either the HTTP Origin header (reliable for
 	// same-origin fetch() calls) or the HTTP Referer pointing to /wp-admin/.
 	// Some hosting reverse-proxies strip Referer; accepting Origin handles that case.
+	//
+	// Additional case: if NEITHER Origin nor Referer is present the request must
+	// be same-origin.  Modern browsers always include Origin for cross-origin
+	// fetch() calls; absence of Origin is conclusive evidence that the request
+	// originated from the same host.  HostGator's reverse proxy can strip
+	// Referer, leaving both headers absent for legitimate wp-admin background
+	// polls.  We still reject requests that carry a mismatched Origin (a
+	// cross-origin request from the wrong host) to preserve the CSRF barrier.
 	$raw_origin = isset( $_SERVER['HTTP_ORIGIN'] )
 		? (string) wp_unslash( $_SERVER['HTTP_ORIGIN'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		: '';
@@ -267,12 +275,20 @@ function dtb_api_security_relax_admin_background_nonce_failures( $result ) {
 	$ref_host    = $referrer ? wp_parse_url( $referrer, PHP_URL_HOST ) : '';
 	$ref_path    = $referrer ? (string) wp_parse_url( $referrer, PHP_URL_PATH ) : '';
 
-	$same_site_origin   = $site_host && $origin_host && strtolower( $site_host ) === strtolower( $origin_host );
-	$admin_referer      = $site_host && $ref_host
+	$same_site_origin    = $site_host && $origin_host && strtolower( $site_host ) === strtolower( $origin_host );
+	$cross_site_origin   = $origin_host && $site_host && strtolower( $site_host ) !== strtolower( $origin_host );
+	$admin_referer       = $site_host && $ref_host
 		&& strtolower( $site_host ) === strtolower( $ref_host )
 		&& false !== strpos( $ref_path, '/wp-admin/' );
+	// No Origin + no Referer = same-origin request with headers stripped by proxy.
+	$no_external_headers = '' === $raw_origin && ! $referrer;
 
-	if ( ! $same_site_origin && ! $admin_referer ) {
+	// Reject if a mismatched Origin header is explicitly present (cross-site CSRF risk).
+	if ( $cross_site_origin ) {
+		return $result;
+	}
+
+	if ( ! $same_site_origin && ! $admin_referer && ! $no_external_headers ) {
 		return $result;
 	}
 
