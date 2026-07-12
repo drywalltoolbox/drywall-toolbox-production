@@ -581,6 +581,105 @@ function dtb_wc_get_webhook_ids_by_delivery_url( string $delivery_url ): array {
 
 
 // ============================================================================
+// SECTION 7b — WEBHOOK SECRET AUTO-SYNC
+//
+// When WC_WEBHOOK_SECRET is rotated in wp-config.php the new value is read by
+// dtb_get_config() on the next boot, but the existing wc_webhooks DB rows still
+// hold the old secret.  WooCommerce uses the per-row stored secret to sign
+// every outgoing delivery; if it does not match the receiver's constant the
+// HMAC check fails and all product-update webhook cache invalidations are
+// silently dropped.
+//
+// This function stores a SHA-256 fingerprint of the current secret in
+// wp_options (dtb_wc_webhook_secret_hash).  On each boot it compares the
+// fingerprint against the live constant.  When they differ (rotation detected)
+// it calls WC_Webhook::set_secret() + save() on every DTB webhook row and
+// updates the stored fingerprint.
+//
+// The function is a no-op (single option read) when secrets are already in
+// sync, so boot overhead is negligible.
+// ============================================================================
+add_action( 'woocommerce_init', 'dtb_wc_sync_webhook_secrets', 25 );
+
+/**
+ * Sync the WC_WEBHOOK_SECRET constant to all DTB wc_webhooks rows.
+ *
+ * Safe to call multiple times — acts only when a rotation is detected.
+ * Can be forced by deleting the dtb_wc_webhook_secret_hash wp_option before
+ * calling (done automatically by the admin REST endpoint).
+ *
+ * @return array{status: string, updated?: int, errors?: array}
+ */
+function dtb_wc_sync_webhook_secrets(): array {
+	static $result = null;
+	if ( null !== $result ) {
+		return $result;
+	}
+
+	if ( defined( 'DTB_DISABLE_PRODUCT_WEBHOOKS' ) && DTB_DISABLE_PRODUCT_WEBHOOKS ) {
+		return $result = [ 'status' => 'skipped', 'reason' => 'product_webhooks_disabled' ];
+	}
+
+	if ( ! class_exists( 'WC_Webhook' ) ) {
+		return $result = [ 'status' => 'skipped', 'reason' => 'woocommerce_not_loaded' ];
+	}
+
+	$config       = function_exists( 'dtb_get_config' ) ? dtb_get_config() : [];
+	$secret       = (string) ( $config['webhook_secret'] ?? ( defined( 'WC_WEBHOOK_SECRET' ) ? WC_WEBHOOK_SECRET : '' ) );
+	$delivery_url = (string) ( $config['webhook_delivery'] ?? '' );
+
+	if ( '' === $secret || '' === $delivery_url ) {
+		return $result = [ 'status' => 'skipped', 'reason' => 'missing_config' ];
+	}
+
+	// Compare fingerprint: acts only when the secret has changed since last sync.
+	$current_hash = hash( 'sha256', 'dtb-wc:' . $secret );
+	$stored_hash  = (string) get_option( 'dtb_wc_webhook_secret_hash', '' );
+
+	if ( '' !== $stored_hash && hash_equals( $current_hash, $stored_hash ) ) {
+		return $result = [ 'status' => 'in_sync', 'updated' => 0 ];
+	}
+
+	// Rotation detected (or first run). Re-save secret on all DTB webhook rows.
+	$webhook_ids = function_exists( 'dtb_wc_get_webhook_ids_by_delivery_url' )
+		? dtb_wc_get_webhook_ids_by_delivery_url( $delivery_url )
+		: [];
+
+	$updated = 0;
+	$errors  = [];
+	foreach ( $webhook_ids as $id ) {
+		$webhook = new WC_Webhook( (int) $id );
+		if ( ! $webhook->get_id() ) {
+			continue;
+		}
+		try {
+			$webhook->set_secret( $secret );
+			$webhook->save();
+			$updated++;
+		} catch ( Throwable $e ) {
+			$errors[] = [ 'id' => (int) $id, 'error' => $e->getMessage() ];
+		}
+	}
+
+	// Only advance the fingerprint when all rows were updated cleanly.
+	if ( empty( $errors ) ) {
+		update_option( 'dtb_wc_webhook_secret_hash', $current_hash, false );
+	}
+
+	$result = [
+		'status'  => empty( $errors ) ? 'synced' : 'partial',
+		'updated' => $updated,
+		'errors'  => $errors,
+	];
+
+	// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+	error_log( '[DTB] WC webhook secret sync: ' . wp_json_encode( $result ) );
+
+	return $result;
+}
+
+
+// ============================================================================
 // SECTION 8 — CHECKOUT FIELD CUSTOMISATION
 //
 // Strips fields not needed by this storefront from billing and shipping

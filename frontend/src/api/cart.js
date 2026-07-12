@@ -20,37 +20,37 @@ let activeStoreBaseIndex = 0;
 let storeNonce = '';
 let cartToken = '';
 
-function shouldUseCartTokenSession() {
-	if ( !runtimeOrigin ) return false;
-	try {
-		return new URL( resolvedApiBase, runtimeOrigin ).origin !== runtimeOrigin;
-	} catch {
-		return false;
-	}
-}
-
-const useCartTokenSession = shouldUseCartTokenSession();
-
+/**
+ * Read the persisted Cart-Token from localStorage.
+ * We always use localStorage (not sessionStorage) so the WooCommerce session
+ * survives hard refreshes and new tabs regardless of same/cross-origin mode.
+ */
 function readPersistedCartToken() {
-	if ( !useCartTokenSession || typeof window === 'undefined' ) return '';
+	if ( typeof window === 'undefined' ) return '';
 	try {
-		return String( window.sessionStorage.getItem( CART_TOKEN_STORAGE_KEY ) || '' );
+		return String( window.localStorage.getItem( CART_TOKEN_STORAGE_KEY ) || '' );
 	} catch {
 		return '';
 	}
 }
 
+/**
+ * Write or clear the Cart-Token in localStorage.
+ * Keeping the token persistent across refreshes is required so that
+ * WooCommerce reconnects to the same server-side cart session rather than
+ * creating an empty new one on every page load.
+ */
 function persistCartToken( token = '' ) {
 	cartToken = String( token || '' );
-	if ( !useCartTokenSession || typeof window === 'undefined' ) return;
+	if ( typeof window === 'undefined' ) return;
 	try {
 		if ( cartToken ) {
-			window.sessionStorage.setItem( CART_TOKEN_STORAGE_KEY, cartToken );
+			window.localStorage.setItem( CART_TOKEN_STORAGE_KEY, cartToken );
 		} else {
-			window.sessionStorage.removeItem( CART_TOKEN_STORAGE_KEY );
+			window.localStorage.removeItem( CART_TOKEN_STORAGE_KEY );
 		}
 	} catch {
-		// Session storage is optional; the current page keeps the token in memory.
+		// localStorage is optional; the in-memory token is used for this page load.
 	}
 }
 
@@ -64,11 +64,11 @@ function updateStoreSessionHeaders( response ) {
 	const nonce = response.headers.get( 'Nonce' ) || response.headers.get( 'X-WC-Store-API-Nonce' );
 	if ( nonce ) storeNonce = nonce;
 	const token = response.headers.get( 'Cart-Token' );
-	if ( token && useCartTokenSession ) persistCartToken( token );
+	if ( token ) persistCartToken( token );
 }
 
 function mutationSessionHeaders() {
-	if ( useCartTokenSession && cartToken ) return { 'Cart-Token': cartToken };
+	if ( cartToken ) return { 'Cart-Token': cartToken };
 	return storeNonce ? { 'X-WC-Store-API-Nonce': storeNonce } : {};
 }
 
@@ -93,7 +93,7 @@ async function storeFetch( path, options = {}, isRetry = false ) {
 	if ( response.status === 401 ) {
 		if ( isRetry ) throw new Error( `Store API 401: ${ url }` );
 		storeNonce = '';
-		if ( useCartTokenSession ) persistCartToken( '' );
+		persistCartToken( '' );
 		await initCart();
 		return storeFetch( path, options, true );
 	}
@@ -116,7 +116,7 @@ export async function initCart() {
 		cache: 'no-store',
 		headers: {
 			'Content-Type': 'application/json',
-			...( useCartTokenSession && cartToken ? { 'Cart-Token': cartToken } : {} ),
+			...( cartToken ? { 'Cart-Token': cartToken } : {} ),
 		},
 	} );
 	updateStoreSessionHeaders( response );

@@ -49,6 +49,9 @@ ErrorDocument 511 __DTB_PUBLIC_URL__/errors/511.html
   RewriteRule ^ - [R=404,L]
 
   # React Router deep-link fallback for cPanel/Apache subdirectory deploys.
+  # Do NOT intercept WordPress REST, admin, or wp/ subdirectory paths — those
+  # must reach Apache/PHP directly, never the SPA shell.
+  RewriteCond %{REQUEST_URI} !^.*/(wp-json|wp-admin|wp)/
   RewriteRule ^ index.html [QSA,L]
 </IfModule>
 

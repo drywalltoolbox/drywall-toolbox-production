@@ -1065,19 +1065,38 @@ function dtb_veeqo_route_admin_map_skus( WP_REST_Request $request ): WP_REST_Res
 
 add_action( 'init', 'dtb_veeqo_ensure_webhooks', 30 );
 
+/**
+ * Ensure the DTB order-status webhook is registered in Veeqo.
+ *
+ * Runs once per day (transient-gated). Also handles secret rotation: when
+ * DTB_VEEQO_WEBHOOK_SECRET is rotated the stored fingerprint (wp_options key
+ * dtb_veeqo_webhook_secret_hash) becomes stale, forcing this function to bypass
+ * the transient gate and update (or recreate) the Veeqo webhook with the new
+ * secret.
+ *
+ * Fingerprint gate is intentionally checked BEFORE the transient so that a
+ * secret rotation is always acted on even if the daily transient is still set.
+ */
 function dtb_veeqo_ensure_webhooks(): void {
 	if ( ! dtb_veeqo_enabled() ) {
 		return;
 	}
 
-	// Only re-check once per day to avoid unnecessary API calls.
-	if ( get_transient( 'dtb_veeqo_webhook_registered' ) ) {
+	$cfg          = dtb_veeqo_config();
+	$delivery_url = rest_url( 'dtb/v1/veeqo/webhooks/order' );
+	$secret       = (string) ( $cfg['webhook_secret'] ?? ( defined( 'DTB_VEEQO_WEBHOOK_SECRET' ) ? DTB_VEEQO_WEBHOOK_SECRET : '' ) );
+
+	// Determine whether the secret has changed since last sync.
+	$current_hash = '' !== $secret ? hash( 'sha256', 'dtb-veeqo:' . $secret ) : '';
+	$stored_hash  = (string) get_option( 'dtb_veeqo_webhook_secret_hash', '' );
+	$secret_rotated = '' !== $current_hash && ! hash_equals( $current_hash, $stored_hash );
+
+	// Skip the daily transient ONLY when a secret rotation is detected so the
+	// new secret is pushed to Veeqo immediately.
+	if ( ! $secret_rotated && get_transient( 'dtb_veeqo_webhook_registered' ) ) {
 		return;
 	}
 	set_transient( 'dtb_veeqo_webhook_registered', 1, DAY_IN_SECONDS );
-
-	$delivery_url = rest_url( 'dtb/v1/veeqo/webhooks/order' );
-	$cfg          = dtb_veeqo_config();
 
 	// List existing webhooks.
 	$result = dtb_veeqo_request( 'GET', '/webhooks' );
@@ -1085,22 +1104,62 @@ function dtb_veeqo_ensure_webhooks(): void {
 		return;
 	}
 
-	// Check if our delivery URL is already registered.
+	// Locate an existing registration by delivery URL.
+	$existing_id = null;
 	foreach ( $result['data'] as $hook ) {
 		if ( isset( $hook['url'] ) && rtrim( $hook['url'], '/' ) === rtrim( $delivery_url, '/' ) ) {
-			return; // Already registered.
+			$existing_id = $hook['id'] ?? null;
+			break;
 		}
 	}
 
-	// Register the webhook in Veeqo.
-	$register = dtb_veeqo_request( 'POST', '/webhooks', [], [
+	// Build the payload — always include secret when one is configured.
+	$payload = [
 		'url'    => $delivery_url,
 		'events' => [ 'order.status_changed' ],
-	] );
+	];
+	if ( '' !== $secret ) {
+		$payload['secret'] = $secret;
+	}
+
+	if ( null !== $existing_id ) {
+		if ( ! $secret_rotated ) {
+			// Already registered and secret is current — nothing to do.
+			return;
+		}
+
+		// Secret rotation detected: update the existing Veeqo webhook via PUT.
+		$update = dtb_veeqo_request( 'PUT', '/webhooks/' . (int) $existing_id, [], $payload );
+
+		if ( $update['ok'] ) {
+			if ( '' !== $current_hash ) {
+				update_option( 'dtb_veeqo_webhook_secret_hash', $current_hash, false );
+			}
+			dtb_veeqo_log( 'info', 'webhook_secret_synced', 'Veeqo webhook secret updated after rotation.', [
+				'webhook_id'   => $existing_id,
+				'delivery_url' => $delivery_url,
+			] );
+			return;
+		}
+
+		// PUT failed (some Veeqo plans return 405). Fall through to DELETE + recreate.
+		dtb_veeqo_log( 'warn', 'webhook_put_failed', 'Veeqo webhook PUT failed; attempting DELETE + recreate.', [
+			'webhook_id' => $existing_id,
+			'error'      => $update['error'],
+		] );
+		dtb_veeqo_request( 'DELETE', '/webhooks/' . (int) $existing_id );
+	}
+
+	// Register (or re-register after delete) the webhook.
+	$register = dtb_veeqo_request( 'POST', '/webhooks', [], $payload );
 
 	if ( $register['ok'] ) {
-		dtb_veeqo_log( 'info', 'webhook_registered', 'Veeqo → WC webhook registered.', [
+		if ( '' !== $current_hash ) {
+			update_option( 'dtb_veeqo_webhook_secret_hash', $current_hash, false );
+		}
+		dtb_veeqo_log( 'info', 'webhook_registered', 'Veeqo → DTB webhook registered.', [
 			'delivery_url' => $delivery_url,
+			'secret_sent'  => '' !== $secret,
 		] );
 	} else {
 		dtb_veeqo_log( 'warn', 'webhook_register_failed', 'Could not register Veeqo webhook.', [

@@ -206,9 +206,20 @@ final class DTB_CheckoutValidator {
 	}
 
 	public static function shipping_rates(): array {
+		// Flush the per-request/session shipping package cache so that a
+		// freshly-set customer destination is used, not a stale cached package.
+		$fresh_packages = (array) WC()->cart->get_shipping_packages();
+		if ( function_exists( 'dtb_commerce_invalidate_shipping_package_cache' ) ) {
+			dtb_commerce_invalidate_shipping_package_cache( $fresh_packages );
+		}
+
+		// Force WooCommerce to recalculate shipping for the current destination.
 		WC()->cart->calculate_shipping();
+
 		$rates = [];
-		foreach ( (array) WC()->shipping()->get_packages() as $package ) {
+		// Read packages back from the cart (authoritative after recalculation),
+		// not from WC()->shipping() which may still hold the pre-flush state.
+		foreach ( (array) WC()->cart->get_shipping_packages() as $package ) {
 			foreach ( (array) ( $package['rates'] ?? [] ) as $rate ) {
 				if ( ! is_object( $rate ) || ! method_exists( $rate, 'get_id' ) ) {
 					continue;

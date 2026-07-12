@@ -21,7 +21,7 @@ if ( defined( 'DTB_ADMIN_PERF_DISABLE' ) && DTB_ADMIN_PERF_DISABLE ) {
 
 // ====== Throttle Heartbeat on admin pages ======
 // Heartbeat is useful, but can cause frequent admin-ajax requests.
-add_filter( 'heartbeat_send', function ( $response, $screen_id, $screen_base ) {
+add_filter( 'heartbeat_send', function ( $response, $screen_id = '', $screen_base = '' ) {
     // Keep the default response but ensure we don't trigger on every tick.
     return $response;
 }, 10, 3 );

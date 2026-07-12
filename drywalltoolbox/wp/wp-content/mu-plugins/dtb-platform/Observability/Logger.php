@@ -24,8 +24,17 @@ final class DTB_Logger {
 			'level'   => sanitize_key( $level ),
 			'message' => sanitize_text_field( $message ),
 			'context' => $context,
-			'ts'      => gmdate( 'c' ),
+			'ts'      => function_exists( 'wp_date' ) ? wp_date( 'Y-m-d g:i:s A T' ) : gmdate( 'Y-m-d g:i:s A \\U\\T\\C' ),
 		];
+
+		if ( class_exists( 'DTB_FriendlyLogWriter' ) ) {
+			DTB_FriendlyLogWriter::write(
+				(string) $record['source'],
+				(string) $record['level'],
+				(string) $record['message'],
+				is_array( $record['context'] ) ? $record['context'] : []
+			);
+		}
 
 		error_log( wp_json_encode( $record, JSON_UNESCAPED_SLASHES ) );
 	}

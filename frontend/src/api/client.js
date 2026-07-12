@@ -56,10 +56,14 @@ function buildApiRequestUrls(endpoint) {
   const urls = [];
 
   for (const base of bases) {
+    // Always try the canonical /wp-json alias first (HostGator root alias).
     urls.push(`${base}${normalizedEndpoint}`);
+    // Fall back to the explicit /wp sub-directory where WP is installed.
     urls.push(`${base}/wp/wp-json${restPath}`);
   }
 
+  // Explicit WP_API_BASE from env (e.g. REACT_APP_WP_BASE_URL) is the
+  // most authoritative candidate — append last so URL deduplication keeps it.
   if (WP_API_BASE) urls.push(`${normalizeBaseUrl(WP_API_BASE)}${restPath}`);
   return uniqueUrls(urls);
 }
@@ -204,6 +208,8 @@ export const credentialsReady = () => Promise.resolve();
  */
 export async function apiClient(endpoint, options = {}) {
   const requestUrls = buildApiRequestUrls(endpoint);
+  const endpointString = String(endpoint || '');
+  const isWpJsonRequest = endpointString.includes('/wp-json/');
   const method = (options.method || 'GET').toUpperCase();
   const headers = { ...(options.headers || {}) };
 
@@ -280,7 +286,13 @@ export async function apiClient(endpoint, options = {}) {
           status: response.status,
           url,
         };
-        if (method === 'GET' && [404, 405, 500, 502, 503, 504].includes(response.status)) continue;
+        if (
+          isWpJsonRequest
+          && requestUrls.length > 1
+          && [404, 405, 500, 502, 503, 504].includes(response.status)
+        ) {
+          continue;
+        }
         throw lastError;
       }
 
@@ -290,7 +302,13 @@ export async function apiClient(endpoint, options = {}) {
         return await parseSuccessfulJsonResponse(response, url);
       } catch (error) {
         lastError = error;
-        if (method === 'GET' && ['non_json_response', 'invalid_json_response'].includes(error?.code)) continue;
+        if (
+          isWpJsonRequest
+          && requestUrls.length > 1
+          && ['non_json_response', 'invalid_json_response'].includes(error?.code)
+        ) {
+          continue;
+        }
         throw error;
       }
     }

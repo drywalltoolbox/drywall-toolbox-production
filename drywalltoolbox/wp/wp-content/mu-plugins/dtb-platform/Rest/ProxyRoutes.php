@@ -268,6 +268,15 @@ function dtb_register_config_routes(): void {
 		],
 	] );
 
+	// ── POST /dtb/v1/admin/webhooks/sync-secrets — force-push rotated secrets ─
+	register_rest_route( $ns, '/admin/webhooks/sync-secrets', [
+		'methods'             => 'POST',
+		'callback'            => 'dtb_route_admin_sync_webhook_secrets',
+		'permission_callback' => static function () {
+			return current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' );
+		},
+	] );
+
 	// ── POST /dtb/v1/admin/cache/products/flush — admin cache flush ───────────
 	register_rest_route( $ns, '/admin/cache/products/flush', [
 		'methods'             => 'POST',
@@ -1463,6 +1472,49 @@ function dtb_route_ensure_webhooks_permission( WP_REST_Request $request ): bool 
 	}
 
 	return false;
+}
+
+/**
+ * POST /dtb/v1/admin/webhooks/sync-secrets
+ *
+ * Force-pushes the current WC_WEBHOOK_SECRET and DTB_VEEQO_WEBHOOK_SECRET to
+ * all registered webhook rows/registrations, bypassing the fingerprint gate.
+ * Use this after deploying a rotated wp-config.php to complete the rotation
+ * without waiting for the next woocommerce_init / init boot cycle.
+ *
+ * Requires manage_woocommerce or manage_options capability.
+ */
+function dtb_route_admin_sync_webhook_secrets( WP_REST_Request $request ): WP_REST_Response {
+	$report = [];
+
+	// --- WooCommerce webhook rows ---
+	if ( function_exists( 'dtb_wc_sync_webhook_secrets' ) ) {
+		// Delete the stored fingerprint so the function sees a "rotation" unconditionally.
+		delete_option( 'dtb_wc_webhook_secret_hash' );
+		$wc_result          = dtb_wc_sync_webhook_secrets();
+		$report['woocommerce'] = $wc_result;
+	} else {
+		$report['woocommerce'] = [ 'status' => 'skipped', 'reason' => 'function_not_available' ];
+	}
+
+	// --- Veeqo webhook registration ---
+	if ( function_exists( 'dtb_veeqo_ensure_webhooks' ) ) {
+		// Clear both the transient and the fingerprint so ensure_webhooks re-registers.
+		delete_transient( 'dtb_veeqo_webhook_registered' );
+		delete_option( 'dtb_veeqo_webhook_secret_hash' );
+		dtb_veeqo_ensure_webhooks();
+		$report['veeqo'] = [ 'status' => 'triggered' ];
+	} else {
+		$report['veeqo'] = [ 'status' => 'skipped', 'reason' => 'function_not_available' ];
+	}
+
+	$all_ok = ( 'synced' === ( $report['woocommerce']['status'] ?? '' ) || 'in_sync' === ( $report['woocommerce']['status'] ?? '' ) )
+		&& 'triggered' === ( $report['veeqo']['status'] ?? '' );
+
+	return new WP_REST_Response( [
+		'success' => $all_ok,
+		'report'  => $report,
+	], 200 );
 }
 
 /** GET /wc-admin/profile — shim to suppress core-profiler crash */

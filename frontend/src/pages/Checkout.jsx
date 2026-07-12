@@ -37,6 +37,32 @@ import { makeCheckoutAttemptId } from '../utils/checkoutRecovery.js';
 const WOO_NATIVE_GATEWAY_ID = 'woo_native';
 const WOO_PAYMENTS_METHOD_ID = '';
 const MANUAL_PAYMENT_METHOD_IDS = new Set(['cod', 'bacs', 'cheque']);
+const CHECKOUT_DRAFT_KEY = 'dtb:checkout-form-draft:v1';
+
+const BLANK_FORM = { firstName: '', lastName: '', email: '', phone: '', address: '', city: '', state: '', zip: '', country: 'US', customerNote: '' };
+
+function readCheckoutDraft() {
+  try {
+    const raw = localStorage.getItem(CHECKOUT_DRAFT_KEY);
+    if (!raw) return BLANK_FORM;
+    const parsed = JSON.parse(raw);
+    return typeof parsed === 'object' && parsed !== null ? { ...BLANK_FORM, ...parsed } : BLANK_FORM;
+  } catch {
+    return BLANK_FORM;
+  }
+}
+
+function writeCheckoutDraft(data) {
+  try {
+    localStorage.setItem(CHECKOUT_DRAFT_KEY, JSON.stringify(data));
+  } catch { /* non-critical */ }
+}
+
+function clearCheckoutDraft() {
+  try {
+    localStorage.removeItem(CHECKOUT_DRAFT_KEY);
+  } catch { /* non-critical */ }
+}
 const PREFERRED_ONLINE_PAYMENT_IDS = [WOO_PAYMENTS_METHOD_ID, 'stripe', 'ppcp-gateway'];
 const PUBLIC_PAYMENT_LABEL = 'Secure card payment';
 const PUBLIC_PAYMENT_TITLE = 'Secure Card Payment';
@@ -214,16 +240,10 @@ function StepProgress({ activeStep }) {
   );
 }
 
-function SectionHeader({ title, complete = false }) {
+function SectionHeader({ title }) {
   return (
     <div className="dtb-co-section__header">
       <h2 className="dtb-co-section__title">{title}</h2>
-      {complete && (
-        <span className="dtb-co-complete-badge" aria-label={`${title} complete`}>
-          <CheckCircle size={11} strokeWidth={2.5} />
-          Complete
-        </span>
-      )}
     </div>
   );
 }
@@ -369,10 +389,7 @@ export default function Checkout() {
   const safeCartItems = useMemo(() => (Array.isArray(cartItems) ? cartItems : []), [cartItems]);
   const cartReady = !cartLoading && lastSyncedAt !== null;
 
-  const [formData, setFormData] = useState({
-    firstName: '', lastName: '', email: '', phone: '',
-    address: '', city: '', state: '', zip: '', country: 'US', customerNote: '',
-  });
+  const [formData, setFormData] = useState(readCheckoutDraft);
   const [errors, setErrors] = useState({});
   const [submitStatus, setSubmitStatus] = useState('idle');
   const [checkoutError, setCheckoutError] = useState(null);
@@ -411,7 +428,10 @@ export default function Checkout() {
     couponCodes: manualCoupons,
     selectedRateId,
     cartItems: safeCartItems,
-    isAddressComplete,
+    // Require the full form (name + email + address) before requesting a quote.
+    // Backend validate_addresses() requires first_name, last_name, and email;
+    // firing with only the address fields filled causes a premature 422.
+    isAddressComplete: isFormComplete,
     cartReady,
   });
 
@@ -451,6 +471,11 @@ export default function Checkout() {
   }, []);
 
   const sanitize = (value) => DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
+
+  // Persist form fields to localStorage so a hard refresh restores progress.
+  useEffect(() => {
+    writeCheckoutDraft(formData);
+  }, [formData]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -524,6 +549,7 @@ export default function Checkout() {
     setOrderDetails({ order: orderPayload });
     dismissPayment();
     setOrderComplete(true);
+    clearCheckoutDraft();
     setCheckoutAttemptId(makeCheckoutAttemptId());
     void clearCart().catch(() => {});
     setSubmitStatus('idle');
@@ -761,7 +787,7 @@ export default function Checkout() {
               initial="hidden"
               animate="visible"
             >
-              <SectionHeader title="Contact" complete={isContactComplete} />
+              <SectionHeader title="Contact" />
               {!isAuthenticated && (
                 <p className="dtb-co-section__subheader">
                   Have an account?{' '}
@@ -809,7 +835,7 @@ export default function Checkout() {
               animate="visible"
               custom={0.05}
             >
-              <SectionHeader title="Shipping address" complete={isAddressComplete} />
+              <SectionHeader title="Shipping address" />
 
               <div className="dtb-co-field" style={{ marginBottom: 12 }}>
                 <label htmlFor="field-address" className="dtb-co-label">

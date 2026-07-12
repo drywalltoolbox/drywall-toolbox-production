@@ -32,6 +32,47 @@ if ( ! dtb_is_admin_or_rest_request() ) {
 }
 
 // =============================================================================
+// JWT → WP CURRENT USER BRIDGE
+// =============================================================================
+
+/**
+ * Resolve the current WordPress user from the DTB JWT for REST requests.
+ *
+ * Fires at priority 25, after native WP cookie auth (priority 20) but before
+ * nonce-based auth. When WP cookie auth has already resolved a user, this is a
+ * no-op — cookie auth is never overridden.
+ *
+ * This bridge is required so that WooCommerce's wc_load_cart() and
+ * WC()->session correctly load the authenticated customer's persistent cart
+ * rather than creating an anonymous guest session, enabling the DTB checkout
+ * quote and session endpoints to see the customer's cart contents.
+ *
+ * @param int|false $user_id User ID resolved by earlier authentication, or 0/false.
+ * @return int|false Resolved user ID, or original value if JWT is absent/invalid.
+ */
+add_filter( 'determine_current_user', 'dtb_jwt_resolve_rest_user', 25 );
+
+function dtb_jwt_resolve_rest_user( $user_id ) {
+	// Respect any earlier authentication (WP cookie auth, etc.).
+	if ( ! empty( $user_id ) ) {
+		return $user_id;
+	}
+
+	// Resolve from DTB JWT (cookie takes precedence over Bearer header).
+	$resolved = dtb_jwt_get_user_id();
+	if ( $resolved <= 0 ) {
+		return $user_id;
+	}
+
+	// Confirm the user record still exists to prevent stale-token escalation.
+	if ( ! get_user_by( 'id', $resolved ) ) {
+		return $user_id;
+	}
+
+	return $resolved;
+}
+
+// =============================================================================
 // CONSTANTS
 // =============================================================================
 

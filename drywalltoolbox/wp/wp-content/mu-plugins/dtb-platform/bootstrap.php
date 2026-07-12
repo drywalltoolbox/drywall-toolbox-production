@@ -66,6 +66,7 @@ require_once $_dtb_platform . '/Health/ApiHealthController.php';
 require_once $_dtb_platform . '/Health/ApiHealthMonitor.php';
 
 // 7. Observability.
+require_once $_dtb_platform . '/Observability/FriendlyLogWriter.php';
 require_once $_dtb_platform . '/Observability/Logger.php';
 require_once $_dtb_platform . '/Observability/EventLogger.php';
 require_once $_dtb_platform . '/Observability/Diagnostics.php';
