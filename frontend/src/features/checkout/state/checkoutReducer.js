@@ -3,7 +3,14 @@ import { CHECKOUT_STATES, checkoutInitialState } from './checkoutStates.js';
 export function checkoutReducer(state = checkoutInitialState, action = {}) {
 	switch ( action.type ) {
 		case 'QUOTE_START':
-			return { ...state, state: CHECKOUT_STATES.QUOTING, error: null, requestId: action.requestId };
+			return {
+				...state,
+				state: CHECKOUT_STATES.QUOTING,
+				quote: null,
+				rates: [],
+				error: null,
+				requestId: action.requestId,
+			};
 		case 'QUOTE_SUCCESS':
 			return {
 				...state,
