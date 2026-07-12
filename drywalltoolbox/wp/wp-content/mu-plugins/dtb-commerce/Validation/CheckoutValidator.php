@@ -21,7 +21,72 @@ final class DTB_CheckoutValidator {
 			return new WP_Error( 'dtb_checkout_cart_unavailable', 'The checkout cart session is unavailable.', [ 'status' => 503 ] );
 		}
 
+		// Bridge: if the cart loaded from the WC user/cookie session is empty,
+		// attempt to restore it from the Store API Cart-Token session.
+		//
+		// WooCommerce has two session systems:
+		//   1. Traditional wc_load_cart() — keyed by logged-in user ID or session cookie.
+		//   2. Store API — keyed by Cart-Token UUID (persisted by the browser in localStorage).
+		//
+		// Items added via /wc/store/v1/cart/* live in the Store API session.  When the
+		// DTB checkout endpoint calls wc_load_cart() the traditional session is loaded,
+		// which can be empty even though the browser has a cart.  Reading Cart-Token
+		// from the request header and restoring the matching WC session fixes this.
+		if ( WC()->cart->is_empty() ) {
+			self::maybe_restore_store_api_session();
+		}
+
 		return true;
+	}
+
+	/**
+	 * If a Cart-Token header is present and the traditional WC cart is empty,
+	 * try to load the WooCommerce session that was created by the Store API for
+	 * that token.
+	 *
+	 * WC_Session_Handler stores guest (and Store API) sessions in a custom DB
+	 * table ({prefix}woocommerce_sessions) keyed by session_key = customer_id.
+	 * For Store API guest sessions the customer_id IS the Cart-Token string.
+	 * For logged-in users the Store API may have written the cart data under
+	 * the token key even though the user session key is their numeric user ID.
+	 *
+	 * We load the session data directly and replay it into the live WC session
+	 * so that subsequent wc_load_cart() / cart calculations see the correct items.
+	 */
+	private static function maybe_restore_store_api_session(): void {
+		// Cart-Token comes through as the HTTP_CART_TOKEN server variable.
+		$cart_token = isset( $_SERVER['HTTP_CART_TOKEN'] )
+			? sanitize_text_field( wp_unslash( (string) $_SERVER['HTTP_CART_TOKEN'] ) )
+			: '';
+
+		if ( '' === $cart_token ) {
+			return;
+		}
+
+		if ( ! WC()->session instanceof WC_Session_Handler ) {
+			return;
+		}
+
+		// Attempt 1: session stored directly under the Cart-Token key.
+		$session_data = WC()->session->get_session( $cart_token );
+
+		// Attempt 2: token may be prefixed with 't_' in some WC versions.
+		if ( empty( $session_data ) ) {
+			$session_data = WC()->session->get_session( 't_' . $cart_token );
+		}
+
+		if ( empty( $session_data ) || ! is_array( $session_data ) ) {
+			return;
+		}
+
+		// Replay each session key into the live WC session so that
+		// WC()->cart->get_cart_from_session() picks up the items.
+		foreach ( $session_data as $key => $value ) {
+			WC()->session->set( $key, $value );
+		}
+
+		// Re-load the cart from the now-populated session data.
+		WC()->cart->get_cart_from_session();
 	}
 
 	public static function normalize_address( $address, bool $include_contact = false ): array {

@@ -56,6 +56,14 @@ function persistCartToken( token = '' ) {
 
 cartToken = readPersistedCartToken();
 
+/**
+ * Return the current Cart-Token for use by other API modules (e.g. checkout).
+ * Returns an empty string when no token has been established yet.
+ */
+export function getCartToken() {
+	return cartToken || readPersistedCartToken();
+}
+
 function currentStoreBase() {
 	return STORE_BASE_CANDIDATES[ activeStoreBaseIndex ] || STORE_BASE_CANDIDATES[0] || '';
 }

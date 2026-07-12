@@ -6,11 +6,14 @@
  * are owned by the DTB backend.
  */
 import { apiClient } from './client.js';
+import { getCartToken } from './cart.js';
 
 function post( path, payload = {} ) {
+	const cartToken = getCartToken();
 	return apiClient( `/wp-json/dtb/v1/checkout/${ path }`, {
 		method: 'POST',
 		body: JSON.stringify( payload ),
+		headers: cartToken ? { 'Cart-Token': cartToken } : undefined,
 	} );
 }
 
