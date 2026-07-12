@@ -22,6 +22,7 @@ require_once __DIR__ . '/Payment/UnpaidOrderPayGuard.php';
 require_once __DIR__ . '/Payment/PaymentBnplCartFinalization.php';
 require_once __DIR__ . '/Payment/CustomerAssociation.php';
 require_once __DIR__ . '/Payment/PaymentStatusGuard.php';
+require_once __DIR__ . '/Shipping/DTBShippingMethod.php';
 require_once __DIR__ . '/Rest/CheckoutRestController.php';
 require_once __DIR__ . '/Email/WooCommerceBrandedEmails.php';
 require_once __DIR__ . '/Email/WooCommerceAdminBrandedEmails.php';
