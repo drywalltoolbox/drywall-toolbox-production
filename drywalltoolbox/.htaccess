@@ -133,13 +133,14 @@ ErrorDocument 511 /errors/511.html
   # WooCommerce payment/order-pay endpoints must be handled by WordPress, not by
   # the React SPA shell. Without this rule, secure-payment redirects can fall
   # back into the public landing/coming-soon page instead of the payment runtime.
-  RewriteRule ^checkout/order-pay/.*$ wp/index.php [QSA,L]
-  RewriteRule ^checkout/.*order-pay.*$ wp/index.php [QSA,L]
-  RewriteRule ^order-pay/.*$ wp/index.php [QSA,L]
+  # Pass the endpoint and order id explicitly. A bare wp/index.php handoff keeps
+  # the original headless/staging REQUEST_URI, so WordPress can resolve it as a
+  # 404 before WooCommerce registers the order-pay endpoint context.
+  RewriteRule ^checkout/order-pay/([0-9]+)/?$ wp/index.php?pagename=checkout&order-pay=$1 [QSA,L]
+  RewriteRule ^order-pay/([0-9]+)/?$ wp/index.php?pagename=checkout&order-pay=$1 [QSA,L]
 
   # Staging variants of the order-pay endpoint must also route to WordPress.
-  RewriteRule ^staging/2972/checkout/order-pay/.*$ wp/index.php [QSA,L]
-  RewriteRule ^staging/2972/checkout/.*order-pay.*$ wp/index.php [QSA,L]
+  RewriteRule ^staging/2972/checkout/order-pay/([0-9]+)/?$ wp/index.php?pagename=checkout&order-pay=$1 [QSA,L]
 
   # Set a cookie that signals Endurance/nginx cache to bypass for order-pay.
   <If "%{REQUEST_URI} =~ m#/checkout/order-pay/#">

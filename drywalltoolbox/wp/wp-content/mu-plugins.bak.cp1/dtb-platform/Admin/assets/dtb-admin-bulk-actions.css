@@ -1,0 +1,62 @@
+.dtb-bulk-toolbar {
+	align-items: center;
+	background: #f8fafc;
+	border: 1px solid #d8e2ef;
+	border-radius: 12px;
+	box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+	display: flex;
+	gap: 12px;
+	justify-content: space-between;
+	margin: 0 0 12px;
+	padding: 10px 12px;
+}
+
+.dtb-bulk-toolbar[hidden] {
+	display: none;
+}
+
+.dtb-bulk-toolbar__summary {
+	align-items: center;
+	color: #1f2a44;
+	display: flex;
+	font-size: 13px;
+	font-weight: 700;
+	gap: 8px;
+}
+
+.dtb-bulk-toolbar__count {
+	align-items: center;
+	background: #2563eb;
+	border-radius: 999px;
+	color: #fff;
+	display: inline-flex;
+	height: 24px;
+	justify-content: center;
+	min-width: 24px;
+	padding: 0 8px;
+}
+
+.dtb-bulk-toolbar__actions {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+}
+
+.dtb-bulk-checkbox,
+.dtb-bulk-select-all {
+	accent-color: #2563eb;
+	cursor: pointer;
+	height: 16px;
+	width: 16px;
+}
+
+.dtb-table .dtb-table__select-col,
+.dtb-table .dtb-table__cell--select {
+	text-align: center;
+	width: 42px;
+}
+
+.dtb-table__row.is-selected,
+.dtb-support-list-row.is-selected {
+	background: #eff6ff;
+}

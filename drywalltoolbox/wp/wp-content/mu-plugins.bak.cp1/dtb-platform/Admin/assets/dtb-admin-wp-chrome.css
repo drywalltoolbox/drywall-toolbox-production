@@ -1,0 +1,155 @@
+/**
+ * DTB Admin — WordPress Chrome Overrides
+ *
+ * Keeps DTB page content modern while restoring the wp-admin side menu and top
+ * admin bar to the default high-contrast black styling for readability.
+ */
+
+body.dtb-admin-screen #wpadminbar,
+body.dtb-repair-admin-screen #wpadminbar {
+  background: #1d2327 !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+body.dtb-admin-screen #wpadminbar .ab-item,
+body.dtb-admin-screen #wpadminbar a.ab-item,
+body.dtb-admin-screen #wpadminbar > #wp-toolbar span.ab-label,
+body.dtb-admin-screen #wpadminbar > #wp-toolbar span.noticon,
+body.dtb-repair-admin-screen #wpadminbar .ab-item,
+body.dtb-repair-admin-screen #wpadminbar a.ab-item,
+body.dtb-repair-admin-screen #wpadminbar > #wp-toolbar span.ab-label,
+body.dtb-repair-admin-screen #wpadminbar > #wp-toolbar span.noticon {
+  color: #f0f0f1 !important;
+}
+
+body.dtb-admin-screen #wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
+body.dtb-admin-screen #wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus,
+body.dtb-admin-screen #wpadminbar .ab-top-menu > li.hover > .ab-item,
+body.dtb-repair-admin-screen #wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
+body.dtb-repair-admin-screen #wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus,
+body.dtb-repair-admin-screen #wpadminbar .ab-top-menu > li.hover > .ab-item {
+  background: #2c3338 !important;
+  color: #72aee6 !important;
+}
+
+body.dtb-admin-screen #wpadminbar .ab-sub-wrapper,
+body.dtb-repair-admin-screen #wpadminbar .ab-sub-wrapper {
+  background: #2c3338 !important;
+}
+
+body.dtb-admin-screen #wpadminbar .ab-submenu .ab-item,
+body.dtb-repair-admin-screen #wpadminbar .ab-submenu .ab-item {
+  color: #c3c4c7 !important;
+}
+
+body.dtb-admin-screen #wpadminbar .ab-submenu .ab-item:hover,
+body.dtb-admin-screen #wpadminbar .ab-submenu .ab-item:focus,
+body.dtb-repair-admin-screen #wpadminbar .ab-submenu .ab-item:hover,
+body.dtb-repair-admin-screen #wpadminbar .ab-submenu .ab-item:focus {
+  color: #72aee6 !important;
+}
+
+body.dtb-admin-screen #adminmenuback,
+body.dtb-admin-screen #adminmenuwrap,
+body.dtb-repair-admin-screen #adminmenuback,
+body.dtb-repair-admin-screen #adminmenuwrap {
+  background: #1d2327 !important;
+  border-right: none !important;
+  box-shadow: none !important;
+}
+
+body.dtb-admin-screen #adminmenu,
+body.dtb-repair-admin-screen #adminmenu {
+  background: #1d2327 !important;
+}
+
+body.dtb-admin-screen #adminmenu .wp-submenu,
+body.dtb-admin-screen #adminmenu .wp-has-current-submenu .wp-submenu,
+body.dtb-repair-admin-screen #adminmenu .wp-submenu,
+body.dtb-repair-admin-screen #adminmenu .wp-has-current-submenu .wp-submenu {
+  background: #2c3338 !important;
+}
+
+body.dtb-admin-screen #adminmenu a,
+body.dtb-admin-screen #collapse-button,
+body.dtb-repair-admin-screen #adminmenu a,
+body.dtb-repair-admin-screen #collapse-button {
+  color: #f0f0f1 !important;
+}
+
+body.dtb-admin-screen #adminmenu div.wp-menu-image:before,
+body.dtb-repair-admin-screen #adminmenu div.wp-menu-image:before {
+  color: #a7aaad !important;
+}
+
+body.dtb-admin-screen #adminmenu .wp-menu-image img,
+body.dtb-repair-admin-screen #adminmenu .wp-menu-image img {
+  filter: brightness(0) invert(1) opacity(0.78) !important;
+}
+
+body.dtb-admin-screen #adminmenu li.menu-top:hover,
+body.dtb-admin-screen #adminmenu li.opensub > a.menu-top,
+body.dtb-admin-screen #adminmenu li > a.menu-top:focus,
+body.dtb-repair-admin-screen #adminmenu li.menu-top:hover,
+body.dtb-repair-admin-screen #adminmenu li.opensub > a.menu-top,
+body.dtb-repair-admin-screen #adminmenu li > a.menu-top:focus {
+  background: #2c3338 !important;
+  color: #72aee6 !important;
+}
+
+body.dtb-admin-screen #adminmenu li.menu-top:hover div.wp-menu-image:before,
+body.dtb-admin-screen #adminmenu li.opensub div.wp-menu-image:before,
+body.dtb-repair-admin-screen #adminmenu li.menu-top:hover div.wp-menu-image:before,
+body.dtb-repair-admin-screen #adminmenu li.opensub div.wp-menu-image:before {
+  color: #72aee6 !important;
+}
+
+body.dtb-admin-screen #adminmenu li.menu-top:hover .wp-menu-image img,
+body.dtb-admin-screen #adminmenu li.opensub .wp-menu-image img,
+body.dtb-repair-admin-screen #adminmenu li.menu-top:hover .wp-menu-image img,
+body.dtb-repair-admin-screen #adminmenu li.opensub .wp-menu-image img {
+  filter: brightness(0) invert(1) opacity(1) !important;
+}
+
+body.dtb-admin-screen #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
+body.dtb-admin-screen #adminmenu li.current a.menu-top,
+body.dtb-repair-admin-screen #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
+body.dtb-repair-admin-screen #adminmenu li.current a.menu-top {
+  background: #2271b1 !important;
+  color: #fff !important;
+}
+
+body.dtb-admin-screen #adminmenu .wp-menu-arrow,
+body.dtb-repair-admin-screen #adminmenu .wp-menu-arrow {
+  background: #2271b1 !important;
+  color: #fff !important;
+}
+
+body.dtb-admin-screen #adminmenu li.wp-has-current-submenu div.wp-menu-image:before,
+body.dtb-admin-screen #adminmenu li.current div.wp-menu-image:before,
+body.dtb-repair-admin-screen #adminmenu li.wp-has-current-submenu div.wp-menu-image:before,
+body.dtb-repair-admin-screen #adminmenu li.current div.wp-menu-image:before {
+  color: #fff !important;
+}
+
+body.dtb-admin-screen #adminmenu li.wp-has-current-submenu .wp-menu-image img,
+body.dtb-admin-screen #adminmenu li.current .wp-menu-image img,
+body.dtb-repair-admin-screen #adminmenu li.wp-has-current-submenu .wp-menu-image img,
+body.dtb-repair-admin-screen #adminmenu li.current .wp-menu-image img {
+  filter: brightness(0) invert(1) opacity(1) !important;
+}
+
+body.dtb-admin-screen #adminmenu .wp-submenu a,
+body.dtb-repair-admin-screen #adminmenu .wp-submenu a {
+  color: #c3c4c7 !important;
+}
+
+body.dtb-admin-screen #adminmenu .wp-submenu a:focus,
+body.dtb-admin-screen #adminmenu .wp-submenu a:hover,
+body.dtb-admin-screen #adminmenu .wp-submenu li.current a,
+body.dtb-repair-admin-screen #adminmenu .wp-submenu a:focus,
+body.dtb-repair-admin-screen #adminmenu .wp-submenu a:hover,
+body.dtb-repair-admin-screen #adminmenu .wp-submenu li.current a {
+  color: #72aee6 !important;
+}
