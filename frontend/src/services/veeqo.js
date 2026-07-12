@@ -14,7 +14,7 @@
  *   stock projection. The storefront must never fetch the bulk Veeqo inventory
  *   endpoint directly.
  */
- 
+
 import { FREE_SHIP_THRESHOLD } from '../constants/shipping.js';
 import { submitRepair } from '../api/repairs.js';
 
@@ -38,10 +38,20 @@ function isContiguousUsDestination( destination = {} ) {
     && ! FREE_SHIPPING_EXCLUDED_STATES.has( state );
 }
 
+function normalizePositiveInteger( value, fallback = 1 ) {
+  const parsed = Number( value );
+  return Number.isFinite( parsed ) ? Math.max( 1, Math.trunc( parsed ) ) : fallback;
+}
+
+function normalizeProductId( value ) {
+  const parsed = Number( value );
+  return Number.isFinite( parsed ) && parsed > 0 ? Math.trunc( parsed ) : null;
+}
+
 function calculateItemsSubtotal( items = [] ) {
   return ( Array.isArray( items ) ? items : [] ).reduce( ( total, item ) => {
     const price = Number( item?.price || 0 );
-    const quantity = Math.max( 1, Number( item?.quantity || 1 ) );
+    const quantity = normalizePositiveInteger( item?.quantity, 1 );
     return total + ( Number.isFinite( price ) ? price * quantity : 0 );
   }, 0 );
 }
@@ -75,12 +85,16 @@ function normalizeFreeShippingRates( rates = [], destination = {}, items = [] ) 
 }
 
 function normalizeAvailabilityItem( item = {} ) {
+  const productId = normalizeProductId(
+    item.variation_id || item.variationId || item.product_id || item.productId || item.id,
+  );
+
   return {
-    id: item.id || item.product_id || item.productId || null,
-    product_id: item.product_id || item.productId || item.id || null,
+    id: productId,
+    product_id: productId,
     sku: String( item.sku || item.sku_code || '' ).trim(),
     name: item.name || item.productName || '',
-    quantity: Math.max( 1, Number( item.quantity || item.qty || 1 ) ),
+    quantity: normalizePositiveInteger( item.quantity ?? item.qty, 1 ),
   };
 }
 
@@ -138,14 +152,14 @@ class VeeqoService {
    * Falls back to available=true on any error so checkout is never blocked by
    * an availability-check outage; WooCommerce still enforces stock server-side.
    *
-   * @param {Array<{ id: number, sku: string, name: string, quantity: number }>} cartItems
+   * @param {Array<{ id?: number, product_id?: number, variation_id?: number, sku?: string, name: string, quantity: number }>} cartItems
    * @returns {Promise<{ available: boolean, items: Array, outOfStock: Array }>}
    */
   async checkInventoryAvailability( cartItems ) {
     try {
       const items = ( Array.isArray( cartItems ) ? cartItems : [] )
         .map( normalizeAvailabilityItem )
-        .filter( ( item ) => item.sku );
+        .filter( ( item ) => item.sku || item.product_id );
 
       if ( items.length === 0 ) {
         return { available: true, items: [], outOfStock: [] };
