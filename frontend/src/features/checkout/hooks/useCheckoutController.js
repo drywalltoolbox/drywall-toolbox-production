@@ -24,16 +24,25 @@ export function useCheckoutController({ quote, formData, couponCodes = [], payme
 	const [remoteSubmitting, setRemoteSubmitting] = useState( false );
 	const submittingRef = useRef( false );
 	const channelRef = useRef( null );
+	const remoteTimerRef = useRef( null );
 
 	useEffect( () => {
 		if ( typeof window === 'undefined' || typeof window.BroadcastChannel === 'undefined' ) return undefined;
 		const channel = new window.BroadcastChannel( 'dtb-checkout-submit-v1' );
 		channelRef.current = channel;
 		channel.onmessage = ( event ) => {
-			if ( event.data?.type === 'start' ) setRemoteSubmitting( true );
-			if ( event.data?.type === 'finish' ) setRemoteSubmitting( false );
+			if ( event.data?.type === 'start' ) {
+				setRemoteSubmitting( true );
+				window.clearTimeout( remoteTimerRef.current );
+				remoteTimerRef.current = window.setTimeout( () => setRemoteSubmitting( false ), 30000 );
+			}
+			if ( event.data?.type === 'finish' ) {
+				window.clearTimeout( remoteTimerRef.current );
+				setRemoteSubmitting( false );
+			}
 		};
 		return () => {
+			window.clearTimeout( remoteTimerRef.current );
 			channel.close();
 			channelRef.current = null;
 		};
@@ -83,7 +92,10 @@ export function useCheckoutController({ quote, formData, couponCodes = [], payme
 				setState( CHECKOUT_STATES.PAYMENT_REQUIRED );
 				onPaymentRequired?.( result );
 			} else {
-				setState( order.payment_verified === true || order.payment_required === false ? CHECKOUT_STATES.COMPLETE : CHECKOUT_STATES.RECOVERABLE );
+				if ( order.payment_verified !== true && order.payment_required !== false ) {
+					throw new Error( 'Verified payment handoff was not returned by the server.' );
+				}
+				setState( CHECKOUT_STATES.COMPLETE );
 				onComplete?.( result );
 			}
 			return result;

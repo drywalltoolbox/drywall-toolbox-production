@@ -32,6 +32,7 @@ function dtb_order_on_created( int $order_id, $order ): void {
 		'actor_id'    => $order instanceof WC_Abstract_Order ? (int) $order->get_customer_id() : 0,
 		'to_status'   => 'pending',
 		'visibility'  => 'customer',
+		'idempotency_key' => 'order-created:' . $order_id,
 		'payload'     => [
 			'total'          => $order instanceof WC_Abstract_Order ? (string) $order->get_total() : null,
 			'currency'       => $order instanceof WC_Abstract_Order ? $order->get_currency() : null,

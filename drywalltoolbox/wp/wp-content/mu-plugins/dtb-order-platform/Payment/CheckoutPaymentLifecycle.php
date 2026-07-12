@@ -65,6 +65,9 @@ final class DTB_CheckoutPaymentLifecycle {
 	}
 
 	private static function record( WC_Order $order, string $event, string $session_state ): void {
+		if ( function_exists( 'dtb_checkout_handoff_is_order' ) && ! dtb_checkout_handoff_is_order( $order ) ) {
+			return;
+		}
 		$event_key = 'payment-lifecycle:' . $event . ':' . (int) $order->get_id();
 		if ( function_exists( 'dtb_order_append_event' ) ) {
 			dtb_order_append_event( (int) $order->get_id(), $event, [

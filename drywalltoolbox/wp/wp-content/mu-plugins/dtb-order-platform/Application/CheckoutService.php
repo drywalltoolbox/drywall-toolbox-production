@@ -368,10 +368,18 @@ final class DTB_OrderCheckoutService {
 			return new WP_Error( 'dtb_checkout_wc_unavailable', 'WooCommerce is not available.', [ 'status' => 503 ] );
 		}
 
-		$order = wc_create_order( [ 'customer_id' => (int) $row['customer_id'] ] );
-		if ( is_wp_error( $order ) || ! $order instanceof WC_Order ) {
-			return is_wp_error( $order ) ? $order : new WP_Error( 'dtb_checkout_order_failed', 'Could not create the WooCommerce order.', [ 'status' => 503 ] );
-		}
+		$order = new WC_Order();
+		$order->set_customer_id( (int) $row['customer_id'] );
+		$order->set_created_via( 'dtb_checkout' );
+		$order->update_meta_data( '_dtb_checkout_gateway', self::PAYMENT_GATEWAY_ID );
+		$order->update_meta_data( '_dtb_checkout_contract_version', self::CONTRACT_VERSION );
+		$order->update_meta_data( '_dtb_checkout_session_id', (string) $row['session_id'] );
+		$order->update_meta_data( '_dtb_checkout_idempotency_key', (string) $row['idempotency_key'] );
+		$order->update_meta_data( '_dtb_checkout_cart_hash', (string) $row['cart_hash'] );
+		$order->update_meta_data( '_dtb_checkout_fingerprint', (string) $row['fingerprint'] );
+		$order->update_meta_data( '_dtb_payment_handoff_pending', '1' );
+		$order->update_meta_data( '_dtb_order_type', 'product' );
+		$order->update_meta_data( '_dtb_tax_calculation_version', '2' );
 		$cleanup = static function () use ( $order ): void {
 			if ( method_exists( $order, 'delete' ) ) {
 				$order->delete( true );
@@ -391,7 +399,6 @@ final class DTB_OrderCheckoutService {
 			}
 		}
 
-		$order->set_created_via( 'dtb_checkout' );
 		$order->set_address( $evaluation['billing'], 'billing' );
 		$order->set_address( $evaluation['shipping'], 'shipping' );
 		$rate = $evaluation['shipping_rate'];
@@ -424,15 +431,6 @@ final class DTB_OrderCheckoutService {
 			$order->set_customer_note( sanitize_textarea_field( (string) $row['context']['customer_note'] ) );
 		}
 
-		$order->update_meta_data( '_dtb_checkout_gateway', self::PAYMENT_GATEWAY_ID );
-		$order->update_meta_data( '_dtb_checkout_contract_version', self::CONTRACT_VERSION );
-		$order->update_meta_data( '_dtb_checkout_session_id', (string) $row['session_id'] );
-		$order->update_meta_data( '_dtb_checkout_idempotency_key', (string) $row['idempotency_key'] );
-		$order->update_meta_data( '_dtb_checkout_cart_hash', (string) $row['cart_hash'] );
-		$order->update_meta_data( '_dtb_checkout_fingerprint', (string) $row['fingerprint'] );
-		$order->update_meta_data( '_dtb_payment_handoff_pending', '1' );
-		$order->update_meta_data( '_dtb_order_type', 'product' );
-		$order->update_meta_data( '_dtb_tax_calculation_version', '2' );
 		$order->calculate_taxes( [
 			'country'  => $evaluation['shipping']['country'],
 			'state'    => $evaluation['shipping']['state'],
@@ -452,13 +450,6 @@ final class DTB_OrderCheckoutService {
 			return new WP_Error( 'dtb_checkout_order_failed', 'The checkout order could not be saved.', [ 'status' => 503 ] );
 		}
 		if ( function_exists( 'dtb_order_append_event' ) ) {
-			dtb_order_append_event( (int) $order->get_id(), 'order.created', [
-				'source'          => 'dtb_checkout',
-				'actor_type'      => 'system',
-				'visibility'      => 'customer',
-				'idempotency_key' => 'checkout-created:' . (string) $row['idempotency_key'],
-				'payload'         => [ 'checkout_contract_version' => self::CONTRACT_VERSION ],
-			] );
 			dtb_order_append_event( (int) $order->get_id(), 'order.payment_pending', [
 				'source'          => 'dtb_checkout',
 				'actor_type'      => 'system',

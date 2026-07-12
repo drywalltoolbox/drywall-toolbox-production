@@ -7,7 +7,7 @@ final class DTB_CheckoutRestController {
 	}
 
 	public static function permission( WP_REST_Request $request ): bool {
-		return ! function_exists( 'dtb_check_origin' ) || dtb_check_origin();
+		return function_exists( 'dtb_check_origin' ) && dtb_check_origin();
 	}
 
 	public static function register_routes(): void {

@@ -191,7 +191,7 @@ export default function Cart() {
                             >
                               <Minus size={ 12 } strokeWidth={ 2.5 } />
                             </button>
-                            <span className="px-3 text-sm font-black text-slate-900 tabular-nums min-w-7
+                            <span className="px-3 text-sm font-black text-slate-900 tabular-nums min-w-7">
                               { item.quantity }
                             </span>
                             <button
