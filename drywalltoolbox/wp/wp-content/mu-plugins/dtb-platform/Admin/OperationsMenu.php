@@ -307,6 +307,24 @@ function dtb_operations_menu_register_pages(): void {
 		'template'   => 'dashboard',
 		'section'    => 'Technical',
 		'icon'       => 'dashicons-monitor',
+		'assets'     => [
+			'css' => [
+				[
+					'id'   => 'dtb-system-manager',
+					'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-platform/SystemManager/assets/',
+					'url'  => content_url( '/mu-plugins/dtb-platform/SystemManager/assets/' ),
+					'file' => 'dtb-system-manager.css',
+				],
+			],
+			'js' => [
+				[
+					'id'   => 'dtb-system-manager',
+					'dir'  => WP_CONTENT_DIR . '/mu-plugins/dtb-platform/SystemManager/assets/',
+					'url'  => content_url( '/mu-plugins/dtb-platform/SystemManager/assets/' ),
+					'file' => 'dtb-system-manager.js',
+				],
+			],
+		],
 	] );
 
 	// Settings.

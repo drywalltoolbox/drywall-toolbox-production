@@ -182,6 +182,13 @@ final class DTB_OrderCheckoutSessionRepository {
 			'finalized_at'              => '%s',
 			'failure_code'              => '%s',
 			'failure_context_redacted'  => '%s',
+			// Allows an anonymous (customer_id 0) checkout row to be promoted
+			// to the authenticated identity when the customer logs in mid-flow
+			// (see DTB_OrderCheckoutService::assert_owner()). Never accept this
+			// from unauthenticated/untrusted input directly — only internal
+			// callers that have already verified the Cart-Token session-hash
+			// match may set it.
+			'customer_id'               => '%d',
 			'updated_at'                => '%s',
 		];
 		$values  = [];

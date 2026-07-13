@@ -216,6 +216,27 @@ if ( ! function_exists( 'dtb_payment_handoff_prepare_order' ) ) {
 			return;
 		}
 
+		// Backfill recovery: orders created before the Referer-based staging
+		// detector existed (or created via a request where no staging Referer
+		// was present) can be left with empty `_dtb_storefront_base_path`
+		// meta, which otherwise permanently pins all future payment/retry
+		// links for that order to the unreachable production root. Any time
+		// the order-pay page itself is loaded through a staging-prefixed URL,
+		// backfill the meta so subsequent link generation for this order
+		// (emails, admin "Pay" actions, BNPL retry) is corrected too.
+		if (
+			function_exists( 'dtb_detect_storefront_base_path' )
+			&& method_exists( $order, 'get_meta' )
+			&& method_exists( $order, 'update_meta_data' )
+			&& '' === (string) $order->get_meta( '_dtb_storefront_base_path', true )
+		) {
+			$detected_base_path = dtb_detect_storefront_base_path();
+			if ( '' !== $detected_base_path ) {
+				$order->update_meta_data( '_dtb_storefront_base_path', $detected_base_path );
+				$order->save_meta_data();
+			}
+		}
+
 		$changed = false;
 		$status  = sanitize_key( (string) $order->get_status() );
 
@@ -361,8 +382,15 @@ add_filter(
 			$path = str_replace( '/wp/order-pay', '/checkout/order-pay', $path );
 		} elseif ( preg_match( '#^/order-pay(?:/|$)#', $path ) ) {
 			$path = '/checkout' . $path;
-		} else {
-			return $url;
+		} elseif ( ! preg_match( '#^/checkout/order-pay(?:/|$)#', $path ) ) {
+			// Path is not a recognised order-pay shape at all (e.g. plain
+			// permalinks reduced it to a bare "/checkout/?order-pay=..").
+			// Leave content alone but still fall through to the staging
+			// base-path normalisation below so the host/domain is corrected.
+			$normalized = $url;
+			return function_exists( 'dtb_apply_storefront_base_path' )
+				? dtb_apply_storefront_base_path( $normalized, dtb_order_storefront_base_path( $order ) )
+				: $normalized;
 		}
 
 		$normalized = home_url( $path );
@@ -371,6 +399,17 @@ add_filter(
 		}
 		if ( ! empty( $parts['fragment'] ) ) {
 			$normalized .= '#' . (string) $parts['fragment'];
+		}
+
+		// Every WooCommerce-generated order-pay/payment URL is otherwise built
+		// against the production domain root (WP_HOME/WP_SITEURL), which
+		// currently serves only the static coming-soon placeholder while the
+		// React storefront is staging-only. Restore the staging mount prefix
+		// the order was originally created under so emails, admin "Pay"
+		// actions, checkout API responses, and retry links all resolve into
+		// the reachable staging storefront instead of the production shell.
+		if ( function_exists( 'dtb_apply_storefront_base_path' ) ) {
+			$normalized = dtb_apply_storefront_base_path( $normalized, dtb_order_storefront_base_path( $order ) );
 		}
 
 		return $normalized;

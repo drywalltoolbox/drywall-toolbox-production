@@ -45,8 +45,6 @@ require_once $_dtb_order . '/Webhooks/PaymentWebhookVerifier.php';
 require_once $_dtb_order . '/Webhooks/PaymentWebhookIdempotency.php';
 require_once $_dtb_order . '/Webhooks/PaymentWebhookController.php';
 require_once $_dtb_order . '/Payment/CheckoutPaymentLifecycle.php';
-require_once $_dtb_order . '/Payment/CheckoutHandoffGuard.php';
-require_once $_dtb_order . '/Payment/CheckoutDuplicateGuard.php';
 require_once $_dtb_order . '/Rest/OrderListController.php';
 require_once $_dtb_order . '/Rest/OrderDetailController.php';
 require_once $_dtb_order . '/Rest/OrderTrackingController.php';

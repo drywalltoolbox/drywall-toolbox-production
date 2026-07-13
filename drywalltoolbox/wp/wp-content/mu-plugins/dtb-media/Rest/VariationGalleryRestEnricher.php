@@ -1,10 +1,12 @@
 <?php
 /**
- * DTB Variation Gallery REST Enricher compatibility bridge.
+ * DTB Media: Variation Gallery REST Enricher.
  *
- * Product-detail responses are normalized after their route callbacks so legacy
- * and canonical detail envelopes expose the same complete variation gallery.
- * Gallery resolution is owned by DTB_VariationGalleryResolver in dtb-media.
+ * Product-detail REST responses are normalized after their route callbacks so
+ * legacy and canonical detail envelopes expose the same complete variation
+ * image gallery. Gallery resolution is owned by DTB_VariationGalleryResolver
+ * (dtb-media/Services/VariationGalleryResolver.php) — this file only wires
+ * that resolver into the REST response pipeline.
  *
  * @package drywall-toolbox
  */

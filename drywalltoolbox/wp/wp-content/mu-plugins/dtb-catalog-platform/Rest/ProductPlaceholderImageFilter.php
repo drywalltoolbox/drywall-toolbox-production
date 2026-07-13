@@ -1,10 +1,10 @@
 <?php
 /**
- * DTB Product Image Placeholder Stripper
+ * Catalog Platform: Product Placeholder Image Filter.
  *
- * Removes environment-relative no-image placeholder URLs from product/catalog REST
- * payloads so PDP galleries, variation galleries, thumbnails, and product cards
- * never receive links like /staging/2972/no-image-placeholder.webp.
+ * Removes environment-relative no-image placeholder URLs from product/catalog
+ * REST payloads so PDP galleries, variation galleries, thumbnails, and product
+ * cards never receive links like /staging/2972/no-image-placeholder.webp.
  *
  * @package drywall-toolbox
  */

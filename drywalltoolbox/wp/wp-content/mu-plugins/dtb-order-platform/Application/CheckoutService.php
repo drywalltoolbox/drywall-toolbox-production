@@ -234,6 +234,10 @@ final class DTB_OrderCheckoutService {
 		}
 		if ( 'confirmed' !== (string) $row['state'] ) {
 			if ( 'finalizing' === (string) $row['state'] ) {
+				$existing_order = self::find_existing_order( $row );
+				if ( $existing_order instanceof WC_Order && self::link_order_to_session( $row, $existing_order ) ) {
+					return self::order_response( $existing_order, true );
+				}
 				return new WP_Error( 'dtb_checkout_in_progress', 'Checkout is already being finalized. Retry status shortly.', [ 'status' => 409 ] );
 			}
 			return new WP_Error( 'dtb_checkout_not_confirmed', 'Checkout must be confirmed before finalization.', [ 'status' => 409 ] );
@@ -281,7 +285,8 @@ final class DTB_OrderCheckoutService {
 
 		if ( ! DTB_OrderCheckoutSessionRepository::transition( (int) $row['id'], 'finalizing', 'order_created', (int) $row['state_version'] + 1, [ 'order_id' => (int) $order->get_id() ] ) ) {
 			$existing = self::find_existing_order( $row );
-			if ( $existing instanceof WC_Order ) {
+			$latest   = DTB_OrderCheckoutSessionRepository::find_by_session_id( (string) $row['session_id'] );
+			if ( $existing instanceof WC_Order && is_array( $latest ) && self::link_order_to_session( $latest, $existing ) ) {
 				return self::order_response( $existing, true );
 			}
 			return new WP_Error( 'dtb_checkout_session_link_failed', 'The checkout order was created but could not be linked safely. Contact support before retrying.', [ 'status' => 503 ] );
@@ -380,6 +385,9 @@ final class DTB_OrderCheckoutService {
 		$order->update_meta_data( '_dtb_payment_handoff_pending', '1' );
 		$order->update_meta_data( '_dtb_order_type', 'product' );
 		$order->update_meta_data( '_dtb_tax_calculation_version', '2' );
+		if ( function_exists( 'dtb_detect_storefront_base_path' ) ) {
+			$order->update_meta_data( '_dtb_storefront_base_path', dtb_detect_storefront_base_path() );
+		}
 		$cleanup = static function () use ( $order ): void {
 			if ( method_exists( $order, 'delete' ) ) {
 				$order->delete( true );
@@ -479,6 +487,26 @@ final class DTB_OrderCheckoutService {
 		return ! empty( $orders[0] ) && $orders[0] instanceof WC_Order ? $orders[0] : null;
 	}
 
+	private static function link_order_to_session( array $row, WC_Order $order ): bool {
+		if ( in_array( (string) $row['state'], [ 'order_created', 'payment_pending', 'paid' ], true ) ) {
+			return (int) $row['order_id'] === (int) $order->get_id();
+		}
+		if ( 'finalizing' !== (string) $row['state'] ) {
+			return false;
+		}
+		if ( ! DTB_OrderCheckoutSessionRepository::transition( (int) $row['id'], 'finalizing', 'order_created', (int) $row['state_version'], [ 'order_id' => (int) $order->get_id() ] ) ) {
+			$latest = DTB_OrderCheckoutSessionRepository::find_by_session_id( (string) $row['session_id'] );
+			return is_array( $latest )
+				&& in_array( (string) $latest['state'], [ 'order_created', 'payment_pending', 'paid' ], true )
+				&& (int) $latest['order_id'] === (int) $order->get_id();
+		}
+		$latest = DTB_OrderCheckoutSessionRepository::find_by_session_id( (string) $row['session_id'] );
+		if ( is_array( $latest ) && 'order_created' === (string) $latest['state'] ) {
+			DTB_OrderCheckoutSessionRepository::transition( (int) $latest['id'], 'order_created', 'payment_pending', (int) $latest['state_version'], [ 'finalized_at' => current_time( 'mysql', true ) ] );
+		}
+		return true;
+	}
+
 	private static function find_payment_method( string $payment_method ): array|WP_Error {
 		foreach ( self::capabilities()['gateways'][0]['payment_methods'] ?? [] as $method ) {
 			if ( $payment_method === (string) ( $method['id'] ?? '' ) && ! empty( $method['enabled'] ) ) {
@@ -503,10 +531,38 @@ final class DTB_OrderCheckoutService {
 
 	private static function assert_owner( array $row ): true|WP_Error {
 		$identity = DTB_CheckoutValidator::customer_identity();
-		if ( (int) $row['customer_id'] !== (int) $identity['customer_id'] || ! hash_equals( (string) $row['woo_session_identifier'], (string) $identity['customer_session_hash'] ) ) {
+
+		// The Cart-Token-derived session hash is the authoritative "same cart"
+		// proof and must always match — this is unconditional.
+		if ( ! hash_equals( (string) $row['woo_session_identifier'], (string) $identity['customer_session_hash'] ) ) {
 			return new WP_Error( 'dtb_checkout_session_forbidden', 'Checkout session ownership could not be verified.', [ 'status' => 403 ] );
 		}
-		return true;
+
+		$row_customer_id      = (int) $row['customer_id'];
+		$identity_customer_id = (int) $identity['customer_id'];
+
+		if ( $row_customer_id === $identity_customer_id ) {
+			return true;
+		}
+
+		// Allow a guest cart to be resumed by the same cart's owner after they
+		// authenticate mid-checkout (login/register between quote and session,
+		// or between session and confirm/finalize). The frontend does not
+		// refresh the WooCommerce Store API Cart-Token immediately on login,
+		// so the same physical cart legitimately presents as anonymous
+		// (customer_id 0) at one step and authenticated at the next while the
+		// session hash — derived from that same Cart-Token — stays identical.
+		// Only an upgrade away from an anonymous row is permitted; a row
+		// already bound to a specific authenticated customer must always
+		// match that exact customer_id (blocks cross-account hijack).
+		if ( 0 === $row_customer_id && $identity_customer_id > 0 ) {
+			if ( ! empty( $row['id'] ) && class_exists( 'DTB_OrderCheckoutSessionRepository' ) && method_exists( 'DTB_OrderCheckoutSessionRepository', 'update_session' ) ) {
+				DTB_OrderCheckoutSessionRepository::update_session( (int) $row['id'], [ 'customer_id' => $identity_customer_id ] );
+			}
+			return true;
+		}
+
+		return new WP_Error( 'dtb_checkout_session_forbidden', 'Checkout session ownership could not be verified.', [ 'status' => 403 ] );
 	}
 
 	private static function contexts_match( array $stored, array $requested ): bool {

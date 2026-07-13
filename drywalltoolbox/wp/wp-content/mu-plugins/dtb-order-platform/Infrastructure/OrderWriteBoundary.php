@@ -302,6 +302,35 @@ if ( ! function_exists( 'dtb_order_loop_find_existing_duplicate' ) ) {
 		$email      = strtolower( sanitize_email( (string) $order->get_billing_email() ) );
 		$window     = max( HOUR_IN_SECONDS, (int) DTB_ORDER_WRITE_BOUNDARY_DUPLICATE_WINDOW );
 
+		// Canonical checkout orders are deduplicated only by their server-issued
+		// session/idempotency identities. A content fingerprint is intentionally
+		// insufficient: a customer may legitimately place the same order twice.
+		if ( function_exists( 'dtb_checkout_handoff_is_order' ) && dtb_checkout_handoff_is_order( $order ) ) {
+			$identity_query = [ 'relation' => 'OR' ];
+			foreach ( [ '_dtb_checkout_session_id', '_dtb_checkout_idempotency_key' ] as $meta_key ) {
+				$value = trim( (string) $order->get_meta( $meta_key, true ) );
+				if ( '' !== $value ) {
+					$identity_query[] = [ 'key' => $meta_key, 'value' => $value, 'compare' => '=' ];
+				}
+			}
+			if ( count( $identity_query ) === 1 ) {
+				return null;
+			}
+			$identity_matches = wc_get_orders( [
+				'limit'      => 2,
+				'orderby'    => 'date',
+				'order'      => 'ASC',
+				'status'     => dtb_order_loop_order_statuses(),
+				'meta_query' => $identity_query,
+			] );
+			foreach ( $identity_matches as $candidate ) {
+				if ( $candidate instanceof WC_Order && absint( $candidate->get_id() ) !== $current_id ) {
+					return $candidate;
+				}
+			}
+			return null;
+		}
+
 		$meta_matches = wc_get_orders( [
 			'limit'        => 10,
 			'orderby'      => 'date',

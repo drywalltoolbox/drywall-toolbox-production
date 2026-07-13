@@ -98,6 +98,9 @@ require_once $_dtb_cp . '/Application/RunProductMappingMutation.php';
 require_once $_dtb_cp . '/Application/ResolveCompatibleParts.php';
 require_once $_dtb_cp . '/Application/RunInventoryIntelligenceJobs.php';
 
+// Rest.
+require_once $_dtb_cp . '/Rest/ProductPlaceholderImageFilter.php';
+
 // Admin / CLI tools.
 if ( is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 	require_once $_dtb_cp . '/Admin/CatalogAdminMenu.php';
