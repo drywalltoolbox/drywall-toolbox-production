@@ -32,7 +32,6 @@ require_once $_dtb_platform . '/Support/Email.php';
 // 3. Security and request boundaries.
 require_once $_dtb_platform . '/Security/OriginAllowlist.php';
 require_once $_dtb_platform . '/Security/ApiSecurity.php';
-require_once $_dtb_platform . '/Security/WooAdminPaymentsCompatibility.php';
 require_once $_dtb_platform . '/Security/FrontendSecurity.php';
 require_once $_dtb_platform . '/Security/AdminSecurity.php';
 require_once $_dtb_platform . '/Security/CorsPolicy.php';
