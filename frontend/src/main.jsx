@@ -32,11 +32,13 @@ import './styles/checkout-desktop-layout.css'
 import './styles/checkout-varela-round.css'
 import './styles/global-loading.css'
 import './styles/checkout-mobile-fluid-fixes.css'
+import './styles/checkout-official-conversion-overrides.css'
 import App from './App.jsx'
 import './components/catalog/products-selector-overrides.css'
 import ErrorBoundary from './components/errors/ErrorBoundary.jsx'
 import { installSchematicPageLabelRuntime } from './utils/schematicPageLabelRuntime.js'
 import { installMobileCheckoutSummaryAutoOpen } from './utils/checkoutMobileSummaryRuntime.js'
+import { installOfficialMobileCheckoutTotalsRuntime } from './utils/checkoutOfficialMobileTotalsRuntime.js'
 import { installMobileSchematicNavRuntime } from './utils/mobileSchematicNavRuntime.js'
 import { installRepairPackageSelectionRuntime } from './utils/repairPackageSelectionRuntime.js'
 import { installCustomerFacingCopyRuntime } from './utils/customerFacingCopyRuntime.js'
@@ -48,6 +50,7 @@ import { prewarmCatalog } from './services/catalog.js';
 
 installSchematicPageLabelRuntime();
 installMobileCheckoutSummaryAutoOpen();
+installOfficialMobileCheckoutTotalsRuntime();
 installMobileSchematicNavRuntime();
 installRepairPackageSelectionRuntime();
 installCustomerFacingCopyRuntime();
