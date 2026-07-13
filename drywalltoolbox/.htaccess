@@ -133,7 +133,9 @@ ErrorDocument 511 /errors/511.html
 
   # WooCommerce legacy callback/API compatibility from the root URL space.
   RewriteCond %{QUERY_STRING} (^|&)wc-api= [NC]
-  RewriteRule ^$ wp/index.php [QSA,L]
+  RewriteRule ^(?:index\.php)?$ wp/index.php [QSA,L]
+  RewriteRule ^wc-api/?$ wp/index.php [QSA,L]
+  RewriteRule ^staging/2972/wc-api/?$ wp/index.php [QSA,L]
 
   # Canonicalize wp-prefixed WooCommerce payment endpoints back to the public
   # checkout URL. WooCommerce order-pay is a checkout endpoint, not a React route;
@@ -170,8 +172,8 @@ ErrorDocument 511 /errors/511.html
   RewriteCond %{QUERY_STRING} (^|&)key=wc_order_ [NC]
   RewriteRule ^staging/2972/checkout/?$ wp/index.php?pagename=checkout [QSA,L]
 
-  # Set a short-lived cookie that signals Endurance/nginx cache to bypass for dynamic WooCommerce payment pages.
-  <If "%{REQUEST_URI} =~ m#/checkout/order-pay/#i || %{QUERY_STRING} =~ m#(pay_for_order=true|order-pay=[0-9]+).*key=wc_order_#i">
+  # Signal Endurance/nginx cache to bypass customer/session-owned WooCommerce surfaces.
+  <If "%{REQUEST_URI} =~ m#^/(?:cart|checkout|account|my-account|dashboard|orders|addresses|rewards|login|register|forgot-password|lost-password|reset-password|logout|wc-api)(?:/|$)#i || %{REQUEST_URI} =~ m#/checkout/order-pay/#i || %{QUERY_STRING} =~ m#(^|&)(?:pay_for_order=true|order-pay=[0-9]+|wc-api=)#i || %{HTTP_COOKIE} =~ m#(?:^|;\s*)(?:woocommerce_cart_hash|woocommerce_items_in_cart|wp_woocommerce_session_)#i">
     Header always set Set-Cookie "endurance-no-cache=1; Path=/; Max-Age=60; SameSite=Strict; Secure"
   </If>
 
@@ -260,8 +262,8 @@ ErrorDocument 511 /errors/511.html
     Header set Cache-Control "public, max-age=2592000"
   </FilesMatch>
 
-  # WooCommerce/session-owned surfaces must never be page-cached on HostGator.
-  <If "%{REQUEST_URI} =~ m#^/(?:cart|checkout|account|dashboard|orders|addresses|rewards|login|register|forgot-password|reset-password)(?:/|$)#i || %{REQUEST_URI} =~ m#/checkout/order-pay/#i || %{QUERY_STRING} =~ m#(^|&)(pay_for_order=true|order-pay=[0-9]+)(&|$)#i">
+  # WooCommerce/session-owned surfaces and cookies must never be page-cached on HostGator.
+  <If "%{REQUEST_URI} =~ m#^/(?:cart|checkout|account|my-account|dashboard|orders|addresses|rewards|login|register|forgot-password|lost-password|reset-password|logout|wc-api)(?:/|$)#i || %{REQUEST_URI} =~ m#/checkout/order-pay/#i || %{QUERY_STRING} =~ m#(^|&)(?:pay_for_order=true|order-pay=[0-9]+|wc-api=)#i || %{HTTP_COOKIE} =~ m#(?:^|;\s*)(?:woocommerce_cart_hash|woocommerce_items_in_cart|wp_woocommerce_session_)#i">
     Header set Cache-Control "no-cache, no-store, must-revalidate, private"
     Header set Pragma "no-cache"
     Header set Expires "0"
