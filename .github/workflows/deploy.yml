@@ -50,9 +50,7 @@ env:
   # for GitHub Pages and causes broken asset URLs on drywalltoolbox.com.
   PUBLIC_URL: /
   REACT_APP_WP_BASE_URL: https://drywalltoolbox.com
-  REACT_APP_WC_BASE_URL: https://drywalltoolbox.com/wp-json/wc/v3
   REACT_APP_WP_API_BASE: https://drywalltoolbox.com/wp-json
-  REACT_APP_WC_API_BASE: https://drywalltoolbox.com/wp-json/wc/v3
   REACT_APP_JWT_ENDPOINT: https://drywalltoolbox.com/wp-json/simple-jwt-login/v1/auth
   REACT_APP_JWT_AUTH_ENDPOINT: /wp-json/simple-jwt-login/v1/auth
   REACT_APP_API_BASE_URL: https://drywalltoolbox.com
@@ -87,14 +85,12 @@ jobs:
       - name: Install frontend dependencies
         run: cd frontend && npm ci --include=dev --prefer-offline --no-audit --no-fund
 
-      - name: Lint frontend
+      - name: Lint frontend source
         run: cd frontend && npm run lint --if-present
 
       - name: Build frontend for drywalltoolbox.com
         run: cd frontend && npm run build
         env:
-          REACT_APP_WC_AUTH_USER: ${{ secrets.REACT_APP_WC_AUTH_USER }}
-          REACT_APP_WC_AUTH_PASS: ${{ secrets.REACT_APP_WC_AUTH_PASS }}
           REACT_APP_STRIPE_PUBLISHABLE_KEY: ${{ secrets.REACT_APP_STRIPE_PUBLISHABLE_KEY }}
 
       - name: Assemble deployment payload
@@ -123,7 +119,7 @@ jobs:
           echo 'Deployment payload:'
           find deploy-root -maxdepth 3 -type f | sort | sed 's#^#  #' | head -200
 
-      - name: Verify deployment payload shape
+      - name: Validate deployment payload boundaries
         shell: bash
         run: |
           set -euo pipefail
@@ -386,15 +382,15 @@ jobs:
           echo "bye" >> "$CMDS_FILE"
           lftp -u "$FTP_USERNAME","$FTP_PASSWORD" "$FTP_HOST" -f "$CMDS_FILE"
 
-  smoke-check:
-    name: Smoke-check production endpoints
+  production-availability:
+    name: Production availability verification
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'deploy' && inputs.confirm == 'DEPLOY' }}
     needs: deploy-to-hostgator
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
-      - name: Smoke-check production asset endpoints
+      - name: Verify production entrypoints
         shell: bash
         run: |
           set -euo pipefail
@@ -403,16 +399,16 @@ jobs:
             https://drywalltoolbox.com/assets/js/main.js \
             https://drywalltoolbox.com/assets/css/main.css \
             https://drywalltoolbox.com/wp-admin/; do
-            echo "Checking $url"
+            echo "Verifying $url"
             curl -I --fail --location --max-time 20 "$url"
           done
 
   rollback-on-failure:
-    name: Roll back automatically if smoke checks fail
-    if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.action == 'deploy' && inputs.confirm == 'DEPLOY' && needs.smoke-check.result == 'failure' }}
+    name: Roll back automatically if production verification fails
+    if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.action == 'deploy' && inputs.confirm == 'DEPLOY' && needs.production-availability.result == 'failure' }}
     needs:
       - backup-remote
-      - smoke-check
+      - production-availability
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment:
@@ -455,11 +451,10 @@ jobs:
           bye
           EOF
 
-
       - name: Fail workflow after rollback
         shell: bash
         run: |
-          echo "Smoke checks failed. Automatic rollback executed from artifact '${{ needs.backup-remote.outputs.backup_artifact_name }}'." >&2
+          echo "Production verification failed. Automatic rollback executed from artifact '${{ needs.backup-remote.outputs.backup_artifact_name }}'." >&2
           exit 1
 
   restore-from-backup:
