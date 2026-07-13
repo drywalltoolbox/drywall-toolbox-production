@@ -81,6 +81,7 @@ function buildTotalsPanel(checkout) {
     panel.className = 'dtb-co-mobile-cta__totals';
     panel.setAttribute('aria-label', 'Order total summary');
     panel.setAttribute('aria-live', 'polite');
+    panel.setAttribute('aria-atomic', 'true');
     ctaInner.insertBefore(panel, primaryButton);
   }
 
@@ -91,7 +92,7 @@ function buildTotalsPanel(checkout) {
   if (panel.dataset.signature === signature) return;
   panel.dataset.signature = signature;
 
-  panel.innerHTML = '';
+  panel.replaceChildren();
   const heading = document.createElement('div');
   heading.className = 'dtb-co-mobile-cta__totals-heading';
   heading.innerHTML = '<span>Order totals</span><span>Secure checkout</span>';
@@ -125,6 +126,8 @@ export function installOfficialMobileCheckoutTotalsRuntime() {
 
   const media = window.matchMedia?.(MOBILE_QUERY);
   let frame = 0;
+  let observer = null;
+
   const schedule = () => {
     if (frame) return;
     frame = window.requestAnimationFrame(() => {
@@ -133,15 +136,25 @@ export function installOfficialMobileCheckoutTotalsRuntime() {
     });
   };
 
-  schedule();
+  const attachObserver = () => {
+    if (observer) return;
+    const checkout = document.querySelector('.dtb-checkout');
+    if (!checkout) {
+      schedule();
+      window.setTimeout(attachObserver, 250);
+      return;
+    }
 
-  const observer = new MutationObserver(schedule);
-  observer.observe(document.documentElement, {
-    childList: true,
-    subtree: true,
-    characterData: true,
-  });
+    observer = new MutationObserver(schedule);
+    observer.observe(checkout, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+    schedule();
+  };
 
+  attachObserver();
   window.addEventListener('resize', schedule, { passive: true });
   media?.addEventListener?.('change', schedule);
 }
