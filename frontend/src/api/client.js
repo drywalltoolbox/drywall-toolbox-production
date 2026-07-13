@@ -31,6 +31,7 @@ const WP_API_BASE = configuredWpBase
   : `${API_BASE_URL}/wp-json`;
 
 const DTB_AUTH_VALIDATE_URL = `${API_BASE_URL}/wp-json/dtb/v1/auth/validate`;
+const IDEMPOTENT_HTTP_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
 function normalizeBaseUrl(value = '') {
   return String(value || '').replace(/\/+$/, '');
@@ -113,6 +114,19 @@ async function parseSuccessfulJsonResponse(response, url) {
       url,
     };
   }
+}
+
+function canRetryWpJsonCandidate(method, status, errorCode = '') {
+  if (IDEMPOTENT_HTTP_METHODS.has(method)) {
+    return [404, 405, 500, 502, 503, 504].includes(status)
+      || ['non_json_response', 'invalid_json_response'].includes(errorCode);
+  }
+
+  // Mutating requests may create orders, sessions, coupons, or payment state.
+  // Only retry when the candidate route is clearly absent; never retry 5xx,
+  // malformed JSON, or network ambiguity because the side effect may have
+  // reached WordPress/WooCommerce even when the browser did not get a response.
+  return [404, 405].includes(status);
 }
 
 async function shouldDispatchAuthExpired() {
@@ -252,7 +266,8 @@ export async function apiClient(endpoint, options = {}) {
         });
       } catch {
         lastError = { code: 'network_error', message: 'Network request failed.', status: 0, url };
-        continue;
+        if (IDEMPOTENT_HTTP_METHODS.has(method)) continue;
+        throw lastError;
       }
 
       if (response.status === 401) {
@@ -289,7 +304,7 @@ export async function apiClient(endpoint, options = {}) {
         if (
           isWpJsonRequest
           && requestUrls.length > 1
-          && [404, 405, 500, 502, 503, 504].includes(response.status)
+          && canRetryWpJsonCandidate(method, response.status, lastError.code)
         ) {
           continue;
         }
@@ -305,7 +320,7 @@ export async function apiClient(endpoint, options = {}) {
         if (
           isWpJsonRequest
           && requestUrls.length > 1
-          && ['non_json_response', 'invalid_json_response'].includes(error?.code)
+          && canRetryWpJsonCandidate(method, error?.status || 0, error?.code)
         ) {
           continue;
         }
