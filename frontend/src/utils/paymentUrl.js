@@ -1,12 +1,11 @@
 /**
- * Normalise a WooCommerce order-pay URL for the current deployment context.
+ * Normalise a WooCommerce order-pay URL for the DTB headless storefront.
  *
- * WooCommerce always generates payment URLs rooted at the production checkout
- * path (e.g. https://drywalltoolbox.com/checkout/order-pay/{id}/...).
- *
- * On staging the React app runs under PUBLIC_URL (e.g. /staging/2972), so the
- * redirect must be prefixed to keep the user inside the staging environment
- * where the correct WP theme / PaymentRuntime template is reached.
+ * WooCommerce payment collection is not a React route. The order-pay URL must
+ * stay in the public WordPress/WooCommerce checkout URL space so the native
+ * gateway template, gateway scripts, nonces, cookies, and payment callbacks are
+ * resolved by WordPress. Staging React builds may live under /staging/{id}, but
+ * order-pay must not be prefixed with that SPA base path.
  *
  * Also normalises legacy /wp/checkout/order-pay/ and /order-pay/ variants that
  * some WooCommerce configurations emit.
@@ -28,47 +27,21 @@ export function normalizePaymentUrl( value ) {
 		return value.trim();
 	}
 
-	// Normalise legacy /wp/checkout/order-pay/ → /checkout/order-pay/
+	// Native payment pages are served by WordPress/WooCommerce, not by the React
+	// SPA. Strip staging prefixes that earlier builds added so the browser lands
+	// on the canonical root payment runtime instead of the staging SPA namespace,
+	// which WordPress canonical redirects can collapse to /checkout/ and lose the
+	// order-pay endpoint context.
+	url.pathname = url.pathname.replace( /^\/staging\/\d+(?=\/checkout(?:\/order-pay)?(?:\/|$))/, '' );
+
+	// Normalise legacy /wp/checkout/order-pay/ → /checkout/order-pay/.
 	if ( /^\/wp\/checkout\/order-pay(?:\/|$)/.test( url.pathname ) ) {
 		url.pathname = url.pathname.replace( /^\/wp/, '' );
 	}
 
-	// Normalise bare /order-pay/ → /checkout/order-pay/
+	// Normalise bare /order-pay/ → /checkout/order-pay/.
 	if ( /^\/order-pay(?:\/|$)/.test( url.pathname ) ) {
 		url.pathname = `/checkout${url.pathname}`;
-	}
-
-	// WooCommerce's get_checkout_payment_url() does not always emit the
-	// pretty-permalink /checkout/order-pay/{id}/ path shape. With plain
-	// permalinks (or when the URL is reduced for any other reason) it emits
-	// a bare /checkout/ path with the order id and pay_for_order carried in
-	// the query string instead — e.g.
-	//   /checkout/?pay_for_order=true&key=wc_order_xxx
-	//   /checkout/?order-pay=123&key=wc_order_xxx
-	// This is a legitimate, order-pay-equivalent shape and MUST be treated
-	// identically to /checkout/order-pay/ for staging-prefix purposes. Every
-	// production incident traced to this file so far was this exact case:
-	// the pathname-only check below matched neither shape, so the staging
-	// prefix was silently dropped and the browser navigated to the bare
-	// production domain (which serves only the static coming-soon page).
-	const isOrderPayPath = /^\/checkout\/order-pay(?:\/|$)/.test( url.pathname );
-	const isReducedOrderPayShape =
-		/^\/checkout\/?$/.test( url.pathname ) &&
-		( url.searchParams.get( 'pay_for_order' ) === 'true' || url.searchParams.has( 'order-pay' ) ) &&
-		url.searchParams.has( 'key' );
-
-	// Prefix with the staging/sub-path base when the app is deployed under a
-	// sub-directory.  process.env.PUBLIC_URL is inlined as a string literal by
-	// Webpack — "/staging/2972" for staging, "" or "/" for production.
-	const publicUrl = ( process.env.PUBLIC_URL || '' ).replace( /\/+$/, '' );
-
-	if (
-		publicUrl &&
-		publicUrl !== '/' &&
-		( isOrderPayPath || isReducedOrderPayShape ) &&
-		!url.pathname.startsWith( publicUrl + '/checkout' )
-	) {
-		url.pathname = publicUrl + url.pathname;
 	}
 
 	return url.toString();
