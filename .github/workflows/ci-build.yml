@@ -16,9 +16,7 @@ env:
   NODE_ENV: production
   PUBLIC_URL: /
   REACT_APP_WP_BASE_URL: https://drywalltoolbox.com
-  REACT_APP_WC_BASE_URL: https://drywalltoolbox.com/wp-json/wc/v3
   REACT_APP_WP_API_BASE: https://drywalltoolbox.com/wp-json
-  REACT_APP_WC_API_BASE: https://drywalltoolbox.com/wp-json/wc/v3
   REACT_APP_JWT_ENDPOINT: https://drywalltoolbox.com/wp-json/simple-jwt-login/v1/auth
   REACT_APP_JWT_AUTH_ENDPOINT: /wp-json/simple-jwt-login/v1/auth
   REACT_APP_API_BASE_URL: https://drywalltoolbox.com
@@ -32,7 +30,7 @@ env:
 
 jobs:
   build:
-    name: Lint and build deploy payload
+    name: Build deployable application payload
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -52,7 +50,7 @@ jobs:
       - name: Install frontend dependencies
         run: cd frontend && npm ci --include=dev --prefer-offline --no-audit --no-fund
 
-      - name: Lint frontend
+      - name: Lint frontend source
         run: cd frontend && npm run lint --if-present
 
       - name: Build frontend for drywalltoolbox.com
@@ -78,7 +76,7 @@ jobs:
           cp -a drywalltoolbox/wp/wp-content/mu-plugins deploy-root/wp/wp-content/mu-plugins
           cp -a drywalltoolbox/wp/wp-content/themes deploy-root/wp/wp-content/themes
 
-      - name: Verify deployment payload shape
+      - name: Validate deployment payload boundaries
         shell: bash
         run: |
           set -euo pipefail
