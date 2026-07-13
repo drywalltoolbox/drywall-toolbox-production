@@ -52,13 +52,10 @@ const values = readCandidateEnvValues();
 const secrets = configuredSecrets(values);
 
 if (mode === 'pre') {
-  const fileDefined = secrets.filter(([key]) =>
-    envFilenames.some((filename) => String(readEnvFile(filename)[key] || '').trim().length >= 4));
-
-  if (fileDefined.length > 0) {
+  if (secrets.length > 0) {
     fail(
-      'Refusing frontend build: server credentials are defined in a browser environment file.',
-      fileDefined.map(([key]) => key),
+      'Refusing frontend build: server credentials are present in browser build configuration.',
+      secrets.map(([key]) => key),
     );
   }
   process.exit(0);
