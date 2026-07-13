@@ -190,7 +190,9 @@ The checkout contract uses an idempotency key. The order write boundary blocks r
 
 External order side effects use `dtb_order_enqueue_job()` and the `dtb-orders` Action Scheduler group. Queue behavior includes scheduled-action deduplication, bounded exponential retry, integration-state recording, event logging, and duplicate side-effect suppression.
 
-Native order-pay is intentionally WooCommerce/WooPayments-owned. Root-level order-pay shims such as `zzzz-dtb-order-pay-official-conversion-polish.php` and `zzzzz-dtb-order-pay-trust-microcopy.php` are presentation-only: they may style provider cards, bottom sheets, selected state, and compact trust/support copy, but must not move gateway iframe fields, alter payment nonces, replace tokenization, bypass WooCommerce callbacks, or change order/payment lifecycle behavior.
+Native order-pay is intentionally WooCommerce/WooPayments-owned. Root-level order-pay shims such as `zzzz-dtb-order-pay-official-conversion-polish.php`, `zzzzz-dtb-order-pay-trust-microcopy.php`, and `zzzzzz-dtb-order-pay-layout-repair.php` are presentation-only: they may style provider cards, bottom sheets, selected state, compact trust/support copy, and layout repair classes, but must not move gateway iframe fields, alter payment nonces, replace tokenization, bypass WooCommerce callbacks, or change order/payment lifecycle behavior.
+
+`zzzzzz-dtb-wc-admin-payments-compat.php` is admin-only compatibility support for WooCommerce Settings > Payments. It may keep required core admin scripts available, send no-cache headers for the payment settings page, and render direct gateway settings links if the WooCommerce provider panel loads without gateway controls. It must not create gateways, alter gateway settings, expose credentials, or bypass WooCommerce capability checks.
 
 ## 6. Veeqo contract
 
