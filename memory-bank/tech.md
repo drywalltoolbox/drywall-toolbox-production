@@ -1,6 +1,6 @@
 # Tech
 
-Last verified against source: 2026-07-12.
+Last verified against source: 2026-07-13.
 
 ## Runtime stack
 
@@ -60,9 +60,9 @@ New business logic belongs inside the owning module subtree, not a root-level le
 - Terser and CSS minimization;
 - optional bundle analysis with `ANALYZE=true`;
 - Python scripts for catalog validation, normalization, pricing, image sync, and audits;
-- PowerShell endpoint/module smoke tests.
+- PowerShell scripts remain operational diagnostics and are not generic CI gates.
 
-Frontend validation gates are lint and production build. The package currently has no standalone automated test script.
+Frontend validation gates are dependency installation, source lint, production build, credential-artifact safety guard, and deploy-payload boundary validation. The package has no standalone automated test, smoke-test, or ad hoc checkout-audit script wired into CI.
 
 ## Frontend build contract
 
@@ -165,7 +165,7 @@ Heavy catalog imports use Action Scheduler with WP-Cron fallback. Operational he
 - `.github/workflows/deploy.yml` provides protected manual deploy and restore;
 - production deploy requires explicit confirmation and protected environment approval;
 - remote state is backed up before deployment;
-- post-deployment smoke checks can trigger automatic rollback;
+- production availability verification can trigger automatic rollback;
 - deploy payload includes frontend output, routing files, logos, mu-plugins, and themes only.
 
 ## Catalog technology constraints
@@ -183,4 +183,4 @@ Heavy catalog imports use Action Scheduler with WP-Cron fallback. Operational he
 - all order/integration writes use the canonical queue and write boundary;
 - public shipping language must distinguish DTB-calculated rates from Veeqo fulfillment data;
 - update `memory-bank/*` and the mu-plugin README whenever durable architecture changes;
-- run `npm run lint` and `npm run build` for frontend changes and relevant smoke scripts for backend route/loader changes.
+- run `npm run lint` and `npm run build` for frontend changes, plus targeted operator validation only when a changed backend/module contract requires it.
