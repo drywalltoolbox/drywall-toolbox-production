@@ -51,7 +51,7 @@ New business logic belongs inside the owning module subtree, not a root-level le
 
 ## Build and tooling
 
-- Node.js 20 in CI;
+- Node.js 20 for frontend builds;
 - locked dependency installation via `npm ci --include=dev`;
 - Webpack 5 and Babel;
 - Tailwind CSS v4, PostCSS, and Autoprefixer;
@@ -62,7 +62,7 @@ New business logic belongs inside the owning module subtree, not a root-level le
 - Python scripts for catalog validation, normalization, pricing, image sync, and audits;
 - PowerShell scripts remain operational diagnostics and are not generic CI gates.
 
-Frontend validation gates are dependency installation, source lint, production build, credential-artifact safety guard, and deploy-payload boundary validation. The package has no standalone automated test, smoke-test, or ad hoc checkout-audit script wired into CI.
+Frontend validation gates are dependency installation, source lint, production build, and credential-artifact safety guard. The package has no standalone automated test, smoke-test, or ad hoc checkout-audit script wired into the production live-server workflow.
 
 ## Frontend build contract
 
@@ -153,20 +153,31 @@ Public WooCommerce Store API for cart/session operations. Storefront inventory v
 - order write boundary blocks raw external order creation, duplicate side effects, and write loops;
 - root and WordPress `.htaccess` preserve authorization headers and enforce routing/security behavior.
 
+## Live HostGator/cPanel deployment
+
+Production/live deployment is a HostGator cPanel or FTP workflow. GitHub workflows are not the operational production deployment path unless explicitly reintroduced.
+
+Live path contract:
+
+- document root: `/public_html/drywalltoolbox/`;
+- WordPress subdirectory: `/public_html/drywalltoolbox/wp/`;
+- React production build: upload the contents of `dist/` into the document root;
+- DTB backend updates: upload changed files under `/public_html/drywalltoolbox/wp/wp-content/mu-plugins/`;
+- never overwrite `wp-config.php`, uploads, cache, upgrade/runtime directories, uncontrolled dumps, or secret-bearing files during code uploads.
+
+Live routing/cache policy:
+
+- root and `/wp` `.htaccess` preserve Authorization headers for REST, JWT, and WooCommerce handlers;
+- root routing sends `/wp-json/*`, `/dtb/*`, WooCommerce `wc-api`, and checkout/order-pay requests into WordPress before the React SPA fallback;
+- WooCommerce/session-owned surfaces are explicitly no-cache: cart, checkout, account, my-account, dashboard, orders, addresses, rewards, login/register/password reset/logout, `wc-api`, and keyed order-pay requests;
+- WooCommerce cart/session cookies also trigger no-cache behavior: `woocommerce_cart_hash`, `woocommerce_items_in_cart`, and `wp_woocommerce_session_`;
+- order-pay presentation shims may add UI polish and trust microcopy only; gateway fields, nonces, tokenization, callbacks, and payment lifecycle remain WooCommerce/WooPayments-owned.
+
 ## Async and integration execution
 
 External order side effects use `dtb_order_enqueue_job()` and the `dtb-orders` Action Scheduler group. The queue provides deduplication, bounded exponential retry, integration-state persistence, event logging, and duplicate-order side-effect suppression.
 
 Heavy catalog imports use Action Scheduler with WP-Cron fallback. Operational health jobs and cleanup tasks use scheduled actions/cron according to their module contracts.
-
-## CI/CD
-
-- `.github/workflows/ci-build.yml` runs for pull requests targeting `main`, pushes to `main`, and manual dispatch;
-- `.github/workflows/deploy.yml` provides protected manual deploy and restore;
-- production deploy requires explicit confirmation and protected environment approval;
-- remote state is backed up before deployment;
-- production availability verification can trigger automatic rollback;
-- deploy payload includes frontend output, routing files, logos, mu-plugins, and themes only.
 
 ## Catalog technology constraints
 
