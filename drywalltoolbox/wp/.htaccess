@@ -1,7 +1,27 @@
 # BEGIN WordPress
+# Drywall Toolbox WordPress subdirectory runtime
+# Live path: /public_html/drywalltoolbox/wp/.htaccess
+
+Options -Indexes
+FileETag None
+
+# Deny direct reads of secrets, local environment files, backups, logs, and dumps.
+<FilesMatch "(^\.|wp-config\.php$|\.env(?:\..*)?$|composer\.(?:json|lock)$|package-lock\.json$|package\.json$|.*\.(?:bak|backup|old|orig|save|sql|sqlite|log|ini|sh|ps1|pem|key)$)">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteBase /wp/
+
+# Preserve Authorization headers for WordPress REST, JWT, and WooCommerce handlers.
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
 # Canonicalize WooCommerce payment endpoints to the public checkout URL.
 # /wp/checkout/order-pay/* is not the storefront checkout permalink; route it
@@ -14,5 +34,19 @@ RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /wp/index.php [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header unset ETag
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # WordPress/WooCommerce admin, REST, cart, checkout, and order-payment surfaces are dynamic.
+  <If "%{REQUEST_URI} =~ m#^/wp/(?:wp-admin|wp-login\.php|wp-json|index\.php)#i || %{REQUEST_URI} =~ m#/(?:cart|checkout|account|dashboard|orders|addresses|rewards)(?:/|$)#i || %{QUERY_STRING} =~ m#(^|&)(rest_route=|pay_for_order=true|order-pay=[0-9]+)#i">
+    Header set Cache-Control "no-cache, no-store, must-revalidate, private"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+    Header set X-Accel-Expires "0"
+  </If>
 </IfModule>
 # END WordPress
