@@ -6,6 +6,7 @@
 DirectoryIndex index.html index.php
 Options -Indexes
 Options +FollowSymLinks
+FileETag None
 
 ErrorDocument 400 /errors/400.html
 ErrorDocument 401 /errors/401.html
@@ -42,6 +43,17 @@ ErrorDocument 505 /errors/505.html
 ErrorDocument 507 /errors/507.html
 ErrorDocument 508 /errors/508.html
 ErrorDocument 511 /errors/511.html
+
+# Block accidental public reads of secrets, backups, logs, and local build files.
+<FilesMatch "(^\.|wp-config\.php$|\.env(?:\..*)?$|composer\.(?:json|lock)$|package-lock\.json$|package\.json$|.*\.(?:bak|backup|old|orig|save|sql|sqlite|log|ini|sh|ps1|pem|key)$)">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
 
 # Explicit MIME types prevent JS/CSS from being served as text/html by host defaults.
 <IfModule mod_mime.c>
@@ -158,9 +170,9 @@ ErrorDocument 511 /errors/511.html
   RewriteCond %{QUERY_STRING} (^|&)key=wc_order_ [NC]
   RewriteRule ^staging/2972/checkout/?$ wp/index.php?pagename=checkout [QSA,L]
 
-  # Set a cookie that signals Endurance/nginx cache to bypass for order-pay.
+  # Set a short-lived cookie that signals Endurance/nginx cache to bypass for dynamic WooCommerce payment pages.
   <If "%{REQUEST_URI} =~ m#/checkout/order-pay/#i || %{QUERY_STRING} =~ m#(pay_for_order=true|order-pay=[0-9]+).*key=wc_order_#i">
-    Header always set Set-Cookie "endurance-no-cache=1; Path=/; Max-Age=60; SameSite=Strict"
+    Header always set Set-Cookie "endurance-no-cache=1; Path=/; Max-Age=60; SameSite=Strict; Secure"
   </If>
 
   # Force homepage to the static React landing page after API fallbacks.
@@ -208,6 +220,14 @@ ErrorDocument 511 /errors/511.html
 </IfModule>
 
 <IfModule mod_headers.c>
+  Header unset ETag
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Permitted-Cross-Domain-Policies "none"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(self), usb=(), browsing-topics=()"
+  Header always set Cross-Origin-Opener-Policy "same-origin-allow-popups"
+
   # HTML shell must revalidate so clients pick up newly deployed asset paths.
   <FilesMatch "^index\.html$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
@@ -239,12 +259,9 @@ ErrorDocument 511 /errors/511.html
   <FilesMatch "\.(?:png|jpe?g|gif|webp|avif|svg|ico|woff2?|woff|ttf|otf|eot|pdf)$">
     Header set Cache-Control "public, max-age=2592000"
   </FilesMatch>
-</IfModule>
 
-# Bypass Endurance/nginx page cache for WooCommerce order-pay pages.
-# These are dynamic payment pages that must never be served from cache.
-<IfModule mod_headers.c>
-  <If "%{REQUEST_URI} =~ m#/checkout/order-pay/#">
+  # WooCommerce/session-owned surfaces must never be page-cached on HostGator.
+  <If "%{REQUEST_URI} =~ m#^/(?:cart|checkout|account|dashboard|orders|addresses|rewards|login|register|forgot-password|reset-password)(?:/|$)#i || %{REQUEST_URI} =~ m#/checkout/order-pay/#i || %{QUERY_STRING} =~ m#(^|&)(pay_for_order=true|order-pay=[0-9]+)(&|$)#i">
     Header set Cache-Control "no-cache, no-store, must-revalidate, private"
     Header set Pragma "no-cache"
     Header set Expires "0"
