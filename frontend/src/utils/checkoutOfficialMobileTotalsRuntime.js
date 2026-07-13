@@ -9,6 +9,7 @@
 
 const INSTALL_KEY = '__dtbOfficialMobileCheckoutTotalsInstalled';
 const MOBILE_QUERY = '(max-width: 1023px)';
+const PRICE_PATTERN = /\$\s?[\d,]+(?:\.\d{2})?|free|by address|calculating/i;
 
 function q(root, selector) {
   return root?.querySelector?.(selector) || null;
@@ -22,10 +23,15 @@ function text(node) {
   return (node?.textContent || '').replace(/\s+/g, ' ').trim();
 }
 
+function normalizedPrice(value) {
+  const match = String(value || '').match(PRICE_PATTERN);
+  return match ? match[0].replace(/\$\s+/, '$').trim() : String(value || '').trim();
+}
+
 function ensureToggleProductSubtotal(checkout) {
   const summary = q(checkout, '.dtb-co-msummary');
   const toggleRight = q(summary, '.dtb-co-msummary__toggle-right');
-  const subtotalValue = text(q(summary, '.dtb-co-msummary__total-row:first-child span:last-child'));
+  const subtotalValue = normalizedPrice(text(q(summary, '.dtb-co-msummary__total-row:first-child span:last-child')));
   if (!summary || !toggleRight || !subtotalValue) return;
 
   let valueNode = q(toggleRight, '.dtb-co-msummary__product-total');
@@ -35,12 +41,32 @@ function ensureToggleProductSubtotal(checkout) {
     toggleRight.insertBefore(valueNode, toggleRight.firstChild);
   }
   valueNode.textContent = subtotalValue;
+  valueNode.setAttribute('aria-label', `Product subtotal ${subtotalValue}`);
 
   Array.from(toggleRight.childNodes).forEach((child) => {
     if (child.nodeType === Node.TEXT_NODE && child.textContent.trim()) {
       child.textContent = '';
     }
   });
+}
+
+function collectRows(source) {
+  return qa(source, '.dtb-co-msummary__total-row')
+    .map((row) => {
+      const cells = qa(row, 'span');
+      const label = text(cells[0]);
+      const value = normalizedPrice(text(cells[cells.length - 1]));
+      const lower = label.toLowerCase();
+      const isFinal = row.classList.contains('dtb-co-msummary__total-row--final') || lower.includes('total');
+      const rank = lower.includes('subtotal') ? 10
+        : lower.includes('shipping') ? 20
+          : lower.includes('tax') ? 30
+            : isFinal ? 0
+              : 50;
+      return label && value ? { label, value, isFinal, rank } : null;
+    })
+    .filter(Boolean)
+    .sort((left, right) => left.rank - right.rank);
 }
 
 function buildTotalsPanel(checkout) {
@@ -54,19 +80,11 @@ function buildTotalsPanel(checkout) {
     panel = document.createElement('div');
     panel.className = 'dtb-co-mobile-cta__totals';
     panel.setAttribute('aria-label', 'Order total summary');
+    panel.setAttribute('aria-live', 'polite');
     ctaInner.insertBefore(panel, primaryButton);
   }
 
-  const rows = qa(source, '.dtb-co-msummary__total-row')
-    .map((row) => {
-      const cells = qa(row, 'span');
-      const label = text(cells[0]);
-      const value = text(cells[cells.length - 1]);
-      const isFinal = row.classList.contains('dtb-co-msummary__total-row--final') || /total/i.test(label);
-      return label && value ? { label, value, isFinal } : null;
-    })
-    .filter(Boolean);
-
+  const rows = collectRows(source);
   if (!rows.length) return;
 
   const signature = JSON.stringify(rows);
