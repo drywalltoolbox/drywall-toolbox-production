@@ -2,7 +2,7 @@
 
 # Drywall Toolbox MU-Plugin Architecture and Runtime Contract
 
-Last verified against source: 2026-07-12.
+Last verified against source: 2026-07-13.
 
 This document is the canonical operational map for:
 
@@ -190,6 +190,8 @@ The checkout contract uses an idempotency key. The order write boundary blocks r
 
 External order side effects use `dtb_order_enqueue_job()` and the `dtb-orders` Action Scheduler group. Queue behavior includes scheduled-action deduplication, bounded exponential retry, integration-state recording, event logging, and duplicate side-effect suppression.
 
+Native order-pay is intentionally WooCommerce/WooPayments-owned. Root-level order-pay shims such as `zzzz-dtb-order-pay-official-conversion-polish.php` and `zzzzz-dtb-order-pay-trust-microcopy.php` are presentation-only: they may style provider cards, bottom sheets, selected state, and compact trust/support copy, but must not move gateway iframe fields, alter payment nonces, replace tokenization, bypass WooCommerce callbacks, or change order/payment lifecycle behavior.
+
 ## 6. Veeqo contract
 
 Veeqo is authoritative for:
@@ -268,21 +270,23 @@ Operational actions require capability checks, nonces where applicable, input sa
 
 ## 12. Deployment contract
 
-Deployment packages:
+Live production code is deployed through HostGator cPanel or FTP unless the business explicitly reintroduces another production deployment path.
 
-- generated frontend `dist/` contents;
-- `drywalltoolbox/.htaccess`;
-- `drywalltoolbox/logos/`;
-- `drywalltoolbox/wp/.htaccess` and `wp/index.php`;
-- DTB mu-plugins and themes.
+Live uploads include:
 
-Deployment never packages:
+- generated frontend `dist/` contents when React/CSS source changes;
+- `drywalltoolbox/.htaccess` to `/public_html/drywalltoolbox/.htaccess`;
+- `drywalltoolbox/logos/` to `/public_html/drywalltoolbox/logos/`;
+- `drywalltoolbox/wp/.htaccess` and `wp/index.php` to `/public_html/drywalltoolbox/wp/`;
+- changed DTB mu-plugin and theme files to the matching `/public_html/drywalltoolbox/wp/wp-content/` paths.
+
+Deployment never overwrites:
 
 - `wp-config.php`;
-- WordPress core;
+- WordPress core unless intentionally performing a controlled WordPress update;
 - uploads, cache, or upgrade state;
 - runtime secrets;
-- database dumps unless an explicitly controlled operational task requires one.
+- uncontrolled database dumps.
 
 ## 13. Validation
 
@@ -290,7 +294,7 @@ Frontend changes:
 
 ```powershell
 cd frontend
-npm ci
+npm ci --include=dev
 npm run lint
 npm run build
 ```
