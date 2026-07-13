@@ -41,8 +41,8 @@ RewriteRule . /wp/index.php [L]
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
 
-  # WordPress/WooCommerce admin, REST, cart, checkout, and order-payment surfaces are dynamic.
-  <If "%{REQUEST_URI} =~ m#^/wp/(?:wp-admin|wp-login\.php|wp-json|index\.php)#i || %{REQUEST_URI} =~ m#/(?:cart|checkout|account|dashboard|orders|addresses|rewards)(?:/|$)#i || %{QUERY_STRING} =~ m#(^|&)(rest_route=|pay_for_order=true|order-pay=[0-9]+)#i">
+  # WordPress/WooCommerce admin, REST, cart, checkout, account, callback, and order-payment surfaces are dynamic.
+  <If "%{REQUEST_URI} =~ m#^/wp/(?:wp-admin|wp-login\.php|wp-json|index\.php|wc-api)(?:/|$)#i || %{REQUEST_URI} =~ m#/(?:cart|checkout|account|my-account|dashboard|orders|addresses|rewards|login|register|forgot-password|lost-password|reset-password|logout|wc-api)(?:/|$)#i || %{QUERY_STRING} =~ m#(^|&)(?:rest_route=|pay_for_order=true|order-pay=[0-9]+|wc-api=)#i || %{HTTP_COOKIE} =~ m#(?:^|;\s*)(?:woocommerce_cart_hash|woocommerce_items_in_cart|wp_woocommerce_session_)#i">
     Header set Cache-Control "no-cache, no-store, must-revalidate, private"
     Header set Pragma "no-cache"
     Header set Expires "0"
