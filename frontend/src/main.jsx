@@ -35,6 +35,7 @@ import './styles/checkout-mobile-fluid-fixes.css'
 import './styles/checkout-official-conversion-overrides.css'
 import './styles/checkout-mobile-conversion-2026.css'
 import './styles/checkout-mobile-first-2026-next.css'
+import './styles/checkout-mobile-final-payment-sheet.css'
 import App from './App.jsx'
 import './components/catalog/products-selector-overrides.css'
 import ErrorBoundary from './components/errors/ErrorBoundary.jsx'
@@ -42,6 +43,7 @@ import { installSchematicPageLabelRuntime } from './utils/schematicPageLabelRunt
 import { installMobileCheckoutSummaryAutoOpen } from './utils/checkoutMobileSummaryRuntime.js'
 import { installOfficialMobileCheckoutTotalsRuntime } from './utils/checkoutOfficialMobileTotalsRuntime.js'
 import { installCheckoutAddressAutocompleteRuntime } from './utils/checkoutAddressAutocompleteRuntime.js'
+import { installCheckoutMobileTotalsMotionRuntime } from './utils/checkoutMobileTotalsMotionRuntime.js'
 import { installMobileSchematicNavRuntime } from './utils/mobileSchematicNavRuntime.js'
 import { installRepairPackageSelectionRuntime } from './utils/repairPackageSelectionRuntime.js'
 import { installCustomerFacingCopyRuntime } from './utils/customerFacingCopyRuntime.js'
@@ -55,6 +57,7 @@ installSchematicPageLabelRuntime();
 installMobileCheckoutSummaryAutoOpen();
 installOfficialMobileCheckoutTotalsRuntime();
 installCheckoutAddressAutocompleteRuntime();
+installCheckoutMobileTotalsMotionRuntime();
 installMobileSchematicNavRuntime();
 installRepairPackageSelectionRuntime();
 installCustomerFacingCopyRuntime();
@@ -88,4 +91,4 @@ createRoot(document.getElementById('root')).render(
       </ErrorBoundary>
     </HelmetProvider>
   </StrictMode>,
-)
+);
