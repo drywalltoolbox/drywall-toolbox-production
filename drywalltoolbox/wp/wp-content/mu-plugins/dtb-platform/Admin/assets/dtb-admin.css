@@ -198,17 +198,46 @@ body.dtb-repair-admin-screen {
 
 /* WordPress .wrap override within dtb pages */
 .wrap.dtb-admin-page {
-  margin: 0 20px 0 20px;
+  margin: 0;
+  max-width: none;
+  min-width: 0;
 }
 
 .dtb-admin {
-  min-height: 80vh;
-  padding: 24px 0 40px;
+  --dtb-admin-gutter: clamp(12px, 2vw, 28px);
+  --dtb-admin-content-max: 1680px;
+  min-height: calc(100vh - 32px);
+  padding: 0;
+  overflow-x: clip;
   animation: dtbFadeIn var(--dtb-motion-base) var(--dtb-ease-standard);
 }
 
+.dtb-admin-frame {
+  width: 100%;
+  padding: clamp(16px, 2.1vw, 30px) var(--dtb-admin-gutter) 44px;
+}
+
+.dtb-admin-frame__inner {
+  width: min(var(--dtb-admin-content-max), 100%);
+  min-width: 0;
+  margin-inline: auto;
+  container-type: inline-size;
+}
+
 .dtb-page-body {
+  min-width: 0;
   padding: 0 0 32px;
+}
+
+.dtb-page-body__inner {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.dtb-admin :where(.dtb-page-header, .dtb-section-nav, .dtb-page-body, .dtb-page-body__inner, .dtb-card, .dtb-kpi, .dtb-toolbar, .dtb-filter-bar, .dtb-grid, .dtb-table-wrap, .dtb-live-region, .dtb-workbench, .dtb-workbench__main) {
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* =============================================================================
@@ -800,12 +829,15 @@ a.dtb-kpi:hover { text-decoration: none; }
   background: var(--dtb-surface);
   border: 1px solid var(--dtb-border);
   border-radius: var(--dtb-radius-xl);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
   box-shadow: var(--dtb-shadow-sm);
 }
 
 .dtb-table {
   width: 100%;
+  min-width: 760px;
   border-collapse: collapse;
   font-size: 13px;
 }
@@ -1768,6 +1800,10 @@ a.dtb-kpi:hover { text-decoration: none; }
 }
 
 @media (max-width: 900px) {
+  .dtb-admin-frame {
+    padding: 14px 12px 34px;
+  }
+
   .dtb-page-header {
     flex-direction: column;
     align-items: stretch;
@@ -1795,6 +1831,33 @@ a.dtb-kpi:hover { text-decoration: none; }
 }
 
 @media (max-width: 600px) {
+  .wrap.dtb-admin-page { margin: 0; }
+
+  .dtb-admin {
+    min-height: calc(100vh - 46px);
+  }
+
+  .dtb-admin-frame {
+    padding: 10px 8px 28px;
+  }
+
+  .dtb-page-header {
+    padding: 14px;
+    border-radius: var(--dtb-radius-md);
+  }
+
+  .dtb-page-title {
+    gap: 8px;
+    font-size: 18px;
+  }
+
+  .dtb-page-title .dashicons {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    font-size: 18px;
+  }
+
   .dtb-grid--kpi { grid-template-columns: 1fr; }
   .dtb-command-center-kpis .dtb-grid--kpi { grid-template-columns: 1fr; }
   .dtb-command-center-kpis .dtb-kpi {

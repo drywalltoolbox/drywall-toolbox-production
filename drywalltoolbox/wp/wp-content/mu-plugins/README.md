@@ -223,6 +223,8 @@ The DTB JWT current-user bridge is storefront/domain-route scoped. It must not r
 
 Admin auth diagnostics live at `GET /wp-json/dtb/v1/admin-auth-smoke` and report the current REST user, native WordPress auth-cookie validity, REST nonce validity, DTB JWT presence, and the route namespace policy. The route is for authenticated operators only and must not expose cookie or token values.
 
+Global wp-admin styling is platform-owned by `dtb-platform/Admin/AdminAssets.php` and `dtb-platform/Admin/assets/dtb-admin-global-skin.css`. DTB-owned admin pages use the shared responsive frame emitted by `dtb-platform/Admin/AdminShell.php`; native WordPress, WooCommerce, and WooPayments pages remain in their native markup and receive only CSS-level canvas, gutter, typography, form, table, notice, and surface polish. The global skin is visual-only: it may tune typography, spacing, chrome, forms, tables, notices, and WooCommerce settings surfaces, but it must not hide required controls, change field names, alter form submission, bypass nonce/capability checks, or replace native WooCommerce/WooPayments admin behavior.
+
 Live deployments that expose WordPress through root-mounted `/wp-admin` and `/wp-json` aliases while WordPress files live under `/wp` must configure native WordPress auth cookies with root path scope in `wp-config.php` before WordPress loads:
 
 ```php

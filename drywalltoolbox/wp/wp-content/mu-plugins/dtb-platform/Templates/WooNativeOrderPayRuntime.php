@@ -69,6 +69,12 @@ if ( ! $order instanceof WC_Order ) {
 
 	if ( empty( $available_gateways ) ) {
 		$error_message = __( 'No payment methods are currently available for this order. Please contact support.', 'drywall-toolbox' );
+	} else {
+		$order_button_text = sprintf(
+			/* translators: %s: formatted order total */
+			__( 'Pay %s securely', 'drywall-toolbox' ),
+			wp_strip_all_tags( $order->get_formatted_order_total() )
+		);
 	}
 }
 

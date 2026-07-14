@@ -409,6 +409,80 @@ function dtb_order_pay_final_ui_normalizer_head(): void {
 			font-weight: 900 !important;
 		}
 
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card #payment {
+			background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%) !important;
+			box-shadow: 0 20px 54px rgba(15, 23, 42, .08) !important;
+		}
+
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card #payment::after {
+			content: 'Wallets appear first when available. Card details are handled inside the secure gateway frame.' !important;
+			margin-top: 18px !important;
+		}
+
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method {
+			transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease, background .16s ease !important;
+		}
+
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method:hover {
+			transform: translateY(-1px) !important;
+			border-color: #b7c6da !important;
+			box-shadow: 0 14px 34px rgba(15, 23, 42, .08) !important;
+		}
+
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method::after {
+			content: '' !important;
+			position: absolute !important;
+			top: 12px !important;
+			right: 12px !important;
+			width: 18px !important;
+			height: 18px !important;
+			border: 2px solid #cbd5e1 !important;
+			border-radius: 999px !important;
+			background: #ffffff !important;
+			box-shadow: inset 0 0 0 4px #ffffff !important;
+			pointer-events: none !important;
+		}
+
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method.dtb-payment-active::after,
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method.dtb-payment-final-active::after {
+			border-color: #2563eb !important;
+			background: #2563eb !important;
+		}
+
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method.dtb-payment-active,
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method.dtb-payment-final-active {
+			background: linear-gradient(180deg, #ffffff, #f8fbff) !important;
+			border-color: #2563eb !important;
+			box-shadow: 0 0 0 4px rgba(37, 99, 235, .13), 0 18px 44px rgba(37, 99, 235, .14) !important;
+		}
+
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .dtb-order-pay-cta-trust {
+			display: flex !important;
+			align-items: center !important;
+			justify-content: flex-end !important;
+			gap: 8px !important;
+			margin-top: 10px !important;
+			color: #64748b !important;
+			font-size: 12.5px !important;
+			font-weight: 700 !important;
+			line-height: 1.35 !important;
+			text-align: right !important;
+		}
+
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .dtb-order-pay-cta-trust::before {
+			content: '✓' !important;
+			display: inline-grid !important;
+			place-items: center !important;
+			width: 18px !important;
+			height: 18px !important;
+			border-radius: 999px !important;
+			background: #eff6ff !important;
+			color: #2563eb !important;
+			font-size: 12px !important;
+			font-weight: 900 !important;
+			flex: 0 0 auto !important;
+		}
+
 		@media (max-width: 1040px) {
 			body.dtb-native-order-pay-shell .dtb-native-order-pay-card form#order_review {
 				grid-template-columns: 1fr !important;
@@ -487,6 +561,12 @@ function dtb_order_pay_final_ui_normalizer_head(): void {
 				margin-right: 0 !important;
 			}
 
+			body.dtb-native-order-pay-shell .dtb-native-order-pay-card .dtb-order-pay-cta-trust {
+				justify-content: center !important;
+				margin: 10px 4px 0 !important;
+				text-align: center !important;
+			}
+
 			body.dtb-native-order-pay-shell .dtb-native-order-pay-card table.shop_table::before {
 				padding: 20px 18px 12px !important;
 			}
@@ -547,6 +627,31 @@ function dtb_order_pay_final_ui_normalizer_footer(): void {
 	(function(){
 		var frame = 0;
 		function methodText(method){return String((method && (method.className + ' ' + method.textContent)) || '').toLowerCase();}
+		function compactText(node){return String((node && node.textContent) || '').replace(/\s+/g,' ').trim();}
+		function orderTotalText(){
+			var total = document.querySelector('.dtb-native-order-pay-card table.shop_table tfoot tr.order-total td');
+			if(!total){total = document.querySelector('.dtb-native-order-pay-card table.shop_table tfoot tr:last-child td');}
+			var text = compactText(total);
+			var match = text.match(/\$\s?[\d,]+(?:\.\d{2})?/);
+			return match ? match[0].replace(/\$\s+/, '$') : '';
+		}
+		function syncPayButton(){
+			var button = document.querySelector('.dtb-native-order-pay-card #place_order');
+			if(!button){return;}
+			var total = orderTotalText();
+			var label = total ? 'Pay ' + total + ' securely' : 'Pay securely';
+			if(!button.dataset.dtbOriginalText){button.dataset.dtbOriginalText = compactText(button);}
+			if(compactText(button) !== label){button.textContent = label;}
+			button.setAttribute('aria-label', label);
+
+			var placeOrder = button.closest('.place-order');
+			if(placeOrder && !placeOrder.querySelector('.dtb-order-pay-cta-trust')){
+				var trust = document.createElement('div');
+				trust.className = 'dtb-order-pay-cta-trust';
+				trust.textContent = 'Encrypted payment. No charge until gateway confirmation.';
+				placeOrder.appendChild(trust);
+			}
+		}
 		function hasDetails(method){
 			var box = method && method.querySelector('.payment_box');
 			if(!box){return false;}
@@ -569,6 +674,7 @@ function dtb_order_pay_final_ui_normalizer_footer(): void {
 					else{method.classList.add('dtb-gateway-card');}
 				}
 			});
+			syncPayButton();
 		}
 		function schedule(){if(frame){return;} frame = window.requestAnimationFrame(sync);}
 		if(document.readyState === 'loading'){

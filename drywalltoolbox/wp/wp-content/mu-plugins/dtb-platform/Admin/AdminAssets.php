@@ -14,6 +14,7 @@
 defined( 'ABSPATH' ) || exit;
 
 add_action( 'admin_enqueue_scripts', 'dtb_admin_assets_enqueue' );
+add_action( 'admin_enqueue_scripts', 'dtb_admin_assets_enqueue_global_skin', 1 );
 add_filter( 'admin_body_class', 'dtb_admin_assets_body_class' );
 
 function dtb_admin_assets_enqueue(): void {
@@ -322,6 +323,39 @@ function dtb_admin_assets_enqueue(): void {
 }
 
 /**
+ * Load the non-invasive global wp-admin visual skin.
+ *
+ * This is intentionally separate from the DTB component system. It gives core
+ * WordPress, WooCommerce, WooPayments, and DTB admin pages a consistent modern
+ * chrome without changing page callbacks, routes, capabilities, form fields, or
+ * JavaScript behavior.
+ */
+function dtb_admin_assets_enqueue_global_skin(): void {
+	if ( ! dtb_feature_enabled( 'DTB_GLOBAL_ADMIN_SKIN_ENABLED', true ) ) {
+		return;
+	}
+
+	if ( wp_doing_ajax() || ( defined( 'IFRAME_REQUEST' ) && IFRAME_REQUEST ) ) {
+		return;
+	}
+
+	$assets_dir = __DIR__ . '/assets/';
+	$assets_url = plugin_dir_url( __FILE__ ) . 'assets/';
+	$css_file   = $assets_dir . 'dtb-admin-global-skin.css';
+
+	if ( ! file_exists( $css_file ) ) {
+		return;
+	}
+
+	wp_enqueue_style(
+		'dtb-admin-global-skin',
+		$assets_url . 'dtb-admin-global-skin.css',
+		[],
+		(string) filemtime( $css_file )
+	);
+}
+
+/**
  * Add a stable body class while rendering DTB admin pages.
  *
  * This lets the shared stylesheet modernize the surrounding wp-admin chrome
@@ -337,6 +371,10 @@ function dtb_admin_assets_body_class( string $classes ): string {
 
 	if ( $page_meta || $is_dtb_slug ) {
 		$classes .= ' dtb-admin-screen';
+	}
+
+	if ( dtb_feature_enabled( 'DTB_GLOBAL_ADMIN_SKIN_ENABLED', true ) ) {
+		$classes .= ' dtb-admin-global-skin';
 	}
 
 	return $classes;

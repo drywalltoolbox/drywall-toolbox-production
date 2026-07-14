@@ -608,6 +608,10 @@ export default function Checkout() {
     `dtb-co-input${errors[field] ? ' dtb-co-input--error' : ''}`;
 
   const activeStep = processing ? 'review' : isFormComplete ? 'payment' : 'shipping';
+  const payButtonLabel = processing ? 'Preparing Payment...' : `Pay $${displayTotal.toFixed(2)} securely`;
+  const payButtonAriaLabel = processing
+    ? 'Preparing secure payment'
+    : `Pay ${displayTotal.toFixed(2)} dollars securely`;
 
   /* ─── Empty cart ─────────────────────────────────────── */
   if (safeCartItems.length === 0 && !orderComplete) {
@@ -810,6 +814,7 @@ export default function Checkout() {
                       value={formData[name]}
                       onChange={handleInputChange}
                       autoComplete={autoComplete}
+                      enterKeyHint={name === 'phone' ? 'next' : undefined}
                       {...(inputMode ? { inputMode } : {})}
                       className={inputCls(name)}
                       aria-invalid={!!errors[name]}
@@ -846,6 +851,7 @@ export default function Checkout() {
                   value={formData.address}
                   onChange={handleInputChange}
                   autoComplete="street-address"
+                  enterKeyHint="next"
                   className={inputCls('address')}
                   aria-invalid={!!errors.address}
                 />
@@ -866,6 +872,7 @@ export default function Checkout() {
                     value={formData.city}
                     onChange={handleInputChange}
                     autoComplete="address-level2"
+                    enterKeyHint="next"
                     className={inputCls('city')}
                     aria-invalid={!!errors.city}
                   />
@@ -905,6 +912,7 @@ export default function Checkout() {
                     onChange={handleInputChange}
                     autoComplete="postal-code"
                     inputMode="numeric"
+                    enterKeyHint="done"
                     className={inputCls('zip')}
                     aria-invalid={!!errors.zip}
                   />
@@ -988,6 +996,10 @@ export default function Checkout() {
                   onChange={(event) => setCouponInput(event.target.value.toUpperCase())}
                   placeholder="Enter code"
                   className="dtb-co-coupon__input"
+                  autoComplete="off"
+                  autoCapitalize="characters"
+                  spellCheck={false}
+                  enterKeyHint="done"
                 />
                 <button type="button" onClick={addManualCoupon} className="dtb-co-coupon__btn">
                   Apply
@@ -1033,6 +1045,8 @@ export default function Checkout() {
                 placeholder="Special instructions for your order…"
                 className="dtb-co-textarea"
                 style={{ marginTop: 6 }}
+                autoComplete="off"
+                enterKeyHint="done"
               />
             </Motion.section>
 
@@ -1102,6 +1116,10 @@ export default function Checkout() {
                 placeholder="Gift card or discount code"
                 className="dtb-co-coupon__input"
                 aria-label="Discount or gift card code"
+                autoComplete="off"
+                autoCapitalize="characters"
+                spellCheck={false}
+                enterKeyHint="done"
               />
               <button type="button" onClick={addManualCoupon} className="dtb-co-coupon__btn">
                 Apply
@@ -1162,11 +1180,16 @@ export default function Checkout() {
               onClick={handlePlaceOrder}
               disabled={!canSubmitCheckout || processing}
               className="dtb-co-btn-primary dtb-co-btn-primary--wide"
+              aria-label={payButtonAriaLabel}
             >
               {processing ? <Loader2 size={16} className="animate-spin" /> : null}
-              {processing ? 'Preparing Payment…' : 'Continue to Secure Payment'}
+              {payButtonLabel}
             </button>
             <InlineSubmitStatus status={submitStatus} />
+            <div className="dtb-co-cta-trust" aria-label="Secure payment details">
+              <span><ShieldCheck size={13} aria-hidden="true" /> Encrypted checkout</span>
+              <span>Payment is verified by the gateway before your order is finalized.</span>
+            </div>
           </div>
 
           {/* Payment logos */}
@@ -1180,23 +1203,50 @@ export default function Checkout() {
 
       {/* ── Mobile sticky CTA ── */}
       <div className="dtb-co-mobile-cta lg:hidden">
-        <div className="dtb-co-mobile-cta__inner">
-          <div className="dtb-co-mobile-cta__total-row">
-            <span>Est. Total</span>
-            <span className="dtb-co-mobile-cta__total-amount">${displayTotal.toFixed(2)}</span>
-          </div>
-          <button
-            type="button"
-            onClick={handlePlaceOrder}
-            disabled={!canSubmitCheckout || processing}
-            className="dtb-co-btn-primary dtb-co-btn-primary--wide"
-          >
-            {processing ? <Loader2 size={16} className="animate-spin" /> : null}
-            {processing ? 'Preparing Payment…' : 'Continue to Secure Payment'}
-          </button>
-          <div className="dtb-co-mobile-cta__logos">
-            <PaymentMethodLogos compact />
-          </div>
+          <div className="dtb-co-mobile-cta__inner">
+            <div className="dtb-co-mobile-cta__total-row">
+              <span>Est. Total</span>
+              <span className="dtb-co-mobile-cta__total-amount">${displayTotal.toFixed(2)}</span>
+            </div>
+            <div className="dtb-co-mobile-cta__totals" aria-label="Order total summary" aria-live="polite" aria-atomic="true">
+              <div className="dtb-co-mobile-cta__totals-heading">
+                <span>Order totals</span>
+                <span>Secure checkout</span>
+              </div>
+              <div className="dtb-co-mobile-cta__total-line dtb-co-mobile-cta__total-line--final">
+                <span>Est. Total</span>
+                <span>${displayTotal.toFixed(2)}</span>
+              </div>
+              <div className="dtb-co-mobile-cta__total-line">
+                <span>Subtotal</span>
+                <span>${subtotal.toFixed(2)}</span>
+              </div>
+              <div className="dtb-co-mobile-cta__total-line">
+                <span>Shipping</span>
+                <span>{quoteReady ? (shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`) : 'By address'}</span>
+              </div>
+              <div className="dtb-co-mobile-cta__total-line">
+                <span>Tax</span>
+                <TaxSummaryValue status={taxPreview.status} amount={taxAmount} />
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handlePlaceOrder}
+              disabled={!canSubmitCheckout || processing}
+              className="dtb-co-btn-primary dtb-co-btn-primary--wide"
+              aria-label={payButtonAriaLabel}
+            >
+              {processing ? <Loader2 size={16} className="animate-spin" /> : null}
+              {payButtonLabel}
+            </button>
+            <div className="dtb-co-mobile-cta__trust">
+              <ShieldCheck size={13} aria-hidden="true" />
+              <span>Encrypted payment. No charge until gateway confirmation.</span>
+            </div>
+            <div className="dtb-co-mobile-cta__logos">
+              <PaymentMethodLogos compact />
+            </div>
         </div>
       </div>
 

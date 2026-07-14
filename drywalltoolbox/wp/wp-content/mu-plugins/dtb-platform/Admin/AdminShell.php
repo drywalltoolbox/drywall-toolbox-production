@@ -56,10 +56,14 @@ function dtb_admin_shell_open( array $args ): void {
 	// Toast container.
 	echo '<div class="dtb-toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>';
 
+	echo '<div class="dtb-admin-frame">';
+	echo '<div class="dtb-admin-frame__inner">';
+
 	// Page header.
 	dtb_admin_shell_render_header( $args );
 
 	echo '<main class="dtb-page-body">';
+	echo '<div class="dtb-page-body__inner">';
 }
 
 /**
@@ -147,7 +151,10 @@ function dtb_admin_shell_render_tabs( array $tabs, string $live_target = '' ): v
  * Close the DTB admin page shell.
  */
 function dtb_admin_shell_close(): void {
+	echo '</div>';  // .dtb-page-body__inner
 	echo '</main>'; // .dtb-page-body
+	echo '</div>';  // .dtb-admin-frame__inner
+	echo '</div>';  // .dtb-admin-frame
 	echo '</div>';  // .dtb-admin
 	echo '</div>';  // .wrap.dtb-admin-page
 }
