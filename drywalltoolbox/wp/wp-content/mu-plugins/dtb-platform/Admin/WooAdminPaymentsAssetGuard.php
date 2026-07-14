@@ -2,9 +2,12 @@
 /**
  * WooCommerce payment-settings asset guard.
  *
- * Keeps WooCommerce/WooPayments admin screens authoritative while preventing the
- * PayPal Payments section bundle from mounting on non-PayPal payment settings
- * pages where its React root is absent.
+ * Keeps WooCommerce/WooPayments admin screens authoritative while offering an
+ * opt-in incident mitigation for PayPal Payments section bundles that mount on
+ * non-PayPal payment settings pages.
+ *
+ * Disabled by default. Enable only with DTB_ENABLE_WOO_ADMIN_PAYMENTS_ASSET_GUARD
+ * after a confirmed Woo/PayPal admin bundle collision.
  *
  * @package drywall-toolbox
  */
@@ -12,7 +15,6 @@
 defined( 'ABSPATH' ) || exit;
 
 add_action( 'admin_enqueue_scripts', 'dtb_woo_admin_payments_asset_guard_dequeue_foreign_provider_scripts', 9999 );
-add_action( 'admin_head', 'dtb_woo_admin_payments_asset_guard_start_output_filter', 0 );
 add_action( 'admin_print_scripts', 'dtb_woo_admin_payments_asset_guard_dequeue_foreign_provider_scripts', 0 );
 add_action( 'admin_print_footer_scripts', 'dtb_woo_admin_payments_asset_guard_dequeue_foreign_provider_scripts', 0 );
 add_filter( 'script_loader_tag', 'dtb_woo_admin_payments_asset_guard_suppress_foreign_provider_script_tag', 10, 3 );
@@ -22,8 +24,8 @@ add_filter( 'script_loader_tag', 'dtb_woo_admin_payments_asset_guard_suppress_fo
  */
 function dtb_woo_admin_payments_asset_guard_enabled(): bool {
 	return function_exists( 'dtb_feature_enabled' )
-		? dtb_feature_enabled( 'DTB_ENABLE_WOO_ADMIN_PAYMENTS_ASSET_GUARD', true )
-		: true;
+		? dtb_feature_enabled( 'DTB_ENABLE_WOO_ADMIN_PAYMENTS_ASSET_GUARD', false )
+		: false;
 }
 
 /**
@@ -95,9 +97,9 @@ function dtb_woo_admin_payments_asset_guard_dequeue_foreign_provider_scripts(): 
 /**
  * Last-chance suppression for late-registered PayPal settings scripts.
  *
- * Some payment plugins register section bundles during the print phase. Returning
- * an empty tag here keeps the generic Payments provider screen available without
- * mutating any gateway settings or blocking the real PayPal settings section.
+ * This is intentionally limited to script-loader tags. It does not use output
+ * buffering or broad HTML filtering, so official WooCommerce admin markup stays
+ * inspectable and debuggable.
  */
 function dtb_woo_admin_payments_asset_guard_suppress_foreign_provider_script_tag( string $tag, string $handle, string $src ): string {
 	if ( ! dtb_woo_admin_payments_asset_guard_is_payments_page() || dtb_woo_admin_payments_asset_guard_is_paypal_section() ) {
@@ -122,38 +124,4 @@ function dtb_woo_admin_payments_asset_guard_suppress_foreign_provider_script_tag
 	}
 
 	return '';
-}
-
-/**
- * Start a narrow final HTML filter for payment plugins that print scripts
- * directly instead of using wp_enqueue_script().
- */
-function dtb_woo_admin_payments_asset_guard_start_output_filter(): void {
-	if ( ! dtb_woo_admin_payments_asset_guard_is_payments_page() || dtb_woo_admin_payments_asset_guard_is_paypal_section() ) {
-		return;
-	}
-
-	if ( ! current_user_can( 'manage_woocommerce' ) && ! current_user_can( 'manage_options' ) ) {
-		return;
-	}
-
-	ob_start( 'dtb_woo_admin_payments_asset_guard_filter_output' );
-}
-
-/**
- * Remove only the PayPal Payments settings bundle from the generic Payments
- * provider page. The PayPal settings section is explicitly excluded upstream.
- */
-function dtb_woo_admin_payments_asset_guard_filter_output( string $html ): string {
-	if ( '' === $html ) {
-		return $html;
-	}
-
-	$filtered = preg_replace(
-		'#<script\b[^>]+src=(["\'])(?=[^"\']*(?:ppcp-settings|ppcp-settings-js|woocommerce-paypal-payments))[^"\']+\1[^>]*>\s*</script>#i',
-		'',
-		$html
-	);
-
-	return is_string( $filtered ) ? $filtered : $html;
 }
