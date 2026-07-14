@@ -36,11 +36,38 @@ function normalizeOptionalPhone() {
   const phone = document.querySelector('[name="phone"]');
   if (!phone) return;
   phone.required = false;
-  phone.setAttribute('aria-hidden', 'true');
-  phone.setAttribute('tabindex', '-1');
+  phone.removeAttribute('aria-required');
+  phone.closest?.('.dtb-co-field')?.classList.add('dtb-co-field--optional-phone-compat');
   if (!String(phone.value || '').trim()) {
     dispatchReactInput(phone, OPTIONAL_PHONE_FALLBACK);
   }
+}
+
+function addressInput() {
+  return document.getElementById('field-address') || document.querySelector('[name="address"]');
+}
+
+function ensureAddressAssist(input) {
+  if (!input) return null;
+  const wrapper = input.closest?.('.dtb-co-field') || input.parentElement;
+  if (!wrapper) return null;
+  let assist = wrapper.querySelector('.dtb-address-assist');
+  if (!assist) {
+    assist = document.createElement('p');
+    assist.className = 'dtb-address-assist dtb-address-assist--ready';
+    assist.setAttribute('aria-live', 'polite');
+    assist.textContent = 'Start typing your address. Browser autofill is supported.';
+    wrapper.appendChild(assist);
+  }
+  return assist;
+}
+
+function setAddressAssist(state, message) {
+  const input = addressInput();
+  const assist = ensureAddressAssist(input);
+  if (!assist) return;
+  assist.className = `dtb-address-assist dtb-address-assist--${state}`;
+  assist.textContent = message;
 }
 
 function component(place, type, length = 'long_name') {
@@ -63,6 +90,8 @@ function applyPlace(place) {
   setField('zip', zip);
   setField('country', country);
   normalizeOptionalPhone();
+
+  setAddressAssist('selected', zip ? 'Address selected. Shipping and tax are updating.' : 'Address selected. Add ZIP code to calculate shipping and tax.');
 
   window.requestAnimationFrame(() => {
     const next = zip ? document.querySelector('[name="customerNote"]') : document.querySelector('[name="zip"]');
@@ -102,32 +131,48 @@ function loadGooglePlaces() {
   return scriptPromise;
 }
 
-function installNativeFallback(addressInput) {
-  addressInput.setAttribute('autocomplete', 'shipping street-address');
-  addressInput.setAttribute('inputmode', 'text');
-  addressInput.setAttribute('enterkeyhint', 'next');
+function installNativeFallback(input) {
+  input.setAttribute('autocomplete', 'shipping street-address');
+  input.setAttribute('inputmode', 'text');
+  input.setAttribute('enterkeyhint', 'next');
+  input.setAttribute('placeholder', input.getAttribute('placeholder') || 'Start typing your address');
   document.querySelector('[name="city"]')?.setAttribute('autocomplete', 'shipping address-level2');
   document.querySelector('[name="state"]')?.setAttribute('autocomplete', 'shipping address-level1');
   document.querySelector('[name="zip"]')?.setAttribute('autocomplete', 'shipping postal-code');
 }
 
-async function enhanceAddressInput(addressInput) {
-  if (!addressInput || addressInput.dataset.dtbAddressEnhanced === 'true') return;
-  addressInput.dataset.dtbAddressEnhanced = 'true';
-  installNativeFallback(addressInput);
+function installManualAddressHints(input) {
+  if (!input || input.dataset.dtbManualHintInstalled === 'true') return;
+  input.dataset.dtbManualHintInstalled = 'true';
+  input.addEventListener('input', () => {
+    const value = String(input.value || '').trim();
+    if (value.length >= 6) {
+      setAddressAssist('manual', 'Continue entering city, state, and ZIP if the address is not auto-completed.');
+    } else {
+      setAddressAssist('ready', GOOGLE_PLACES_KEY ? 'Start typing your address to search.' : 'Start typing your address. Browser autofill is supported.');
+    }
+  });
+}
+
+async function enhanceAddressInput(input) {
+  if (!input || input.dataset.dtbAddressEnhanced === 'true') return;
+  input.dataset.dtbAddressEnhanced = 'true';
+  installNativeFallback(input);
+  installManualAddressHints(input);
+  setAddressAssist('ready', GOOGLE_PLACES_KEY ? 'Start typing your address to search.' : 'Start typing your address. Browser autofill is supported.');
 
   const places = await loadGooglePlaces();
   if (!places?.Autocomplete) {
-    addressInput.dataset.dtbAddressProvider = 'browser-autofill';
+    input.dataset.dtbAddressProvider = 'browser-autofill';
     return;
   }
 
-  const autocomplete = new places.Autocomplete(addressInput, {
+  const autocomplete = new places.Autocomplete(input, {
     componentRestrictions: { country: ['us'] },
     fields: ['address_components', 'formatted_address'],
     types: ['address'],
   });
-  addressInput.dataset.dtbAddressProvider = 'google-places';
+  input.dataset.dtbAddressProvider = 'google-places';
   autocomplete.addListener('place_changed', () => applyPlace(autocomplete.getPlace()));
 }
 
@@ -137,8 +182,7 @@ export function installCheckoutAddressAutocompleteRuntime() {
   const boot = () => {
     if (!isCheckoutPage()) return;
     normalizeOptionalPhone();
-    const addressInput = document.getElementById('field-address') || document.querySelector('[name="address"]');
-    void enhanceAddressInput(addressInput);
+    void enhanceAddressInput(addressInput());
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
