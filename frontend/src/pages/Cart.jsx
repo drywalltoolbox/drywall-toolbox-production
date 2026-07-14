@@ -26,6 +26,7 @@ import SEOHead from '../components/shared/SEOHead';
 import { FREE_SHIP_THRESHOLD, ESTIMATED_SHIP_RATE } from '../constants/shipping';
 
 const PAYMENT_LOGO_BASE = `${ process.env.PUBLIC_URL || '' }/payment_logos`;
+const CHECKOUT_HREF = `${ ( process.env.PUBLIC_URL || '' ).replace( /\/+$/, '' ) }/checkout`;
 const CART_PAYMENT_LOGOS = [
   { key: 'visa', src: `${ PAYMENT_LOGO_BASE }/visa.svg`, alt: 'Visa' },
   { key: 'mastercard', src: `${ PAYMENT_LOGO_BASE }/mastercard.svg`, alt: 'Mastercard' },
@@ -291,14 +292,14 @@ export default function Cart() {
                 </div>
 
                 {/* Checkout CTA */}
-                <Link
-                  to="/checkout"
+                <a
+                  href={ CHECKOUT_HREF }
                   className="w-full inline-flex items-center justify-center gap-2.5 bg-primary-600 hover:bg-primary-700 active:scale-[0.99] text-white py-3.5 rounded-xl font-bold text-sm tracking-wide transition-all shadow-sm min-h-[48px]"
                 >
                   <Lock size={ 14 } strokeWidth={ 2.5 } />
                   Proceed to Checkout
                   <ArrowRight size={ 14 } strokeWidth={ 2.5 } />
-                </Link>
+                </a>
 
                 {/* Accepted payments */}
                 <div className="mt-5 pt-4 border-t border-slate-100">

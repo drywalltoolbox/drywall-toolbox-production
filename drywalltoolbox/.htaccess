@@ -198,6 +198,7 @@ ErrorDocument 511 /errors/511.html
   RewriteCond %{REQUEST_URI} ^/staging/2972/ [NC]
   RewriteCond %{REQUEST_URI} !^/staging/2972/(?:wp-json|dtb)(?:/|$) [NC]
   RewriteCond %{REQUEST_URI} !^/staging/2972/checkout/order-pay/ [NC]
+  RewriteCond %{REQUEST_URI} !\.(?:css|js|mjs|map|json|webmanifest|png|jpe?g|gif|webp|avif|svg|ico|woff2?|ttf|otf|eot|pdf|txt|xml)$ [NC]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^staging/2972/ /staging/2972/index.html [QSA,L]

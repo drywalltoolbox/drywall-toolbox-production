@@ -9,6 +9,7 @@ import { getVariationSelectionMap } from '../../utils/variationSelection.js';
 
 const CART_QTY_SYNC_DELAY_MS = 260;
 const MAX_CART_QUANTITY = 99;
+const CHECKOUT_HREF = `${ ( process.env.PUBLIC_URL || '' ).replace( /\/+$/, '' ) }/checkout`;
 
 function getCartItemKey(item) {
   return String(item?.cartKey || item?.key || item?.id || '');
@@ -457,14 +458,14 @@ export default function StorefrontCartSheet({
                 ${subtotal.toFixed(2)}
               </strong>
             </div>
-            <Link
-              to="/checkout"
+            <a
+              href={CHECKOUT_HREF}
               onClick={handleNavAndClose}
               className="scs-checkout-btn"
             >
               <span>Checkout</span>
               <ArrowRight size={16} strokeWidth={2.2} />
-            </Link>
+            </a>
             <Link
               to="/cart"
               onClick={handleNavAndClose}

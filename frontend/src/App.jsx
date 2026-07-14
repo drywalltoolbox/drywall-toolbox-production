@@ -16,6 +16,7 @@ import MobileInstallNudge from './components/pwa/MobileInstallNudge.jsx';
 import SmartBackButton from './components/navigation/SmartBackButton.jsx';
 import { isRewardsEnabled } from './utils/featureFlags.js';
 import { initializeWebpackPublicPath } from './setWebpackPublicPath.js';
+import Checkout from './pages/Checkout';
 
 const HOMEPAGE_SIGNUP_CTA_SEEN_KEY = 'dtb:homepage-signup-cta-seen:v1';
 const HOMEPAGE_SIGNUP_CTA_DELAY_MS = 900;
@@ -82,7 +83,6 @@ const RepairStatus = lazyWithReload(() => import('./pages/RepairStatus'));
 const ReturnStatus = lazyWithReload(() => import('./pages/ReturnStatus'));
 const SupportStatus = lazyWithReload(() => import('./pages/SupportStatus'));
 const Cart = lazyWithReload(() => import('./pages/Cart'));
-const Checkout = lazyWithReload(() => import('./pages/Checkout'));
 const CheckoutReturn = lazyWithReload(() => import('./pages/CheckoutReturn'));
 const OrderConfirmation = lazyWithReload(() => import('./pages/OrderConfirmation'));
 const OrderTracking = lazyWithReload(() => import('./pages/OrderTracking'));
@@ -225,62 +225,68 @@ function AppRoutes() {
   const location = useLocation();
   const rewardsEnabled = isRewardsEnabled();
   const productSelectorElement = <Products title="Products" isPartsFilter={0} />;
+  const routes = (
+    <Suspense fallback={<RouteChunkFallback />}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/products" element={<Products forceProductGrid title="Products" isPartsFilter={0} />} />
+        <Route path="/products/brands" element={productSelectorElement} />
+        <Route path="/products/brands/:brandSlug" element={productSelectorElement} />
+        <Route path="/products/brands/:brandSlug/categories/:categorySlug" element={productSelectorElement} />
+        <Route path="/products/:slug/variations/:variationId" element={<ProductDetailPage />} />
+        <Route path="/products/:slug" element={<ProductDetailPage />} />
+        <Route path="/all-products" element={<RedirectToProducts />} />
+        <Route path="/parts" element={<Parts />} />
+        <Route path="/product/:partNumber" element={<Product />} />
+        <Route path="/category/:slug" element={<CategoryPage />} />
+        <Route path="/schematics" element={<Schematics />} />
+        <Route path="/repairs" element={<Repairs />} />
+        <Route path="/repairs/start" element={<RepairStart />} />
+        <Route path="/repairs/packages" element={<RepairPackages />} />
+        <Route path="/repairs/track" element={<RepairTrack />} />
+        <Route path="/repairs/status/:id" element={<RepairStatus />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/calculators" element={<Calculators />} />
+        <Route path="/shipping-policy" element={<ShippingPolicy />} />
+        <Route path="/returns" element={<ReturnPortal />} />
+        <Route path="/returns/status/:id" element={<ReturnStatus />} />
+        <Route path="/return-policy" element={<ReturnPolicy />} />
+        <Route path="/policies" element={<StorePolicies />} />
+        {/* <Route path="/toolset-builder" element={<ToolsetBuilder />} /> */}
+        <Route path="/preview/technical-specifications" element={<TechnicalSpecificationsPreview />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/checkout/complete" element={<CheckoutReturn fallbackState="complete" />} />
+        <Route path="/checkout/payment-failed" element={<CheckoutReturn fallbackState="failed" />} />
+        <Route path="/checkout/payment-cancelled" element={<CheckoutReturn fallbackState="cancelled" />} />
+        <Route path="/checkout/order-received/:id" element={<CheckoutReturn fallbackState="complete" />} />
+        <Route path="/order/:id" element={<OrderConfirmation />} />
+        <Route path="/order-tracking/:id" element={<OrderTracking />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/support/status/:id" element={<SupportStatus />} />
+        <Route path="/settings/woocommerce" element={<ProtectedRoute><WooCommerceSettings /></ProtectedRoute>} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/dashboard/repairs/:id" element={<ProtectedRoute><RepairStatus /></ProtectedRoute>} />
+        <Route path="/orders" element={<Navigate to="/dashboard?tab=orders" replace />} />
+        <Route path="/rewards" element={<Navigate to={rewardsEnabled ? "/dashboard?tab=rewards" : "/dashboard"} replace />} />
+        <Route path="/account-settings" element={<Navigate to="/dashboard?tab=settings" replace />} />
+        <Route path="/addresses" element={<Navigate to="/dashboard?tab=addresses" replace />} />
+        <Route path="/notifications" element={<Navigate to="/dashboard?tab=settings" replace />} />
+        <Route path="/error/:code" element={<CustomerErrorPage />} />
+        <Route path="*" element={<CustomerErrorPage code={404} />} />
+      </Routes>
+    </Suspense>
+  );
+
+  if (location.pathname === '/checkout') return routes;
+
   return (
     <PageTransition locationKey={`${location.pathname}${location.search}`}>
-      <Suspense fallback={<RouteChunkFallback />}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<Products forceProductGrid title="Products" isPartsFilter={0} />} />
-          <Route path="/products/brands" element={productSelectorElement} />
-          <Route path="/products/brands/:brandSlug" element={productSelectorElement} />
-          <Route path="/products/brands/:brandSlug/categories/:categorySlug" element={productSelectorElement} />
-          <Route path="/products/:slug/variations/:variationId" element={<ProductDetailPage />} />
-          <Route path="/products/:slug" element={<ProductDetailPage />} />
-          <Route path="/all-products" element={<RedirectToProducts />} />
-          <Route path="/parts" element={<Parts />} />
-          <Route path="/product/:partNumber" element={<Product />} />
-          <Route path="/category/:slug" element={<CategoryPage />} />
-          <Route path="/schematics" element={<Schematics />} />
-          <Route path="/repairs" element={<Repairs />} />
-          <Route path="/repairs/start" element={<RepairStart />} />
-          <Route path="/repairs/packages" element={<RepairPackages />} />
-          <Route path="/repairs/track" element={<RepairTrack />} />
-          <Route path="/repairs/status/:id" element={<RepairStatus />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/calculators" element={<Calculators />} />
-          <Route path="/shipping-policy" element={<ShippingPolicy />} />
-          <Route path="/returns" element={<ReturnPortal />} />
-          <Route path="/returns/status/:id" element={<ReturnStatus />} />
-          <Route path="/return-policy" element={<ReturnPolicy />} />
-          <Route path="/policies" element={<StorePolicies />} />
-          {/* <Route path="/toolset-builder" element={<ToolsetBuilder />} /> */}
-          <Route path="/preview/technical-specifications" element={<TechnicalSpecificationsPreview />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/checkout/complete" element={<CheckoutReturn fallbackState="complete" />} />
-          <Route path="/checkout/payment-failed" element={<CheckoutReturn fallbackState="failed" />} />
-          <Route path="/checkout/payment-cancelled" element={<CheckoutReturn fallbackState="cancelled" />} />
-          <Route path="/checkout/order-received/:id" element={<CheckoutReturn fallbackState="complete" />} />
-          <Route path="/order/:id" element={<OrderConfirmation />} />
-          <Route path="/order-tracking/:id" element={<OrderTracking />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/support/status/:id" element={<SupportStatus />} />
-          <Route path="/settings/woocommerce" element={<ProtectedRoute><WooCommerceSettings /></ProtectedRoute>} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/dashboard/repairs/:id" element={<ProtectedRoute><RepairStatus /></ProtectedRoute>} />
-          <Route path="/orders" element={<Navigate to="/dashboard?tab=orders" replace />} />
-          <Route path="/rewards" element={<Navigate to={rewardsEnabled ? "/dashboard?tab=rewards" : "/dashboard"} replace />} />
-          <Route path="/account-settings" element={<Navigate to="/dashboard?tab=settings" replace />} />
-          <Route path="/addresses" element={<Navigate to="/dashboard?tab=addresses" replace />} />
-          <Route path="/notifications" element={<Navigate to="/dashboard?tab=settings" replace />} />
-          <Route path="/error/:code" element={<CustomerErrorPage />} />
-          <Route path="*" element={<CustomerErrorPage code={404} />} />
-        </Routes>
-      </Suspense>
+      {routes}
     </PageTransition>
   );
 }
@@ -336,7 +342,7 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
       {!minimalChrome && <Footer />}
       {!minimalChrome && <CartSidebar isOpen={cartOpen} onClose={closeCart} />}
       <MobileInstallNudge />
-      {!user && <HomepageSignupCtaController />}
+      {!minimalChrome && !user && <HomepageSignupCtaController />}
     </>
   );
 }

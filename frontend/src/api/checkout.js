@@ -8,6 +8,8 @@
 import { apiClient } from './client.js';
 import { getCartToken } from './cart.js';
 
+const CHECKOUT_CAPABILITIES_TIMEOUT_MS = 8000;
+
 function post( path, payload = {} ) {
 	const cartToken = getCartToken();
 	return apiClient( `/wp-json/dtb/v1/checkout/${ path }`, {
@@ -18,8 +20,19 @@ function post( path, payload = {} ) {
 }
 
 export async function getCheckoutCapabilities() {
-	const response = await apiClient( '/wp-json/dtb/v1/checkout/capabilities' );
-	return response?.capabilities || response || {};
+	const controller = new AbortController();
+	const timeoutId = window.setTimeout( () => controller.abort(), CHECKOUT_CAPABILITIES_TIMEOUT_MS );
+	try {
+		const response = await apiClient( '/wp-json/dtb/v1/checkout/capabilities', { signal: controller.signal } );
+		return response?.capabilities || response || {};
+	} catch ( error ) {
+		if ( error?.name === 'AbortError' ) {
+			throw Object.assign( new Error( 'Checkout payment capabilities timed out.' ), { code: 'checkout_capabilities_timeout' } );
+		}
+		throw error;
+	} finally {
+		window.clearTimeout( timeoutId );
+	}
 }
 
 export async function createCheckoutQuote( payload = {} ) {

@@ -489,6 +489,12 @@ module.exports = (envFlags, argv) => {
         minSize: 20_000,
         minRemainingSize: 0,
         cacheGroups: {
+          // Disable Webpack's implicit default groups. They emit numeric shared
+          // async chunks (for example 770.chunk.js) that are easy to miss during
+          // selective staging deploys, leaving lazy checkout routes unable to
+          // load even when their route-specific chunk exists.
+          default: false,
+          defaultVendors: false,
           // React core — must be in the initial bundle for every route.
           reactVendor: {
             test:     /[\\/]node_modules[\\/](react|react-dom|react-router(-dom)?)[\\/]/,

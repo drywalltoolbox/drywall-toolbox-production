@@ -43,9 +43,6 @@ import ErrorBoundary from './components/errors/ErrorBoundary.jsx'
 import { installSchematicPageLabelRuntime } from './utils/schematicPageLabelRuntime.js'
 import { installMobileCheckoutSummaryAutoOpen } from './utils/checkoutMobileSummaryRuntime.js'
 import { installOfficialMobileCheckoutTotalsRuntime } from './utils/checkoutOfficialMobileTotalsRuntime.js'
-import { installCheckoutAddressAutocompleteRuntime } from './utils/checkoutAddressAutocompleteRuntime.js'
-import { installCheckoutMobileTotalsMotionRuntime } from './utils/checkoutMobileTotalsMotionRuntime.js'
-import { installCheckoutFieldValidationRuntime } from './utils/checkoutFieldValidationRuntime.js'
 import { installMobileSchematicNavRuntime } from './utils/mobileSchematicNavRuntime.js'
 import { installRepairPackageSelectionRuntime } from './utils/repairPackageSelectionRuntime.js'
 import { installCustomerFacingCopyRuntime } from './utils/customerFacingCopyRuntime.js'
@@ -58,9 +55,6 @@ import { prewarmCatalog } from './services/catalog.js';
 installSchematicPageLabelRuntime();
 installMobileCheckoutSummaryAutoOpen();
 installOfficialMobileCheckoutTotalsRuntime();
-installCheckoutAddressAutocompleteRuntime();
-installCheckoutMobileTotalsMotionRuntime();
-installCheckoutFieldValidationRuntime();
 installMobileSchematicNavRuntime();
 installRepairPackageSelectionRuntime();
 installCustomerFacingCopyRuntime();
