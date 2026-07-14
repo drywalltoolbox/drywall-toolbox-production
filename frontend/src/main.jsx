@@ -36,6 +36,7 @@ import './styles/checkout-official-conversion-overrides.css'
 import './styles/checkout-mobile-conversion-2026.css'
 import './styles/checkout-mobile-first-2026-next.css'
 import './styles/checkout-mobile-final-payment-sheet.css'
+import './styles/checkout-field-validation-official.css'
 import App from './App.jsx'
 import './components/catalog/products-selector-overrides.css'
 import ErrorBoundary from './components/errors/ErrorBoundary.jsx'
@@ -44,6 +45,7 @@ import { installMobileCheckoutSummaryAutoOpen } from './utils/checkoutMobileSumm
 import { installOfficialMobileCheckoutTotalsRuntime } from './utils/checkoutOfficialMobileTotalsRuntime.js'
 import { installCheckoutAddressAutocompleteRuntime } from './utils/checkoutAddressAutocompleteRuntime.js'
 import { installCheckoutMobileTotalsMotionRuntime } from './utils/checkoutMobileTotalsMotionRuntime.js'
+import { installCheckoutFieldValidationRuntime } from './utils/checkoutFieldValidationRuntime.js'
 import { installMobileSchematicNavRuntime } from './utils/mobileSchematicNavRuntime.js'
 import { installRepairPackageSelectionRuntime } from './utils/repairPackageSelectionRuntime.js'
 import { installCustomerFacingCopyRuntime } from './utils/customerFacingCopyRuntime.js'
@@ -58,6 +60,7 @@ installMobileCheckoutSummaryAutoOpen();
 installOfficialMobileCheckoutTotalsRuntime();
 installCheckoutAddressAutocompleteRuntime();
 installCheckoutMobileTotalsMotionRuntime();
+installCheckoutFieldValidationRuntime();
 installMobileSchematicNavRuntime();
 installRepairPackageSelectionRuntime();
 installCustomerFacingCopyRuntime();
