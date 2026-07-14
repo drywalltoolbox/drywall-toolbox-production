@@ -8,6 +8,7 @@
 
 const GOOGLE_PLACES_KEY = String(process.env.REACT_APP_GOOGLE_MAPS_PLACES_API_KEY || '').trim();
 const GOOGLE_PLACES_URL = 'https://maps.googleapis.com/maps/api/js';
+const OPTIONAL_PHONE_FALLBACK = 'Not provided';
 
 let scriptPromise = null;
 
@@ -31,6 +32,17 @@ function setField(name, value) {
   dispatchReactInput(element, String(value).trim());
 }
 
+function normalizeOptionalPhone() {
+  const phone = document.querySelector('[name="phone"]');
+  if (!phone) return;
+  phone.required = false;
+  phone.setAttribute('aria-hidden', 'true');
+  phone.setAttribute('tabindex', '-1');
+  if (!String(phone.value || '').trim()) {
+    dispatchReactInput(phone, OPTIONAL_PHONE_FALLBACK);
+  }
+}
+
 function component(place, type, length = 'long_name') {
   const part = place?.address_components?.find((item) => Array.isArray(item.types) && item.types.includes(type));
   return part?.[length] || '';
@@ -50,6 +62,7 @@ function applyPlace(place) {
   setField('state', state);
   setField('zip', zip);
   setField('country', country);
+  normalizeOptionalPhone();
 
   window.requestAnimationFrame(() => {
     const next = zip ? document.querySelector('[name="customerNote"]') : document.querySelector('[name="zip"]');
@@ -123,6 +136,7 @@ export function installCheckoutAddressAutocompleteRuntime() {
 
   const boot = () => {
     if (!isCheckoutPage()) return;
+    normalizeOptionalPhone();
     const addressInput = document.getElementById('field-address') || document.querySelector('[name="address"]');
     void enhanceAddressInput(addressInput);
   };
