@@ -5,7 +5,7 @@
 
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout {
 	display: grid !important;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+	grid-template-columns: 1fr;
 	gap: 10px;
 	width: 100%;
 }
@@ -45,7 +45,7 @@
 
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-express-row {
 	order: 1;
-	grid-column: auto !important;
+	grid-column: 1 / -1 !important;
 	min-width: 0;
 }
 
@@ -136,7 +136,7 @@
 
 .dtb-payment-runtime #payment ul.payment_methods.dtb-express-layout > .dtb-payment-bnpl-row {
 	order: 3;
-	grid-column: auto !important;
+	grid-column: 1 / -1 !important;
 	min-width: 0;
 }
 

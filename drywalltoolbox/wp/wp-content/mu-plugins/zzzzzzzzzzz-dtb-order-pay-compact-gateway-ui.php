@@ -92,9 +92,9 @@ function dtb_order_pay_compact_gateway_ui_head(): void {
 
 		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_methods {
 			display: grid !important;
-			grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+			grid-template-columns: 1fr !important;
 			gap: 10px !important;
-			align-items: stretch !important;
+			align-items: start !important;
 		}
 
 		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_methods::before {
@@ -117,7 +117,7 @@ function dtb_order_pay_compact_gateway_ui_head(): void {
 
 		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method.dtb-gateway-express,
 		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method.dtb-gateway-paylater {
-			grid-column: span 3 !important;
+			grid-column: 1 / -1 !important;
 		}
 
 		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method.dtb-gateway-express {
@@ -134,7 +134,9 @@ function dtb_order_pay_compact_gateway_ui_head(): void {
 		}
 
 		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method > label {
+			overflow: hidden !important;
 			min-height: 54px !important;
+			max-height: 64px !important;
 			padding: 10px 14px !important;
 			border-radius: 16px !important;
 			font-size: 13px !important;
@@ -146,6 +148,18 @@ function dtb_order_pay_compact_gateway_ui_head(): void {
 			max-width: 106px !important;
 			max-height: 27px !important;
 			object-fit: contain !important;
+		}
+
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method:not(.dtb-gateway-card) > label iframe,
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method:not(.dtb-gateway-card) > label button,
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method:not(.dtb-gateway-card) > label [id*="payment-request"],
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method:not(.dtb-gateway-card) > label [class*="payment-request"],
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method:not(.dtb-gateway-card) > label [id*="express-checkout"],
+		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method:not(.dtb-gateway-card) > label [class*="express-checkout"] {
+			max-height: 42px !important;
+			min-height: 0 !important;
+			height: 42px !important;
+			overflow: hidden !important;
 		}
 
 		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method::after {
@@ -167,7 +181,7 @@ function dtb_order_pay_compact_gateway_ui_head(): void {
 
 		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method.dtb-gateway-paylater.dtb-payment-active.dtb-payment-has-detail,
 		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method.dtb-gateway-paylater.dtb-payment-final-active.dtb-payment-final-has-detail {
-			grid-column: span 3 !important;
+			grid-column: 1 / -1 !important;
 		}
 
 		body.dtb-native-order-pay-shell .dtb-native-order-pay-card .wc_payment_method.dtb-gateway-paylater > .payment_box,
