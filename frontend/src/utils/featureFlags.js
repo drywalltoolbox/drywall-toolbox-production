@@ -8,10 +8,13 @@
  * localStorage for development and QA purposes.
  */
 
-const SAFE_ENV = ( typeof process !== 'undefined' && process?.env ) ? process.env : {};
+const PUBLIC_ENV = {
+  REACT_APP_ENV: process.env.REACT_APP_ENV,
+  REACT_APP_DTB_CATALOG_PLATFORM: process.env.REACT_APP_DTB_CATALOG_PLATFORM,
+};
 
 export function getFeatureFlag( key, defaultValue = false ) {
-  if ( SAFE_ENV.REACT_APP_ENV !== 'production' && typeof window !== 'undefined' ) {
+  if ( PUBLIC_ENV.REACT_APP_ENV !== 'production' && typeof window !== 'undefined' ) {
     try {
       const stored = window.localStorage.getItem( `dtb_flag_${ key }` );
       if ( stored !== null ) {
@@ -23,7 +26,7 @@ export function getFeatureFlag( key, defaultValue = false ) {
   }
 
   const envKey = `REACT_APP_${ key.toUpperCase() }`;
-  const envVal = SAFE_ENV[ envKey ];
+  const envVal = PUBLIC_ENV[ envKey ];
   if ( envVal !== undefined ) {
     return envVal === '1' || envVal === 'true';
   }
