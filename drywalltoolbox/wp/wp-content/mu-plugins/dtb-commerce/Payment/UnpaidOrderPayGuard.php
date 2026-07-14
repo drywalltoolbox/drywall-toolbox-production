@@ -8,6 +8,23 @@
 
 defined( 'ABSPATH' ) || exit;
 
+if ( ! function_exists( 'dtb_unpaid_order_pay_guard_is_gateway_payment_post' ) ) {
+	/**
+	 * Detect the active native WooCommerce order-pay submit.
+	 *
+	 * WooPayments owns status and payment-reference writes during this POST.
+	 * The unpaid-order guard should run before/after payment processing, not in
+	 * the middle of the gateway's capture/update sequence.
+	 */
+	function dtb_unpaid_order_pay_guard_is_gateway_payment_post(): bool {
+		$method = isset( $_SERVER['REQUEST_METHOD'] )
+			? strtoupper( sanitize_text_field( wp_unslash( (string) $_SERVER['REQUEST_METHOD'] ) ) )
+			: '';
+
+		return 'POST' === $method && isset( $_POST['woocommerce_pay'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	}
+}
+
 if ( ! function_exists( 'dtb_unpaid_order_pay_guard_is_native_unpaid_order' ) ) {
 	function dtb_unpaid_order_pay_guard_is_native_unpaid_order( $order ): bool {
 		if ( ! $order instanceof WC_Order ) {
@@ -45,7 +62,7 @@ if ( ! function_exists( 'dtb_unpaid_order_pay_guard_is_native_unpaid_order' ) ) 
 if ( ! function_exists( 'dtb_unpaid_order_pay_guard_normalize_status' ) ) {
 	function dtb_unpaid_order_pay_guard_normalize_status( int $order_id ): void {
 		static $running = false;
-		if ( $running || ! function_exists( 'wc_get_order' ) ) {
+		if ( $running || dtb_unpaid_order_pay_guard_is_gateway_payment_post() || ! function_exists( 'wc_get_order' ) ) {
 			return;
 		}
 
@@ -102,5 +119,4 @@ foreach ( [
 		2
 	);
 }
-
 

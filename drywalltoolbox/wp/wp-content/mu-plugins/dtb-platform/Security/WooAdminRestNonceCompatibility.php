@@ -2,9 +2,9 @@
 /**
  * WooCommerce admin REST nonce compatibility.
  *
- * Narrowly restores authenticated same-site wp-admin GET requests for official
- * WooCommerce/WooPayments payment-admin read endpoints when a stale wp_rest
- * nonce causes WordPress REST cookie auth to fail.
+ * Narrowly restores authenticated same-site wp-admin requests for official
+ * WooCommerce/WooPayments payment-admin endpoints when a stale wp_rest nonce
+ * causes WordPress REST cookie auth to fail.
  *
  * This does not expose credentials, allow cross-site requests, relax storefront
  * REST routes, or bypass capability checks for unauthenticated users.
@@ -48,11 +48,12 @@ function dtb_woo_admin_rest_nonce_compat_current_route(): string {
 }
 
 /**
- * Whether a route is an official WooCommerce admin payment read endpoint.
+ * Whether a route is an official WooCommerce admin payment endpoint.
  */
-function dtb_woo_admin_rest_nonce_compat_route_allowed( string $route ): bool {
-	$allowed_routes = [
+function dtb_woo_admin_rest_nonce_compat_route_allowed( string $route, string $method ): bool {
+	$allowed_get_routes = [
 		'/wc-admin/options',
+		'/wc-admin/settings/payments/providers',
 		'/wc-analytics/admin/notes',
 		'/wc/v3/payments/settings',
 		'/wc/v3/payments/pm-promotions',
@@ -62,7 +63,26 @@ function dtb_woo_admin_rest_nonce_compat_route_allowed( string $route ): bool {
 		'/newfold-ctb/v2/ctb/url',
 	];
 
-	return in_array( $route, $allowed_routes, true );
+	if ( 'GET' === $method ) {
+		return in_array( $route, $allowed_get_routes, true );
+	}
+
+	$allowed_post_routes = [
+		'/wc-admin/settings/payments/providers',
+	];
+
+	return 'POST' === $method && in_array( $route, $allowed_post_routes, true );
+}
+
+/**
+ * Whether the request carries the normal wp-admin REST nonce header.
+ */
+function dtb_woo_admin_rest_nonce_compat_has_rest_nonce_header(): bool {
+	$nonce = isset( $_SERVER['HTTP_X_WP_NONCE'] )
+		? trim( (string) wp_unslash( $_SERVER['HTTP_X_WP_NONCE'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		: '';
+
+	return '' !== $nonce;
 }
 
 /**
@@ -120,7 +140,7 @@ function dtb_woo_admin_rest_nonce_compat_auth_user_id(): int {
 }
 
 /**
- * Restore only authenticated same-site GET requests after stale nonce failure.
+ * Restore only authenticated same-site admin requests after stale nonce failure.
  *
  * @param WP_Error|mixed $result Authentication result from previous handlers.
  * @return WP_Error|mixed|null
@@ -133,12 +153,16 @@ function dtb_woo_admin_rest_nonce_compat_restore_get_request( $result ) {
 	$method = isset( $_SERVER['REQUEST_METHOD'] )
 		? strtoupper( sanitize_text_field( (string) wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		: '';
-	if ( 'GET' !== $method ) {
+	if ( ! in_array( $method, [ 'GET', 'POST' ], true ) ) {
 		return $result;
 	}
 
 	$route = dtb_woo_admin_rest_nonce_compat_current_route();
-	if ( ! dtb_woo_admin_rest_nonce_compat_route_allowed( $route ) || ! dtb_woo_admin_rest_nonce_compat_same_site_admin_context() ) {
+	if (
+		! dtb_woo_admin_rest_nonce_compat_route_allowed( $route, $method )
+		|| ! dtb_woo_admin_rest_nonce_compat_same_site_admin_context()
+		|| ( 'POST' === $method && ! dtb_woo_admin_rest_nonce_compat_has_rest_nonce_header() )
+	) {
 		return $result;
 	}
 
@@ -154,6 +178,7 @@ function dtb_woo_admin_rest_nonce_compat_restore_get_request( $result ) {
 			'woo_admin_get_rest_nonce_restored',
 			[
 				'route' => $route,
+				'method' => $method,
 			]
 		);
 	}

@@ -88,7 +88,7 @@ if ( ! $order instanceof WC_Order ) {
 <header class="dtb-native-order-pay-header" role="banner">
 	<div class="dtb-native-order-pay-header__inner">
 		<a class="dtb-native-order-pay-logo-link" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'Drywall Toolbox home', 'drywall-toolbox' ); ?>">
-			<img class="dtb-native-order-pay-logo" src="<?php echo esc_url( home_url( '/logo-white.svg' ) ); ?>" alt="Drywall Toolbox">
+			<img class="dtb-native-order-pay-logo" src="<?php echo esc_url( home_url( '/logos/drywall-logo-white.png' ) ); ?>" alt="Drywall Toolbox">
 		</a>
 		<span class="dtb-native-order-pay-badge"><?php esc_html_e( 'Secure payment', 'drywall-toolbox' ); ?></span>
 	</div>

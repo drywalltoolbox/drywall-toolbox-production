@@ -90,23 +90,72 @@ define( 'WP_DEBUG', false );
 /* Add any custom values between this line and the "stop editing" line. */
 
 /**
- * Drywall Toolbox routing architecture (document root + /wp core).
+ * Drywall Toolbox live routing architecture.
  *
  * - Domain document root: /public_html/drywalltoolbox/
  * - WordPress core files: /public_html/drywalltoolbox/wp/
- * - Public site URL:       https://www.drywalltoolbox.com
- * - WordPress core URL:    https://www.drywalltoolbox.com/wp
+ * - Public site URL:       https://drywalltoolbox.com
+ * - Public admin URL:      https://drywalltoolbox.com/wp-admin/
+ * - Public REST URL:       https://drywalltoolbox.com/wp-json/
  */
-define( 'WP_HOME', 'https://www.drywalltoolbox.com' );
-define( 'WP_SITEURL', 'https://www.drywalltoolbox.com/wp' );
-define( 'WP_CONTENT_URL', 'https://www.drywalltoolbox.com/wp-content' );
+define( 'WP_HOME',    'https://drywalltoolbox.com' );
+define( 'WP_SITEURL', 'https://drywalltoolbox.com' );
 
-// Keep auth cookies site-wide while scoping admin cookies to /wp/wp-admin.
+/**
+ * Production HTTPS, cookie, and admin-runtime hardening.
+ *
+ * The live site exposes WordPress through root-mounted /wp-admin and /wp-json
+ * aliases while the WordPress files live under /wp. Woo Admin and WooPayments
+ * authenticate REST calls with native WordPress auth cookies plus X-WP-Nonce,
+ * so auth cookies must be valid for root /wp-json requests.
+ */
+if (
+	( isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && 'https' === strtolower( (string) $_SERVER['HTTP_X_FORWARDED_PROTO'] ) )
+	|| ( isset( $_SERVER['HTTP_X_FORWARDED_SSL'] ) && 'on' === strtolower( (string) $_SERVER['HTTP_X_FORWARDED_SSL'] ) )
+	|| ( isset( $_SERVER['HTTP_X_FORWARDED_PORT'] ) && '443' === (string) $_SERVER['HTTP_X_FORWARDED_PORT'] )
+	|| ( isset( $_SERVER['SERVER_PORT'] ) && '443' === (string) $_SERVER['SERVER_PORT'] )
+) {
+	$_SERVER['HTTPS'] = 'on';
+}
+
+define( 'FORCE_SSL_ADMIN', true );
 define( 'COOKIEPATH', '/' );
 define( 'SITECOOKIEPATH', '/' );
-define( 'COOKIE_PATH', '/' );
-define( 'SITE_COOKIE_PATH', '/' );
-define( 'ADMIN_COOKIE_PATH', '/wp/wp-admin' );
+define( 'ADMIN_COOKIE_PATH', '/' );
+define( 'COOKIE_DOMAIN', 'drywalltoolbox.com' );
+
+define( 'DISALLOW_FILE_EDIT', true );
+define( 'WP_MEMORY_LIMIT', '256M' );
+define( 'WP_MAX_MEMORY_LIMIT', '512M' );
+
+/**
+ * Drywall Toolbox server-side credentials.
+ *
+ * Replace placeholders in real wp-config.php only. Never commit or expose live
+ * secrets in wp-config-sample.php, browser code, logs, or generated artifacts.
+ */
+define( 'DTB_WC_AUTH_USER', 'replace-with-wordpress-username' );
+define( 'DTB_WC_AUTH_PASS', 'replace-with-application-password' );
+define( 'WC_PROXY_CONSUMER_KEY', '' );
+define( 'WC_PROXY_CONSUMER_SECRET', '' );
+define( 'DTB_WC_WEBHOOK_SECRET', 'replace-with-strong-webhook-secret' );
+define( 'DTB_IMPORT_SECRET', 'replace-with-strong-import-secret' );
+define( 'DRYWALL_JWT_SECRET', 'replace-with-strong-jwt-secret' );
+define( 'DTB_DISABLE_PRODUCT_WEBHOOKS', true );
+define( 'DTB_ADMIN_EMAIL', 'info@drywalltoolbox.com' );
+
+/**
+ * Veeqo integration constants.
+ *
+ * Start IDs at 0 unless the live values have already been confirmed by the
+ * Veeqo settings auto-discovery flow.
+ */
+define( 'DTB_VEEQO_API_KEY', '' );
+define( 'DTB_VEEQO_WEBHOOK_SECRET', '' );
+define( 'DTB_VEEQO_WAREHOUSE_ID', 0 );
+define( 'DTB_VEEQO_CHANNEL_ID', 0 );
+define( 'DTB_VEEQO_DELIVERY_METHOD_ID', 0 );
+define( 'DTB_VEEQO_DEBUG', false );
 
 
 /* That's all, stop editing! Happy publishing. */

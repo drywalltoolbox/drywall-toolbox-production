@@ -302,6 +302,22 @@ add_action( 'template_redirect', 'dtb_wc_payment_runtime_prepare_current_order',
 add_action( 'woocommerce_before_checkout_form', 'dtb_wc_payment_runtime_prepare_current_order', 0 );
 
 add_filter(
+	'woocommerce_is_checkout',
+	static function ( bool $is_checkout ): bool {
+		if ( $is_checkout ) {
+			return true;
+		}
+
+		if ( ! dtb_wc_payment_runtime_request() || dtb_wc_payment_runtime_order_pay_id() <= 0 ) {
+			return false;
+		}
+
+		return '' !== dtb_wc_payment_runtime_request_order_key();
+	},
+	PHP_INT_MAX
+);
+
+add_filter(
 	'woocommerce_get_notices',
 	static function ( array $notices ): array {
 		if ( ! dtb_wc_payment_runtime_request() ) {

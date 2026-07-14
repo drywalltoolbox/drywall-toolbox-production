@@ -28,6 +28,24 @@ if ( ! function_exists( 'dtb_checkout_status_guard_is_finalize_request' ) ) {
 	}
 }
 
+if ( ! function_exists( 'dtb_checkout_status_guard_is_gateway_payment_post' ) ) {
+	/**
+	 * Detect the active native WooCommerce order-pay submit.
+	 *
+	 * Status normalization is a pre-payment/recovery guard. During the gateway
+	 * POST, WooPayments owns status and payment meta writes, and those writes can
+	 * occur across multiple WooCommerce hooks before all gateway references are
+	 * visible on the order.
+	 */
+	function dtb_checkout_status_guard_is_gateway_payment_post(): bool {
+		$method = isset( $_SERVER['REQUEST_METHOD'] )
+			? strtoupper( sanitize_text_field( wp_unslash( (string) $_SERVER['REQUEST_METHOD'] ) ) )
+			: '';
+
+		return 'POST' === $method && isset( $_POST['woocommerce_pay'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	}
+}
+
 if ( ! function_exists( 'dtb_checkout_status_guard_current_order_pay_id' ) ) {
 	/**
 	 * Resolve the WooCommerce order-pay order id from rewrite query vars or the
@@ -46,7 +64,7 @@ if ( ! function_exists( 'dtb_checkout_status_guard_current_order_pay_id' ) ) {
 			: '';
 		$path = (string) wp_parse_url( $request_uri, PHP_URL_PATH );
 
-		if ( preg_match( '#/(?:wp/)?checkout/order-pay/(\d+)/?#', $path, $matches ) ) {
+		if ( preg_match( '#/(?:staging/\d+/)?(?:wp/)?checkout/order-pay/(\d+)/?#', $path, $matches ) ) {
 			return absint( $matches[1] ?? 0 );
 		}
 
@@ -110,7 +128,7 @@ if ( ! function_exists( 'dtb_checkout_status_guard_normalize_order' ) ) {
 	function dtb_checkout_status_guard_normalize_order( int $order_id ): void {
 		static $running = false;
 
-		if ( $running || ! dtb_checkout_status_guard_is_scoped_request_for_order( $order_id ) || ! function_exists( 'wc_get_order' ) ) {
+		if ( $running || dtb_checkout_status_guard_is_gateway_payment_post() || ! dtb_checkout_status_guard_is_scoped_request_for_order( $order_id ) || ! function_exists( 'wc_get_order' ) ) {
 			return;
 		}
 
@@ -186,5 +204,4 @@ add_filter(
 	PHP_INT_MAX,
 	2
 );
-
 

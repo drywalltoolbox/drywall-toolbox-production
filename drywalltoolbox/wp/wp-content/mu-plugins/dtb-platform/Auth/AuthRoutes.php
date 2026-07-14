@@ -52,9 +52,116 @@ if ( ! dtb_is_admin_or_rest_request() ) {
  */
 add_filter( 'determine_current_user', 'dtb_jwt_resolve_rest_user', 25 );
 
+if ( ! function_exists( 'dtb_jwt_is_wp_admin_rest_route' ) ) {
+	/**
+	 * Whether the current REST request belongs to wp-admin/Woo Admin.
+	 *
+	 * DTB storefront JWTs must not become the WordPress current user for these
+	 * namespaces. WooCommerce Admin routes rely on native WordPress auth cookies
+	 * and capabilities; resolving a customer JWT here demotes the request before
+	 * WooCommerce performs permission checks.
+	 */
+	function dtb_jwt_is_wp_admin_rest_route(): bool {
+		$route = '';
+
+		if ( isset( $_GET['rest_route'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$route = sanitize_text_field( wp_unslash( (string) $_GET['rest_route'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$route = '' === $route ? '' : ( '/' === $route[0] ? $route : '/' . $route );
+		}
+
+		$request_uri = isset( $_SERVER['REQUEST_URI'] )
+			? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			: '';
+		$path        = '' !== $request_uri ? (string) wp_parse_url( $request_uri, PHP_URL_PATH ) : '';
+
+		if ( '' === $route ) {
+			$marker = '/wp-json';
+			$offset = false !== $path ? strpos( $path, $marker ) : false;
+			if ( false === $offset ) {
+				return false;
+			}
+
+			$route = substr( $path, $offset + strlen( $marker ) );
+			$route = '' === $route ? '/' : ( '/' === $route[0] ? $route : '/' . $route );
+		}
+
+		foreach ( dtb_jwt_wp_admin_rest_route_prefixes() as $prefix ) {
+			if ( 0 === strpos( $route, $prefix ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+}
+
+if ( ! function_exists( 'dtb_jwt_wp_admin_rest_route_prefixes' ) ) {
+	/**
+	 * REST namespaces that must be authenticated only by native WordPress auth.
+	 */
+	function dtb_jwt_wp_admin_rest_route_prefixes(): array {
+		return [
+			'/wp/v2/',
+			'/wc-admin/',
+			'/wc-analytics/',
+			'/wc/v3/',
+			'/newfold-ctb/',
+		];
+	}
+}
+
+if ( ! function_exists( 'dtb_jwt_current_rest_route' ) ) {
+	/**
+	 * Resolve the current REST route for diagnostics without trusting it for auth.
+	 */
+	function dtb_jwt_current_rest_route(): string {
+		if ( isset( $_GET['rest_route'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$route = sanitize_text_field( wp_unslash( (string) $_GET['rest_route'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return '' === $route ? '' : ( '/' === $route[0] ? $route : '/' . $route );
+		}
+
+		$request_uri = isset( $_SERVER['REQUEST_URI'] )
+			? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			: '';
+		$path        = '' !== $request_uri ? (string) wp_parse_url( $request_uri, PHP_URL_PATH ) : '';
+
+		$marker = '/wp-json';
+		$offset = false !== $path ? strpos( $path, $marker ) : false;
+		if ( false === $offset ) {
+			return '';
+		}
+
+		$route = substr( $path, $offset + strlen( $marker ) );
+		return '' === $route ? '/' : ( '/' === $route[0] ? $route : '/' . $route );
+	}
+}
+
+if ( ! function_exists( 'dtb_jwt_rest_route_is_native_admin_namespace' ) ) {
+	/**
+	 * Whether a REST route belongs to a native WordPress/WooCommerce admin namespace.
+	 */
+	function dtb_jwt_rest_route_is_native_admin_namespace( string $route ): bool {
+		if ( '' === $route ) {
+			return false;
+		}
+
+		foreach ( dtb_jwt_wp_admin_rest_route_prefixes() as $prefix ) {
+			if ( 0 === strpos( $route, $prefix ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+}
+
 function dtb_jwt_resolve_rest_user( $user_id ) {
 	// Respect any earlier authentication (WP cookie auth, etc.).
 	if ( ! empty( $user_id ) ) {
+		return $user_id;
+	}
+
+	if ( dtb_jwt_is_wp_admin_rest_route() ) {
 		return $user_id;
 	}
 

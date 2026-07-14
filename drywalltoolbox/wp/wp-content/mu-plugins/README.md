@@ -192,7 +192,7 @@ External order side effects use `dtb_order_enqueue_job()` and the `dtb-orders` A
 
 Native order-pay is intentionally WooCommerce/WooPayments-owned. Root-level order-pay shims such as `zzzz-dtb-order-pay-official-conversion-polish.php`, `zzzzz-dtb-order-pay-trust-microcopy.php`, and `zzzzzz-dtb-order-pay-layout-repair.php` are presentation-only: they may style provider cards, bottom sheets, selected state, compact trust/support copy, and layout repair classes, but must not move gateway iframe fields, alter payment nonces, replace tokenization, bypass WooCommerce callbacks, or change order/payment lifecycle behavior.
 
-`zzzzzz-dtb-wc-admin-payments-compat.php` is admin-only compatibility support for WooCommerce Settings > Payments. It may keep required core admin scripts available, send no-cache headers for the payment settings page, and render direct gateway settings links if the WooCommerce provider panel loads without gateway controls. It must not create gateways, alter gateway settings, expose credentials, or bypass WooCommerce capability checks.
+WooCommerce Settings > Payments compatibility is platform-owned by `dtb-platform/Security/WooAdminRestNonceCompatibility.php` and `dtb-platform/Admin/WooAdminPaymentsAssetGuard.php`. These files may narrowly restore authenticated same-site Woo Admin payment screen REST calls after stale admin nonce failures and suppress provider-specific settings bundles outside their own sections. They must not create gateways, alter gateway settings, expose credentials, or bypass WooCommerce capability checks.
 
 ## 6. Veeqo contract
 
@@ -218,6 +218,20 @@ When QuickBooks constants are absent, the integration remains explicitly unconfi
 ## 8. Authentication and customer ownership
 
 DTB authentication uses an HS256 JWT signed with `DRYWALL_JWT_SECRET` and issued primarily as the HttpOnly `dtb_auth` cookie. Bearer tokens are supported for compatible API clients.
+
+The DTB JWT current-user bridge is storefront/domain-route scoped. It must not resolve `dtb_auth` as the WordPress current user for wp-admin/Woo Admin REST namespaces such as `/wp-json/wc-admin/`, `/wp-json/wc-analytics/`, `/wp-json/wc/v3/`, `/wp-json/wp/v2/`, or hosting admin namespaces; those routes rely on native WordPress auth cookies and capability checks.
+
+Admin auth diagnostics live at `GET /wp-json/dtb/v1/admin-auth-smoke` and report the current REST user, native WordPress auth-cookie validity, REST nonce validity, DTB JWT presence, and the route namespace policy. The route is for authenticated operators only and must not expose cookie or token values.
+
+Live deployments that expose WordPress through root-mounted `/wp-admin` and `/wp-json` aliases while WordPress files live under `/wp` must configure native WordPress auth cookies with root path scope in `wp-config.php` before WordPress loads:
+
+```php
+define( 'COOKIEPATH', '/' );
+define( 'SITECOOKIEPATH', '/' );
+define( 'ADMIN_COOKIE_PATH', '/' );
+```
+
+Without these constants, wp-admin HTML may load while Woo Admin REST calls to `/wp-json/*` receive only storefront/session cookies such as `dtb_auth`, causing WooCommerce permission failures.
 
 Customer-facing record routes must:
 

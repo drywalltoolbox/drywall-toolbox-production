@@ -239,7 +239,7 @@ function dtb_order_pay_checkout_sync_footer(): void {
 	}
 
 	$payload = [
-		'logoUrl' => home_url( '/logos/logo-white.svg' ),
+		'logoUrl' => home_url( '/logos/drywall-logo-white.png' ),
 	];
 	?>
 	<script id="dtb-order-pay-checkout-sync-polish-js">
