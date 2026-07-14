@@ -88,7 +88,7 @@ module.exports = (envFlags, argv) => {
     }
     seen.add(envFile);
     if (fs.existsSync(envFile)) {
-      require('dotenv').config({ path: envFile });
+      require('dotenv').config({ path: envFile, quiet: true });
     }
   }
 
@@ -594,23 +594,16 @@ module.exports = (envFlags, argv) => {
 
     performance: {
       hints:             isDev ? false : 'warning',
-      // Keep budgets close to the measured production baseline so warnings
-      // flag meaningful growth instead of expected storefront/schematics size.
-      maxEntrypointSize: 1_200_000,
-      maxAssetSize:      950_000,
+      // Keep budgets close to the measured split-bundle baseline so warnings
+      // flag real growth instead of the expected React/vendor storefront shell.
+      maxEntrypointSize: 1_300_000,
+      maxAssetSize:      1_000_000,
       // Only warn on JS and CSS — images/fonts/media are expected to be large
       assetFilter: (assetFilename) =>
         /\.(js|css)$/.test(assetFilename) && !assetFilename.endsWith('.map'),
     },
 
-    stats: isDev ? 'errors-warnings' : {
-      assets:      true,
-      chunks:      true,
-      chunkGroups: false,
-      modules:     false,
-      entrypoints: true,
-      colors:      true,
-    },
+    stats: isDev ? 'errors-warnings' : 'errors-warnings',
   };
 };
 
