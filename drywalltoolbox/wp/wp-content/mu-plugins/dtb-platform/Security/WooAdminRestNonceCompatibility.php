@@ -2,12 +2,13 @@
 /**
  * WooCommerce admin REST nonce compatibility.
  *
- * Narrowly restores authenticated same-site wp-admin requests for official
- * WooCommerce/WooPayments payment-admin endpoints when a stale wp_rest nonce
- * causes WordPress REST cookie auth to fail.
+ * Narrowly restores authenticated same-site wp-admin GET requests for official
+ * WooCommerce/WooPayments payment-admin read endpoints when a stale wp_rest
+ * nonce causes WordPress REST cookie auth to fail.
  *
- * This does not expose credentials, allow cross-site requests, relax storefront
- * REST routes, or bypass capability checks for unauthenticated users.
+ * Disabled by default. Enable only with DTB_ENABLE_WOO_ADMIN_REST_NONCE_COMPAT
+ * during a diagnosed Woo admin incident. This file never restores mutating
+ * payment settings requests.
  *
  * @package drywall-toolbox
  */
@@ -21,8 +22,8 @@ add_filter( 'rest_authentication_errors', 'dtb_woo_admin_rest_nonce_compat_resto
  */
 function dtb_woo_admin_rest_nonce_compat_enabled(): bool {
 	return function_exists( 'dtb_feature_enabled' )
-		? dtb_feature_enabled( 'DTB_ENABLE_WOO_ADMIN_REST_NONCE_COMPAT', true )
-		: true;
+		? dtb_feature_enabled( 'DTB_ENABLE_WOO_ADMIN_REST_NONCE_COMPAT', false )
+		: false;
 }
 
 /**
@@ -48,9 +49,13 @@ function dtb_woo_admin_rest_nonce_compat_current_route(): string {
 }
 
 /**
- * Whether a route is an official WooCommerce admin payment endpoint.
+ * Whether a route is an official WooCommerce admin payment read endpoint.
  */
 function dtb_woo_admin_rest_nonce_compat_route_allowed( string $route, string $method ): bool {
+	if ( 'GET' !== $method ) {
+		return false;
+	}
+
 	$allowed_get_routes = [
 		'/wc-admin/options',
 		'/wc-admin/settings/payments/providers',
@@ -63,26 +68,7 @@ function dtb_woo_admin_rest_nonce_compat_route_allowed( string $route, string $m
 		'/newfold-ctb/v2/ctb/url',
 	];
 
-	if ( 'GET' === $method ) {
-		return in_array( $route, $allowed_get_routes, true );
-	}
-
-	$allowed_post_routes = [
-		'/wc-admin/settings/payments/providers',
-	];
-
-	return 'POST' === $method && in_array( $route, $allowed_post_routes, true );
-}
-
-/**
- * Whether the request carries the normal wp-admin REST nonce header.
- */
-function dtb_woo_admin_rest_nonce_compat_has_rest_nonce_header(): bool {
-	$nonce = isset( $_SERVER['HTTP_X_WP_NONCE'] )
-		? trim( (string) wp_unslash( $_SERVER['HTTP_X_WP_NONCE'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		: '';
-
-	return '' !== $nonce;
+	return in_array( $route, $allowed_get_routes, true );
 }
 
 /**
@@ -140,7 +126,7 @@ function dtb_woo_admin_rest_nonce_compat_auth_user_id(): int {
 }
 
 /**
- * Restore only authenticated same-site admin requests after stale nonce failure.
+ * Restore only authenticated same-site admin read requests after stale nonce failure.
  *
  * @param WP_Error|mixed $result Authentication result from previous handlers.
  * @return WP_Error|mixed|null
@@ -153,16 +139,12 @@ function dtb_woo_admin_rest_nonce_compat_restore_get_request( $result ) {
 	$method = isset( $_SERVER['REQUEST_METHOD'] )
 		? strtoupper( sanitize_text_field( (string) wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		: '';
-	if ( ! in_array( $method, [ 'GET', 'POST' ], true ) ) {
+	if ( 'GET' !== $method ) {
 		return $result;
 	}
 
 	$route = dtb_woo_admin_rest_nonce_compat_current_route();
-	if (
-		! dtb_woo_admin_rest_nonce_compat_route_allowed( $route, $method )
-		|| ! dtb_woo_admin_rest_nonce_compat_same_site_admin_context()
-		|| ( 'POST' === $method && ! dtb_woo_admin_rest_nonce_compat_has_rest_nonce_header() )
-	) {
+	if ( ! dtb_woo_admin_rest_nonce_compat_route_allowed( $route, $method ) || ! dtb_woo_admin_rest_nonce_compat_same_site_admin_context() ) {
 		return $result;
 	}
 
@@ -177,7 +159,7 @@ function dtb_woo_admin_rest_nonce_compat_restore_get_request( $result ) {
 		dtb_security_log(
 			'woo_admin_get_rest_nonce_restored',
 			[
-				'route' => $route,
+				'route'  => $route,
 				'method' => $method,
 			]
 		);
