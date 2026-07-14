@@ -63,13 +63,13 @@ function errorId(name) {
 
 function getExistingReactError(wrapper, name) {
   if (!wrapper) return null;
-  return wrapper.querySelector(`#err-${CSS.escape(name)}`) || wrapper.querySelector('.dtb-co-field-error:not(.dtb-co-field-error--runtime)');
+  return wrapper.querySelector(`[id="err-${name}"]`) || wrapper.querySelector('.dtb-co-field-error:not(.dtb-co-field-error--runtime)');
 }
 
 function ensureRuntimeError(element, name) {
   const wrapper = fieldWrapper(element);
   if (!wrapper) return null;
-  let error = wrapper.querySelector(`#${CSS.escape(errorId(name))}`);
+  let error = wrapper.querySelector(`[id="${errorId(name)}"]`);
   if (!error) {
     error = document.createElement('span');
     error.id = errorId(name);
