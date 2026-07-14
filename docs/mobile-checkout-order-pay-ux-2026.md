@@ -14,10 +14,16 @@ WooCommerce and WooPayments still own gateway fields, payment iframes, payment n
 
 - Mobile-first single-column checkout form behavior.
 - Thumb-safe checkout controls and sticky mobile CTA.
-- Reduced visible checkout fields by hiding phone from the customer flow while preserving a non-empty compatibility value for existing request shape.
+- Reduced visible checkout fields by hiding phone from the customer flow while preserving a non-empty compatibility value for the existing request shape.
+- Progressive checkout field validation:
+  - email validates on blur/change;
+  - ZIP validates against supported US postal formats;
+  - required name/address fields show inline feedback before final submit;
+  - final submit and server validation remain authoritative.
 - Progressive address completion:
   - native browser autofill always available;
-  - optional Google Places address autocomplete when `REACT_APP_GOOGLE_MAPS_PLACES_API_KEY` is configured with domain restrictions.
+  - optional Google Places address autocomplete when `REACT_APP_GOOGLE_MAPS_PLACES_API_KEY` is configured with domain restrictions;
+  - visible address-entry status messaging for search, selected-address, and manual fallback states.
 - Mobile order-pay no longer uses DTB's blurred custom overlay for selected gateway details.
 - Wallet buttons remain gateway/native-browser owned.
 - Klarna/Affirm/Afterpay/card details render in fitted panels owned by the WooCommerce form DOM.
@@ -47,11 +53,14 @@ Order-pay MU-plugin changes require uploading:
 
 ```text
 /public_html/drywalltoolbox/wp/wp-content/mu-plugins/zzzzzzzzzz-dtb-order-pay-premium-mobile-ux.php
+/public_html/drywalltoolbox/wp/wp-content/mu-plugins/zzzzzzzzzzz-dtb-order-pay-compact-gateway-ui.php
 ```
 
 ## Validation
 
 - Mobile checkout: iOS Safari, Android Chrome, and in-app browser if available.
+- Checkout field validation: email, ZIP, empty first/last name, empty city/state/address.
+- Address entry: native browser autofill fallback and Google Places selection when configured.
 - Order-pay: Apple Pay, Google Pay, Klarna/Affirm/Afterpay, and card selection.
 - Confirm no WooPayments iframe fields are moved or replaced.
 - Confirm card and wallet payment still submit through WooCommerce/WooPayments.
