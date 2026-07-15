@@ -54,7 +54,7 @@ The root and WordPress `.htaccess` files intentionally mark these request famili
 
 The root `.htaccess` also sets `endurance-no-cache=1` for those surfaces so HostGator/Endurance cache is bypassed for admin, login, REST, WooCommerce session, and order-payment requests.
 
-`endurance-no-cache` must be appended as an additional `Set-Cookie` header. Do not use an Apache `Header set Set-Cookie ...` directive for it, because WordPress login and WooCommerce session responses already emit their own `Set-Cookie` headers.
+`endurance-no-cache` must be added as its own `Set-Cookie` header. Use Apache `Header add Set-Cookie ...`; do not use `Header set Set-Cookie ...`, which replaces WordPress/DTB cookies, or `Header append Set-Cookie ...`, which can comma-join cookies into an invalid combined header.
 
 ## Cacheable assets
 
