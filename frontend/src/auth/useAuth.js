@@ -8,6 +8,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 const AUTH_BASE_PATH = '/wp-json/dtb/v1/auth';
+const SESSION_SYNC_ERROR = 'Sign-in succeeded, but the browser did not return the secure session cookie. Confirm cookies are enabled for drywalltoolbox.com, close private browsing if enabled, and try again.';
+const SESSION_VALIDATE_DELAYS_MS = [0, 150, 400, 800];
 const SESSION_SYNC_ERROR = 'Sign-in succeeded, but the server session could not be confirmed. Please try again; if it continues, contact support so we can inspect the auth session handoff.';
 const SESSION_VALIDATE_DELAYS_MS = [0, 150, 400, 800];
 const PUBLIC_ENV = {
