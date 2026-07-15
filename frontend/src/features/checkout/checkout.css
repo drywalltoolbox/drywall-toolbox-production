@@ -1,7 +1,9 @@
 /*
- * Checkout identity-choice component, CTA title polish, and compact mobile
- * totals sheet. Presentation-only: does not alter checkout validation, payment
- * handoff, order creation, or WooCommerce/WooPayments lifecycle behavior.
+ * React-owned checkout UX layer.
+ *
+ * This file replaces the checkout identity/mobile totals DOM runtimes with
+ * component-owned styling. It deliberately does not own backend quote policy,
+ * payment handoff, WooCommerce order-pay, gateway fields, or order lifecycle.
  */
 
 .dtb-checkout .dtb-co-auth-choice {
@@ -15,10 +17,6 @@
     radial-gradient(circle at 92% 0%, rgba(37, 99, 235, .10), transparent 30%),
     linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
   box-shadow: 0 18px 42px rgba(15, 23, 42, .07);
-}
-
-.dtb-checkout .dtb-co-section__subheader--auth-choice-replaced {
-  display: none !important;
 }
 
 .dtb-checkout .dtb-co-auth-choice__eyebrow {
@@ -41,7 +39,8 @@
 }
 
 .dtb-checkout .dtb-co-auth-choice__copy,
-.dtb-checkout .dtb-co-auth-choice__footnote {
+.dtb-checkout .dtb-co-auth-choice__footnote,
+.dtb-checkout .dtb-co-guest-note {
   margin: 0;
   color: var(--co-text-500, #64748b);
   font-size: 13px;
@@ -113,35 +112,43 @@
   font-size: 11.75px;
 }
 
-.dtb-checkout .dtb-co-mobile-cta__stage,
-.dtb-checkout .dtb-co-sidebar-cta__stage {
+.dtb-checkout .dtb-co-guest-note {
+  margin: 6px 0 14px;
+}
+
+.dtb-checkout .dtb-co-inline-disclosure {
   display: grid;
-  gap: 2px;
-  color: var(--co-text-500, #64748b);
-  font-size: 11px;
-  font-weight: 780;
-  line-height: 1.18;
+  gap: 10px;
 }
 
-.dtb-checkout .dtb-co-mobile-cta__stage span,
-.dtb-checkout .dtb-co-sidebar-cta__stage span {
-  color: var(--co-primary, #2563eb);
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-}
-
-.dtb-checkout .dtb-co-mobile-cta__stage strong,
-.dtb-checkout .dtb-co-sidebar-cta__stage strong {
+.dtb-checkout .dtb-co-disclosure-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--co-text-900, #0f172a);
-  font-size: 14px;
-  font-weight: 900;
-  letter-spacing: -.035em;
+  cursor: pointer;
+  text-align: left;
 }
 
-.dtb-checkout .dtb-co-sidebar-cta__stage {
-  margin-bottom: 12px;
+.dtb-checkout .dtb-co-disclosure-toggle__copy {
+  color: var(--co-text-500, #64748b);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.dtb-checkout .dtb-co-disclosure-toggle__icon {
+  color: var(--co-primary, #2563eb);
+  transition: transform .18s ease;
+}
+
+.dtb-checkout .dtb-co-disclosure-toggle[aria-expanded="true"] .dtb-co-disclosure-toggle__icon {
+  transform: rotate(90deg);
 }
 
 @media (max-width: 1023px) {
@@ -161,16 +168,12 @@
     grid-column: 1 / -1;
   }
 
-  .dtb-checkout .dtb-co-mobile-cta__stage {
-    display: none !important;
-  }
-
   .dtb-checkout .dtb-co-formpane {
-    padding-bottom: calc(132px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(128px + env(safe-area-inset-bottom)) !important;
     transition: padding-bottom .22s ease;
   }
 
-  .dtb-checkout.dtb-co-mobile-cta-expanded .dtb-co-formpane {
+  .dtb-checkout:has(.dtb-co-mobile-cta--expanded) .dtb-co-formpane {
     padding-bottom: calc(218px + env(safe-area-inset-bottom)) !important;
   }
 
@@ -183,7 +186,6 @@
     box-shadow: 0 -10px 32px rgba(15, 23, 42, .12) !important;
     backdrop-filter: blur(16px) saturate(1.12) !important;
     -webkit-backdrop-filter: blur(16px) saturate(1.12) !important;
-    transition: box-shadow .22s ease, transform .22s ease;
   }
 
   .dtb-checkout .dtb-co-mobile-cta__inner {
@@ -231,21 +233,12 @@
     border-radius: 999px;
     background: #eff5ff;
     color: var(--co-primary, #2563eb);
-    font-size: 13px;
-    font-weight: 900;
-    line-height: 1;
-    transform: rotate(0deg);
     transition: transform .2s ease, background .2s ease;
   }
 
   .dtb-checkout .dtb-co-mobile-cta--expanded .dtb-co-mobile-cta__summary-chevron {
-    transform: rotate(180deg);
+    transform: rotate(-90deg);
     background: #dbeafe;
-  }
-
-  .dtb-checkout .dtb-co-mobile-cta__total-row,
-  .dtb-checkout .dtb-co-mobile-cta__totals-heading {
-    display: none !important;
   }
 
   .dtb-checkout .dtb-co-mobile-cta__totals {
@@ -320,26 +313,15 @@
   }
 
   .dtb-checkout .dtb-co-mobile-cta__trust {
-    max-height: 0;
-    margin: 0 !important;
-    overflow: hidden;
-    opacity: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     color: var(--co-text-500, #64748b) !important;
     font-size: 11px !important;
     font-weight: 720 !important;
     line-height: 1.22 !important;
     text-align: center !important;
-    transition: max-height .2s ease, opacity .18s ease, margin .2s ease;
-  }
-
-  .dtb-checkout .dtb-co-mobile-cta--expanded .dtb-co-mobile-cta__trust {
-    max-height: 32px;
-    margin-top: 1px !important;
-    opacity: 1;
-  }
-
-  .dtb-checkout .dtb-co-mobile-cta__logos {
-    display: none !important;
   }
 }
 
@@ -365,10 +347,10 @@
   }
 
   .dtb-checkout .dtb-co-formpane {
-    padding-bottom: calc(128px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(126px + env(safe-area-inset-bottom)) !important;
   }
 
-  .dtb-checkout.dtb-co-mobile-cta-expanded .dtb-co-formpane {
+  .dtb-checkout:has(.dtb-co-mobile-cta--expanded) .dtb-co-formpane {
     padding-bottom: calc(212px + env(safe-area-inset-bottom)) !important;
   }
 }
