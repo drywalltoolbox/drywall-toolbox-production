@@ -41,77 +41,23 @@ function dtb_auth_harden_rest_response( $response, $server, $request ) { // phpc
 	}
 
 	if ( '/dtb/v1/auth/login' === $route || '/dtb/v1/auth/register' === $route ) {
-		dtb_auth_refresh_cookie_from_response( $response );
+		dtb_auth_signal_session_mutation();
 	}
 
 	if ( '/dtb/v1/auth/logout' === $route ) {
-		dtb_auth_clear_hardened_cookie();
+		dtb_auth_signal_session_mutation();
 	}
 
 	return $response;
 }
 
 /**
- * Re-emit the DTB auth cookie from a successful login/register response.
+ * Signal shared-hosting cache bypass after auth session mutation.
  *
- * AuthRoutes.php already authenticates credentials and creates the token. This
- * refresh keeps the same server-side authority while normalizing cookie options
- * for the live root-hosted SPA and mobile browsers.
- *
- * @param WP_REST_Response|WP_HTTP_Response $response REST response.
+ * AuthRoutes.php is the single owner that issues and clears the `dtb_auth`
+ * cookie. This hardening layer must not generate or overwrite auth tokens.
  */
-function dtb_auth_refresh_cookie_from_response( $response ): void {
-	if ( ! ( $response instanceof WP_REST_Response || $response instanceof WP_HTTP_Response ) ) {
-		return;
-	}
-
-	$data = $response->get_data();
-	if ( empty( $data['success'] ) || empty( $data['user']['id'] ) ) {
-		return;
-	}
-
-	$user = get_user_by( 'id', (int) $data['user']['id'] );
-	if ( ! $user instanceof WP_User || ! function_exists( 'dtb_generate_jwt' ) ) {
-		return;
-	}
-
-	$cookie_name = defined( 'DTB_AUTH_COOKIE' ) ? DTB_AUTH_COOKIE : 'dtb_auth';
-	$jwt         = dtb_generate_jwt( $user );
-	$cross      = function_exists( 'dtb_is_cross_origin_request' ) && dtb_is_cross_origin_request();
-
-	setcookie( $cookie_name, $jwt, [
-		'expires'  => time() + 7 * DAY_IN_SECONDS,
-		'path'     => '/',
-		'secure'   => true,
-		'httponly' => true,
-		'samesite' => $cross ? 'None' : 'Lax',
-	] );
-
-	// Signal HostGator/Endurance cache bypass for the immediate post-login path.
-	setcookie( 'endurance-no-cache', '1', [
-		'expires'  => time() + 60,
-		'path'     => '/',
-		'secure'   => true,
-		'httponly' => false,
-		'samesite' => 'Strict',
-	] );
-}
-
-/**
- * Clear the hardened host-only cookie variant.
- */
-function dtb_auth_clear_hardened_cookie(): void {
-	$cookie_name = defined( 'DTB_AUTH_COOKIE' ) ? DTB_AUTH_COOKIE : 'dtb_auth';
-	$cross       = function_exists( 'dtb_is_cross_origin_request' ) && dtb_is_cross_origin_request();
-
-	setcookie( $cookie_name, '', [
-		'expires'  => time() - DAY_IN_SECONDS,
-		'path'     => '/',
-		'secure'   => true,
-		'httponly' => true,
-		'samesite' => $cross ? 'None' : 'Lax',
-	] );
-}
+function dtb_auth_signal_session_mutation(): void {
 	setcookie( 'endurance-no-cache', '1', [
 		'expires'  => time() + 60,
 		'path'     => '/',

@@ -14,14 +14,15 @@ Because WordPress is mounted under `/wp` but exposed through root aliases, cooki
 
 ```php
 define( 'WP_HOME', 'https://drywalltoolbox.com' );
-define( 'WP_SITEURL', 'https://drywalltoolbox.com/wp' );
+define( 'WP_SITEURL', 'https://drywalltoolbox.com' );
 
 define( 'COOKIEPATH', '/' );
 define( 'SITECOOKIEPATH', '/' );
 define( 'ADMIN_COOKIE_PATH', '/' );
+define( 'COOKIE_DOMAIN', 'drywalltoolbox.com' );
 ```
 
-The root cookie paths are required because native WordPress admin cookies are issued by WordPress in `/wp` but must be valid for root-mounted `/wp-admin`, `/wp-login.php`, and root `/wp-json` requests.
+The root WordPress URLs and root cookie paths are required because WordPress core files live in `/wp` behind rewrite aliases, while operators and browser clients use root-mounted `/wp-admin`, `/wp-login.php`, and `/wp-json` requests.
 
 ## Canonical host policy
 

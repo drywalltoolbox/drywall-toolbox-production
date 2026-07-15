@@ -183,9 +183,15 @@ ErrorDocument 511 /errors/511.html
   # Conventional browser favicon path backed by the shared logo assets folder.
   RewriteRule ^favicon\.ico$ logos/favicon.ico [L]
 
-  # WordPress admin/login aliases from the root URL space. Redirect to the real
-  # /wp/* subdirectory so native WordPress test/login cookies use the same path
-  # the browser submits back to wp-login.php and wp-admin.
+  # WordPress admin/login aliases from the root URL space. Login form POSTs must
+  # be internally routed, not externally redirected: a 302 on POST can convert
+  # the request to GET and discard credentials before WordPress authenticates.
+  RewriteCond %{REQUEST_METHOD} POST [NC]
+  RewriteRule ^wp-login\.php$ wp/wp-login.php [L,QSA]
+
+  # GET navigation can canonicalize to the real /wp/* subdirectory so native
+  # WordPress test/login cookies use the same path the browser submits back to
+  # wp-login.php and wp-admin.
   RewriteRule ^wp-admin/?$ /wp/wp-admin/ [R=302,L,QSA]
   RewriteRule ^wp-admin/(.*)$ /wp/wp-admin/$1 [R=302,L,QSA]
   RewriteRule ^wp-login\.php$ /wp/wp-login.php [R=302,L,QSA]
