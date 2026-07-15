@@ -174,7 +174,9 @@ ErrorDocument 511 /errors/511.html
 
   # Signal Endurance/nginx cache to bypass WordPress admin/auth and customer/session-owned surfaces.
   <If "%{REQUEST_URI} =~ m#^/(?:wp-admin|wp-login\.php|wp-json|dtb|wp-cron\.php|xmlrpc\.php|cart|checkout|account|my-account|dashboard|orders|addresses|rewards|login|register|forgot-password|lost-password|reset-password|logout|wc-api)(?:/|$)#i || %{REQUEST_URI} =~ m#/checkout/order-pay/#i || %{QUERY_STRING} =~ m#(^|&)(?:rest_route=|pay_for_order=true|order-pay=[0-9]+|wc-api=)#i || %{HTTP_COOKIE} =~ m#(?:^|;\s*)(?:wordpress_logged_in_|wordpress_sec_|wordpress_test_cookie|wp-settings-|woocommerce_cart_hash|woocommerce_items_in_cart|wp_woocommerce_session_|dtb_auth)#i">
-    Header always set Set-Cookie "endurance-no-cache=1; Path=/; Max-Age=60; SameSite=Strict; Secure"
+    # Append instead of set: Set-Cookie is a multi-value header, and replacing it
+    # strips WordPress auth cookies during wp-login.php handoff.
+    Header always append Set-Cookie "endurance-no-cache=1; Path=/; Max-Age=60; SameSite=Strict; Secure"
   </If>
 
   # Force homepage to the static React landing page after API fallbacks.
@@ -183,18 +185,12 @@ ErrorDocument 511 /errors/511.html
   # Conventional browser favicon path backed by the shared logo assets folder.
   RewriteRule ^favicon\.ico$ logos/favicon.ico [L]
 
-  # WordPress admin/login aliases from the root URL space. Login form POSTs must
-  # be internally routed, not externally redirected: a 302 on POST can convert
-  # the request to GET and discard credentials before WordPress authenticates.
-  RewriteCond %{REQUEST_METHOD} POST [NC]
+  # WordPress admin/login aliases from the root URL space. Keep these as
+  # internal rewrites: external redirects during login can split the native
+  # WordPress auth-cookie handoff across root and /wp URLs.
+  RewriteRule ^wp-admin/?$ wp/wp-admin/ [L,QSA]
+  RewriteRule ^wp-admin/(.*)$ wp/wp-admin/$1 [L,QSA]
   RewriteRule ^wp-login\.php$ wp/wp-login.php [L,QSA]
-
-  # GET navigation can canonicalize to the real /wp/* subdirectory so native
-  # WordPress test/login cookies use the same path the browser submits back to
-  # wp-login.php and wp-admin.
-  RewriteRule ^wp-admin/?$ /wp/wp-admin/ [R=302,L,QSA]
-  RewriteRule ^wp-admin/(.*)$ /wp/wp-admin/$1 [R=302,L,QSA]
-  RewriteRule ^wp-login\.php$ /wp/wp-login.php [R=302,L,QSA]
 
   # Expose WordPress asset/core paths at root for compatibility.
   RewriteRule ^wp-content/(.*)$ wp/wp-content/$1 [L,QSA]
