@@ -18,7 +18,6 @@ import './styles/storefront-drawer.css'
 import './styles/storefront-search-product-cards.css'
 import './styles/account-hub.css'
 import './styles/account-hub-cta.css'
-import './styles/checkout-typography.css'
 import './styles/mobile-responsive.css'
 import './styles/mobile-product-typography.css'
 import './styles/mobile-liquid-typography.css'
@@ -28,14 +27,9 @@ import './styles/product-compatible-schematics-cleanup.css'
 import './styles/order-tracking-layout-fixes.css'
 import './styles/mobile-account-order-layout-fixes.css'
 import './styles/order-checkout-font-consistency.css'
-import './styles/checkout-desktop-layout.css'
-import './styles/checkout-varela-round.css'
 import './styles/global-loading.css'
-import './styles/checkout-field-validation-official.css'
-import './features/checkout/checkout.css'
-import './features/checkout/checkout-unified-official.css'
-import './features/checkout/checkout-fluid-authority.css'
-import './features/checkout/checkout-keyboard-viewport.css'
+import './features/checkout/checkout-system.css'
+import './features/checkout/checkout-express-payment-rail.css'
 import './components/catalog/products-selector-overrides.css'
 import App from './App.jsx'
 import ErrorBoundary from './components/errors/ErrorBoundary.jsx'
@@ -43,6 +37,7 @@ import { installSchematicPageLabelRuntime } from './utils/schematicPageLabelRunt
 import { installMobileSchematicNavRuntime } from './utils/mobileSchematicNavRuntime.js'
 import { installRepairPackageSelectionRuntime } from './utils/repairPackageSelectionRuntime.js'
 import { installCustomerFacingCopyRuntime } from './utils/customerFacingCopyRuntime.js'
+import { installCheckoutExpressRailRuntime } from './features/checkout/checkoutExpressRailRuntime.js'
 
 // ─── Pre-warm product catalog cache ──────────────────────────────────────────
 // The legacy all-products cache is intentionally delayed so it cannot compete
@@ -53,6 +48,7 @@ installSchematicPageLabelRuntime();
 installMobileSchematicNavRuntime();
 installRepairPackageSelectionRuntime();
 installCustomerFacingCopyRuntime();
+installCheckoutExpressRailRuntime();
 
 if (typeof window !== 'undefined') {
   const pathname = window.location.pathname.replace(/^\/drywall-toolbox(?=\/|$)/, '') || '/';
