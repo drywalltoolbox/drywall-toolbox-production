@@ -5,10 +5,10 @@
  * payment step presentation.
  *
  * This does not render provider card fields, clone WooCommerce gateway markup,
- * or bypass DTB/WooCommerce payment lifecycle ownership. The rail remains a
- * launch affordance that routes through the existing guarded checkout primary
- * action: prepare the DTB checkout session/order first, then open the protected
- * provider-owned payment step when it is ready.
+ * or bypass DTB/WooCommerce payment lifecycle ownership. The desktop/sidebar rail
+ * remains a launch affordance that routes through the existing guarded checkout
+ * primary action. The mobile cloned rail is presentation-only and renders as a
+ * compact supported-payment logo strip.
  */
 
 const PROVIDER_LABELS = {
@@ -49,6 +49,14 @@ function focusNextRequiredField(root) {
   return false;
 }
 
+function prepareStaticMobileLogo(logo) {
+  logo.dataset.dtbExpressRailBound = 'static';
+  logo.removeAttribute('role');
+  logo.removeAttribute('tabindex');
+  logo.removeAttribute('title');
+  logo.removeAttribute('aria-disabled');
+}
+
 function activateLogo(logo) {
   if (!(logo instanceof HTMLElement) || logo.dataset.dtbExpressRailBound === 'true') return;
   if (logo.closest(`.${MOBILE_LOGOS_ONLY_CLASS}`)) {
@@ -57,6 +65,11 @@ function activateLogo(logo) {
     logo.removeAttribute('tabindex');
     logo.removeAttribute('title');
     logo.setAttribute('aria-hidden', 'true');
+    return;
+  }
+
+  if (logo.closest(MOBILE_CLONE_SELECTOR)) {
+    prepareStaticMobileLogo(logo);
     return;
   }
 
@@ -140,6 +153,11 @@ function syncMobileReferenceExpressRail(root) {
     node.removeAttribute('data-dtb-express-rail-bound');
   });
 
+  const label = clone.querySelector('.dtb-co-payment-label');
+  if (label instanceof HTMLElement) {
+    label.textContent = 'Supported payment methods';
+  }
+
   if (mobileSummary?.parentElement === formInner) {
     mobileSummary.insertAdjacentElement('afterend', clone);
   } else {
@@ -162,7 +180,10 @@ function bindExpressRail() {
 }
 
 function bindCheckoutFastFlow() {
-  document.querySelectorAll('.dtb-checkout').forEach(syncMobileReferenceExpressRail);
+  document.querySelectorAll('.dtb-checkout').forEach((root) => {
+    syncCheckoutInitialViewport(root);
+    syncMobileReferenceExpressRail(root);
+  });
   bindExpressRail();
   syncPaymentWorkflowState();
 }
