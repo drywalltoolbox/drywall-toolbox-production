@@ -117,7 +117,7 @@ function dtb_auth_clear_hardened_cookie(): void {
 		'samesite' => $cross ? 'None' : 'Lax',
 	] );
 }
- * Signal shared-hosting cache bypass after auth session mutation.
+ /* Signal shared-hosting cache bypass after auth session mutation.
  *
  * AuthRoutes.php is the single owner that issues and clears the `dtb_auth`
  * cookie. This hardening layer must not generate or overwrite auth tokens.
