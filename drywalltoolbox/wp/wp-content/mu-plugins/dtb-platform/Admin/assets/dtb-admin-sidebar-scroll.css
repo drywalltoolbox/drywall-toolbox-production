@@ -36,10 +36,12 @@
    */
   body.wp-admin:not(.folded) #adminmenu > li.wp-has-submenu:hover > .wp-submenu,
   body.wp-admin:not(.folded) #adminmenu > li.opensub > .wp-submenu,
-  body.wp-admin:not(.folded) #adminmenu > li:hover > .wp-submenu {
+  body.wp-admin:not(.folded) #adminmenu > li:hover > .wp-submenu,
+  body.wp-admin:not(.folded) #adminmenu > li.dtb-admin-menu-flyout-active > .wp-submenu {
     position: fixed !important;
-    left: 160px !important;
-    max-height: calc(100vh - 44px) !important;
+    top: var(--dtb-admin-flyout-top, 32px) !important;
+    left: var(--dtb-admin-flyout-left, 160px) !important;
+    max-height: var(--dtb-admin-flyout-max-height, calc(100vh - 44px)) !important;
     overflow-y: auto !important;
     overscroll-behavior: contain;
     z-index: 10020 !important;
@@ -73,15 +75,12 @@
 }
 
 @media screen and (min-width: 783px) {
-  body.wp-admin.folded #adminmenuwrap,
-  body.wp-admin.auto-fold #adminmenuwrap {
+  body.wp-admin.folded #adminmenuwrap {
     overflow: visible !important;
   }
 
   body.wp-admin.folded #adminmenu > li.wp-has-submenu:hover > .wp-submenu,
-  body.wp-admin.folded #adminmenu > li.opensub > .wp-submenu,
-  body.wp-admin.auto-fold #adminmenu > li.wp-has-submenu:hover > .wp-submenu,
-  body.wp-admin.auto-fold #adminmenu > li.opensub > .wp-submenu {
+  body.wp-admin.folded #adminmenu > li.opensub > .wp-submenu {
     z-index: 10020 !important;
   }
 }

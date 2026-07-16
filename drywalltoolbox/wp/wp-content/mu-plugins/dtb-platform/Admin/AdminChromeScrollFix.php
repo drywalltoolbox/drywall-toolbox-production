@@ -19,6 +19,7 @@ function dtb_platform_admin_chrome_scroll_fix_enqueue(): void {
 	$assets_dir = __DIR__ . '/assets/';
 	$assets_url = plugin_dir_url( __FILE__ ) . 'assets/';
 	$css_file   = $assets_dir . 'dtb-admin-sidebar-scroll.css';
+	$js_file    = $assets_dir . 'dtb-admin-sidebar-scroll.js';
 
 	if ( ! file_exists( $css_file ) ) {
 		return;
@@ -30,4 +31,14 @@ function dtb_platform_admin_chrome_scroll_fix_enqueue(): void {
 		[],
 		(string) filemtime( $css_file )
 	);
+
+	if ( file_exists( $js_file ) ) {
+		wp_enqueue_script(
+			'dtb-admin-sidebar-scroll',
+			$assets_url . 'dtb-admin-sidebar-scroll.js',
+			[],
+			(string) filemtime( $js_file ),
+			true
+		);
+	}
 }
