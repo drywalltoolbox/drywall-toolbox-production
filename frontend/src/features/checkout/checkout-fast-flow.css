@@ -1,7 +1,7 @@
 /*
  * frontend/src/features/checkout/checkout-fast-flow.css
  *
- * Final checkout conversion layer for the synchronized single-page workflow.
+ * Final checkout conversion layer for the synchronized multi-step in-page workflow.
  * This deliberately keeps payment provider ownership intact: no card fields,
  * gateway iframe cloning, tokenization bypass, or order creation changes.
  * The goal is a simpler customer path: express methods first, contact/delivery,

@@ -649,6 +649,7 @@ final class DTB_OrderCheckoutService {
 		return [
 			'order' => [
 				'order_id'         => (int) $order->get_id(),
+				'order_key'        => $needs ? (string) $order->get_order_key() : '',
 				'status'           => $status,
 				'payment_method'   => (string) $order->get_payment_method(),
 				'total'            => (string) $order->get_total(),
@@ -657,6 +658,15 @@ final class DTB_OrderCheckoutService {
 				'payment_required' => $needs,
 				'payment_verified'  => $paid,
 				'payment_url'      => $url,
+				'same_shell_payment' => $needs ? [
+					'order_id'          => (int) $order->get_id(),
+					'order_key'         => (string) $order->get_order_key(),
+					'billing_email'     => (string) $order->get_billing_email(),
+					'payment_method'    => (string) $order->get_payment_method(),
+					'store_api_path'    => '/wp-json/wc/store/v1/checkout/' . (int) $order->get_id(),
+					'fallback_url'      => $url,
+					'contract_version'  => self::CONTRACT_VERSION,
+				] : null,
 			],
 		];
 	}

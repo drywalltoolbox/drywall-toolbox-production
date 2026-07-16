@@ -117,6 +117,10 @@ async function storeFetch( path, options = {}, isRetry = false ) {
 	return response.json();
 }
 
+export async function storeApiRequest( path, options = {} ) {
+	return storeFetch( path, options );
+}
+
 export async function initCart() {
 	const url = `${ currentStoreBase() }/cart`;
 	const response = await fetch( url, {

@@ -108,7 +108,7 @@ export function CheckoutMobileActionSheet({
 
         <div className="dtb-co-mobile-cta__trust">
           <ShieldCheck size={13} aria-hidden="true" />
-          <span>Protected checkout stays synchronized in this page.</span>
+          <span>Checkout steps stay synchronized without reloading.</span>
         </div>
       </div>
     </div>

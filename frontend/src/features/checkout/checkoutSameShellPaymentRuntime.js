@@ -9,6 +9,7 @@
  */
 
 import { getCheckoutCapabilities } from '../../api/checkout.js';
+import { processExistingOrderPayment } from '../../api/checkout.js';
 
 const CHECKOUT_PATH_RE = /(?:^|\/)checkout\/?$/;
 const PROVIDER_GATEWAY_IDS = new Set([
@@ -56,6 +57,54 @@ function providerAdapter() {
   const adapter = window.dtbCheckoutSameShellProvider;
   if (!adapter || typeof adapter !== 'object') return null;
   return typeof adapter.startPayment === 'function' ? adapter : null;
+}
+
+function decodeDatasetJson(value) {
+  if (!value) return null;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
+}
+
+function paymentContext(root, action) {
+  const paymentStep = root.querySelector('#checkout-payment-step');
+  const source = action instanceof HTMLElement ? action : paymentStep;
+  const orderId = Number(source?.dataset?.dtbOrderId || paymentStep?.dataset?.dtbOrderId || 0);
+  const orderKey = String(source?.dataset?.dtbOrderKey || paymentStep?.dataset?.dtbOrderKey || '');
+  const billingEmail = String(source?.dataset?.dtbBillingEmail || paymentStep?.dataset?.dtbBillingEmail || '');
+  const fallbackUrl = String(source?.dataset?.dtbPaymentUrl || paymentStep?.dataset?.dtbPaymentUrl || '');
+  const paymentMethod = String(source?.dataset?.dtbPaymentMethod || paymentStep?.dataset?.dtbPaymentMethod || '');
+  const billingAddress = decodeDatasetJson(paymentStep?.dataset?.dtbBillingAddress || '') || {};
+  const shippingAddress = decodeDatasetJson(paymentStep?.dataset?.dtbShippingAddress || '') || billingAddress;
+  return {
+    orderId,
+    orderKey,
+    billingEmail,
+    fallbackUrl,
+    paymentMethod,
+    billingAddress,
+    shippingAddress,
+  };
+}
+
+function paymentResultRedirectUrl(result) {
+  return String(
+    result?.payment_result?.redirect_url
+    || result?.payment_result?.redirectUrl
+    || result?.redirect_url
+    || result?.redirectUrl
+    || '',
+  );
+}
+
+function paymentResultSuccess(result) {
+  const status = String(result?.payment_result?.payment_status || result?.payment_status || '').toLowerCase();
+  return result?.payment_result?.payment_status === 'success'
+    || result?.payment_result?.status === 'success'
+    || result?.status === 'success'
+    || ['success', 'completed', 'processing'].includes(status);
 }
 
 function activeProviderMethods(capabilities) {
@@ -158,7 +207,7 @@ function renderStatus(root, status, message, fallbackAction) {
   panel.replaceChildren();
 
   const title = document.createElement('strong');
-  title.textContent = status === 'error' ? 'Same-page payment unavailable' : 'Secure same-page payment';
+  title.textContent = status === 'error' ? 'In-checkout payment unavailable' : 'Secure in-checkout payment';
   const copy = document.createElement('p');
   copy.textContent = message;
   panel.append(title, copy);
@@ -189,7 +238,18 @@ async function startSameShellPayment(root, action) {
     renderStatus(
       root,
       'error',
-      'The provider-owned same-page payment adapter is not available. Use the protected fallback payment route.',
+      'The provider-owned in-checkout payment adapter is not available. Use the protected fallback payment route.',
+      () => openFallback(action),
+    );
+    return;
+  }
+
+  const context = paymentContext(root, action);
+  if (!context.orderId || !context.orderKey) {
+    renderStatus(
+      root,
+      'error',
+      'The prepared WooCommerce order is missing the payment context required for in-checkout payment. Use the protected fallback payment route.',
       () => openFallback(action),
     );
     return;
@@ -198,23 +258,61 @@ async function startSameShellPayment(root, action) {
   paymentInFlight = true;
   renderStatus(root, 'loading', 'Opening the provider-owned WooPayments controls inside checkout…');
   try {
-    await adapter.startPayment({
+    const result = await adapter.startPayment({
       root,
       capabilities: currentState.capabilities,
       methods: currentState.methods,
+      order: context,
       visualMethod: root.dataset.dtbVisualPaymentMethod || 'card',
+      processPayment: (request = {}) => processExistingOrderPayment({
+        orderId: context.orderId,
+        orderKey: context.orderKey,
+        billingEmail: request.billingEmail || context.billingEmail,
+        billingAddress: request.billingAddress || context.billingAddress,
+        shippingAddress: request.shippingAddress || context.shippingAddress,
+        paymentMethod: request.paymentMethod || context.paymentMethod,
+        paymentData: request.paymentData || [],
+        extensions: request.extensions || {},
+        customerNote: request.customerNote || '',
+      }),
     });
+
+    const processed = result?.paymentData || result?.payment_data || result?.paymentMethod || result?.payment_method
+      ? await processExistingOrderPayment({
+        orderId: context.orderId,
+        orderKey: context.orderKey,
+        billingEmail: result.billingEmail || context.billingEmail,
+        billingAddress: result.billingAddress || context.billingAddress,
+        shippingAddress: result.shippingAddress || context.shippingAddress,
+        paymentMethod: result.paymentMethod || result.payment_method || context.paymentMethod,
+        paymentData: result.paymentData || result.payment_data || [],
+        extensions: result.extensions || {},
+        customerNote: result.customerNote || '',
+      })
+      : result;
+
+    const redirectUrl = paymentResultRedirectUrl(processed);
+    if (redirectUrl) {
+      window.location.assign(redirectUrl);
+      return;
+    }
+
+    if (processed && !paymentResultSuccess(processed) && processed.requires_action !== true && processed.completed !== true) {
+      throw new Error(processed?.message || processed?.payment_result?.message || 'Provider-owned payment did not complete.');
+    }
+
     renderStatus(root, 'ready', 'Provider-owned payment controls are active in this checkout step.');
     window.dispatchEvent(new CustomEvent('dtb:checkout-same-shell-payment-started', {
       detail: {
         methods: currentState.methods.map((method) => normalizeId(method?.id)).filter(Boolean),
+        orderId: context.orderId,
       },
     }));
   } catch (error) {
     renderStatus(
       root,
       'error',
-      error?.message || 'Provider-owned same-page payment could not start. Use the protected fallback payment route.',
+      error?.message || 'Provider-owned in-checkout payment could not start. Use the protected fallback payment route.',
       () => openFallback(action),
     );
   } finally {

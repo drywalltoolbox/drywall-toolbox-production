@@ -1,7 +1,7 @@
 /**
  * frontend/src/pages/Checkout.jsx
  *
- * Branded checkout intake with a synchronized single-page workflow shell.
+ * Branded checkout intake with a synchronized multi-step in-page workflow shell.
  * React owns presentation and step orchestration only; DTB/WooCommerce remain
  * authoritative for quote, session, finalize, order creation, and payment.
  */
@@ -102,8 +102,8 @@ const SUBMIT_MESSAGES = {
   idle: '',
   validating: 'Checking your checkout details…',
   creating: 'Creating your protected order…',
-  ready: 'Protected payment step is ready.',
-  redirecting: 'Opening protected payment…',
+  ready: 'Protected payment is ready.',
+  redirecting: 'Opening protected provider payment…',
 };
 
 const fadeSlide = {
@@ -170,6 +170,22 @@ function resolveCartItemImage(item) {
 function normalizeWooPaymentUrl(value) {
   if (typeof value !== 'string' || !value.trim()) return '';
   return normalizePaymentUrl(value);
+}
+
+function checkoutAddressForStoreApi(form = {}) {
+  return {
+    first_name: form.firstName || '',
+    last_name: form.lastName || '',
+    company: '',
+    address_1: form.address || '',
+    address_2: '',
+    city: form.city || '',
+    state: form.state || '',
+    postcode: form.zip || '',
+    country: form.country || 'US',
+    email: form.email || '',
+    phone: form.phone || '',
+  };
 }
 
 function makeCartSnapshot(cartItems) {
@@ -361,7 +377,7 @@ function ReviewSummary({ formData, shippingRates, activeSelectedRateId, displayT
     <Motion.section className="dtb-co-section" variants={fadeSlide} initial="hidden" animate="visible" custom={0.1}>
       <SectionHeader
         title="Review"
-        subtitle="Confirm the checkout details before preparing the protected payment step."
+        subtitle="Confirm the checkout details before preparing protected payment."
       />
       <div className="dtb-co-rates" aria-label="Checkout review summary">
         <div className="dtb-co-rate-option dtb-co-rate-option--selected">
@@ -394,6 +410,8 @@ function ReviewSummary({ formData, shippingRates, activeSelectedRateId, displayT
 function CheckoutPaymentStep({
   blocksBridge,
   displayTotal,
+  formData,
+  orderDetails,
   paymentMethod,
   paymentReady,
   paymentSetupError,
@@ -404,10 +422,21 @@ function CheckoutPaymentStep({
 }) {
   const bridgeReady = blocksBridge?.sameShellReady === true;
   const fallbackReason = blocksBridge?.reason || 'classic_order_pay_fallback';
+  const order = orderDetails?.order || {};
+  const sameShellPayment = order.same_shell_payment || {};
+  const storeAddress = checkoutAddressForStoreApi(formData);
+  const encodedStoreAddress = JSON.stringify(storeAddress);
   return (
     <Motion.section
       id="checkout-payment-step"
       className="dtb-co-section dtb-co-payment-workflow"
+      data-dtb-order-id={sameShellPayment.order_id || order.order_id || ''}
+      data-dtb-order-key={sameShellPayment.order_key || order.order_key || ''}
+      data-dtb-payment-url={paymentUrl || sameShellPayment.fallback_url || ''}
+      data-dtb-payment-method={paymentMethod || sameShellPayment.payment_method || ''}
+      data-dtb-billing-email={storeAddress.email || sameShellPayment.billing_email || ''}
+      data-dtb-billing-address={encodedStoreAddress}
+      data-dtb-shipping-address={encodedStoreAddress}
       variants={fadeSlide}
       initial="hidden"
       animate="visible"
@@ -445,6 +474,11 @@ function CheckoutPaymentStep({
           className="dtb-co-btn-primary dtb-co-btn-primary--wide"
           onClick={onContinueToPayment}
           disabled={!paymentReady || !paymentUrl || processing}
+          data-dtb-order-id={sameShellPayment.order_id || order.order_id || ''}
+          data-dtb-order-key={sameShellPayment.order_key || order.order_key || ''}
+          data-dtb-payment-url={paymentUrl || sameShellPayment.fallback_url || ''}
+          data-dtb-payment-method={paymentMethod || sameShellPayment.payment_method || ''}
+          data-dtb-billing-email={storeAddress.email || sameShellPayment.billing_email || ''}
           style={{ marginTop: 14 }}
           aria-label={`Open protected payment for ${displayTotal.toFixed(2)} dollars`}
         >
@@ -1255,6 +1289,8 @@ export default function Checkout() {
             <CheckoutPaymentStep
               blocksBridge={blocksBridge}
               displayTotal={displayTotal}
+              formData={formData}
+              orderDetails={orderDetails}
               paymentMethod={paymentMethod}
               paymentReady={paymentReady}
               paymentSetupError={paymentSetupError}
@@ -1395,7 +1431,7 @@ export default function Checkout() {
             <InlineSubmitStatus status={submitStatus} />
             <div className="dtb-co-cta-trust" aria-label="Secure payment details">
               <span><ShieldCheck size={13} aria-hidden="true" /> Encrypted checkout</span>
-              <span>All checkout details stay in this page until the protected provider-owned payment step opens.</span>
+              <span>Contact, delivery, review, and payment preparation stay synchronized in this checkout route.</span>
             </div>
           </div>
 

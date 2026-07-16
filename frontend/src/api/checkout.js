@@ -6,7 +6,7 @@
  * are owned by the DTB backend.
  */
 import { apiClient } from './client.js';
-import { getCartToken } from './cart.js';
+import { getCartToken, storeApiRequest } from './cart.js';
 import {
 	applyCheckoutPaymentPreference,
 	rememberCheckoutCapabilities,
@@ -69,4 +69,71 @@ export async function resumeCheckoutPayment( resumeToken ) {
 
 export async function cancelCheckoutSession( resumeToken ) {
 	return post( 'cancel', { resume_token: resumeToken } );
+}
+
+function normalizeStoreAddress(address = {}) {
+	return {
+		first_name: address.first_name || address.firstName || '',
+		last_name: address.last_name || address.lastName || '',
+		company: address.company || '',
+		address_1: address.address_1 || address.address || '',
+		address_2: address.address_2 || '',
+		city: address.city || '',
+		state: address.state || '',
+		postcode: address.postcode || address.zip || '',
+		country: address.country || 'US',
+		email: address.email || '',
+		phone: address.phone || '',
+	};
+}
+
+function normalizePaymentData(paymentData = []) {
+	if (Array.isArray(paymentData)) return paymentData;
+	if (!paymentData || typeof paymentData !== 'object') return [];
+	return Object.entries(paymentData).map(([key, value]) => ({ key, value }));
+}
+
+export async function processExistingOrderPayment({
+	orderId,
+	orderKey,
+	billingEmail = '',
+	billingAddress = {},
+	shippingAddress = {},
+	paymentMethod = '',
+	paymentData = [],
+	extensions = {},
+	customerNote = '',
+} = {}) {
+	const id = Number(orderId);
+	if (!Number.isInteger(id) || id <= 0) {
+		throw Object.assign(new Error('A valid WooCommerce order id is required for in-checkout payment.'), { code: 'dtb_payment_order_required' });
+	}
+	if (!orderKey) {
+		throw Object.assign(new Error('The WooCommerce order key is required for in-checkout payment.'), { code: 'dtb_payment_order_key_required' });
+	}
+	if (!paymentMethod) {
+		throw Object.assign(new Error('A provider payment method is required for in-checkout payment.'), { code: 'dtb_payment_method_required' });
+	}
+
+	const billing = normalizeStoreAddress(billingAddress);
+	const shipping = normalizeStoreAddress(shippingAddress);
+	const email = billingEmail || billing.email;
+
+	if (!email) {
+		throw Object.assign(new Error('Billing email is required for in-checkout payment.'), { code: 'dtb_payment_email_required' });
+	}
+
+	return storeApiRequest(`/checkout/${id}`, {
+		method: 'POST',
+		body: JSON.stringify({
+			key: orderKey,
+			billing_email: email,
+			billing_address: billing,
+			shipping_address: shipping,
+			customer_note: customerNote,
+			payment_method: paymentMethod,
+			payment_data: normalizePaymentData(paymentData),
+			extensions,
+		}),
+	});
 }

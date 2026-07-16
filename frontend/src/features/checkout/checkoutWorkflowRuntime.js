@@ -66,7 +66,7 @@ function classifySection(section) {
   if (title === 'delivery' || title === 'shipping method') return 'delivery';
   if (title === 'review') return 'review';
   if (title === 'payment') return 'payment';
-  if (section?.querySelector?.('#field-customerNote-wrap, #dtb-co-mobile-coupon')) return 'delivery';
+  if (section?.querySelector?.('#field-customerNote-wrap, #dtb-co-mobile-coupon')) return 'review';
   return '';
 }
 

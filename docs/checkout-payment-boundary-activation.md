@@ -113,8 +113,11 @@ A production provider adapter must:
 
 - render or activate only provider-owned WooPayments/WooCommerce Blocks controls;
 - update the same DTB-created WooCommerce pending order;
+- submit valid provider-owned `payment_data` through WooCommerce's existing-order Store API payment path, `POST /wc/store/v1/checkout/{ORDER_ID}`, using the DTB-created order id and order key returned in `order.same_shell_payment`;
 - return success/failure to the checkout shell without creating a second WooCommerce order;
 - expose recoverable failure so the fallback route can remain available.
+
+`order.same_shell_payment` is emitted only while the order still requires payment. It contains the prepared WooCommerce order id, order key, billing email, selected payment method, the Store API path, and the protected fallback URL. The order key is already present in WooCommerce's order-pay URL, but DTB must still avoid logging it or exposing it after payment is verified.
 
 ## Runtime switch conditions for same-shell payment
 
@@ -131,7 +134,7 @@ at least one active non-manual provider gateway reports blocks_active === true
 window.wc.wcBlocksRegistry.registerPaymentMethod exists
 window.wc.wcBlocksRegistry.registerExpressPaymentMethod exists
 provider-owned UI renders without DTB-created card inputs
-payment callback updates the same DTB-created WooCommerce pending order
+payment submission targets `POST /wc/store/v1/checkout/{ORDER_ID}` for the same DTB-created WooCommerce pending order
 no duplicate WooCommerce order is created by the Blocks provider flow
 ```
 
