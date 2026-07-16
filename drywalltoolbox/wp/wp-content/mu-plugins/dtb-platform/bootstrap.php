@@ -117,6 +117,7 @@ require_once $_dtb_platform . '/Admin/AdminPageRegistry.php';
 require_once $_dtb_platform . '/Admin/AdminMenuRegistry.php';
 require_once $_dtb_platform . '/Admin/AdminAssets.php';
 require_once $_dtb_platform . '/Admin/AdminChromeScrollFix.php';
+require_once $_dtb_platform . '/Admin/AdminCacheToolbar.php';
 require_once $_dtb_platform . '/Admin/WooAdminPaymentsAssetGuard.php';
 require_once $_dtb_platform . '/Admin/AdminShell.php';
 require_once $_dtb_platform . '/Admin/AdminUi.php';

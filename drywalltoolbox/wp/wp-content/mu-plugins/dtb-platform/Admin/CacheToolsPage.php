@@ -33,7 +33,7 @@ function dtb_cache_tools_render_page(): void {
 
 	dtb_admin_shell_open( [
 		'title'    => __( 'Cache Tools', 'drywall-toolbox' ),
-		'subtitle' => __( 'Real-time, end-to-end cache cleanup — WordPress transients, WooCommerce cache, PHP OPcache, and the full-site Endurance/nginx page cache — in one place.', 'drywall-toolbox' ),
+		'subtitle' => __( 'Real-time, end-to-end cache cleanup — WordPress transients, WooCommerce cache, PHP OPcache, HostGator page cache, and supported host-managed CDN cache — in one place.', 'drywall-toolbox' ),
 		'section'  => 'tools',
 		'page'     => 'dtb-cache-tools',
 		'template' => 'tool',
@@ -52,7 +52,7 @@ function dtb_cache_tools_render_page(): void {
 	// ---------------------------------------------------------------------
 	ob_start();
 	?>
-	<p><?php esc_html_e( 'Runs every cache target below in sequence, including the full-site page cache purge and PHP OPcache reset. Use this after uploading corrected files via cPanel, or whenever a fix does not appear to be taking effect live.', 'drywall-toolbox' ); ?></p>
+	<p><?php esc_html_e( 'Runs every cache target below in sequence, including PHP OPcache reset, HostGator page-cache purge, and supported host-managed CDN purge. Unsupported CDN layers are reported as skipped instead of a false success. Use this after uploading corrected files via cPanel, or whenever a fix does not appear to be taking effect live.', 'drywall-toolbox' ); ?></p>
 	<button type="button" id="dtb-cache-run-all" class="button button-primary button-hero" data-dtb-cache-targets="all">
 		<span class="dashicons dashicons-shield" style="vertical-align:middle;"></span>
 		<?php esc_html_e( 'Full Site Cache Sanitize', 'drywall-toolbox' ); ?>

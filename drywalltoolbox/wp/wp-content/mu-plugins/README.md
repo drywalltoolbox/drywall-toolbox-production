@@ -285,6 +285,8 @@ DTB wp-admin provides:
 - integration health/state and exception surfaces;
 - cache, API health, configuration reference, SEO, and cleanup tools.
 
+The wp-admin toolbar cache control is consolidated by `dtb-platform/Admin/AdminCacheToolbar.php`: duplicate host/plugin cache nodes are hidden, and the single **Clear Caches** action delegates to `DTB_CacheOperationsService` for DTB, WooCommerce, WordPress object cache, OPcache, HostGator page cache, and supported host-managed CDN purge targets with per-target skipped/failed reporting.
+
 Operational actions require capability checks, nonces where applicable, input sanitization, escaped output, prepared SQL, and audit/event recording.
 
 ## 12. Deployment contract

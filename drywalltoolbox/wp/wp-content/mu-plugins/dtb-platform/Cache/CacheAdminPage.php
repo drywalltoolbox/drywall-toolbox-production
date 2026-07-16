@@ -137,7 +137,7 @@ function dtb_render_cache_admin_page(): void {
 		<!-- Full Site Sanitize -->
 		<div class="card" style="max-width: 100%; margin: 20px 0; padding: 20px; border-left: 4px solid #2271b1;">
 			<h2 style="margin-top: 0;">Full Site Cache Sanitize</h2>
-			<p>Clears every cache layer in one pass: DTB/WooCommerce transients, the WordPress object cache, PHP OPcache, and the HostGator/Endurance full-site page cache. Use this after uploading corrected files via cPanel, or whenever a fix does not appear to be taking effect live.</p>
+			<p>Clears every cache layer in one pass: DTB/WooCommerce transients, the WordPress object cache, PHP OPcache, HostGator/Endurance full-site page cache, and supported host-managed CDN cache. Unsupported CDN layers are reported as skipped instead of a false success. Use this after uploading corrected files via cPanel, or whenever a fix does not appear to be taking effect live.</p>
 			<form method="post" action="">
 				<?php wp_nonce_field( 'dtb_cache_admin', 'dtb_cache_nonce' ); ?>
 				<input type="hidden" name="dtb_cache_action" value="sanitize_all" />

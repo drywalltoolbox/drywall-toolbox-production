@@ -86,8 +86,13 @@ final class DTB_CacheOperationsService {
 				'safe_for_all' => true,
 			],
 			'page_cache'      => [
-				'label'        => __( 'Full-Site Page Cache (Endurance/nginx)', 'drywall-toolbox' ),
-				'description'  => __( 'HostGator\'s server-level full-page cache. Must be purged after any deploy or checkout/order-pay related fix — stale cached HTML is the single most common cause of "fix deployed but still broken" reports.', 'drywall-toolbox' ),
+				'label'        => __( 'HostGator Page Cache (Endurance/nginx)', 'drywall-toolbox' ),
+				'description'  => __( 'HostGator\'s server-level full-page cache. Must be purged after any deploy or checkout/order-pay related fix.', 'drywall-toolbox' ),
+				'safe_for_all' => true,
+			],
+			'cdn_cache'       => [
+				'label'        => __( 'CDN Cache (host-managed when available)', 'drywall-toolbox' ),
+				'description'  => __( 'Requests a CDN purge only when the active Endurance/HostGator runtime exposes a supported CDN purge path; otherwise reports skipped.', 'drywall-toolbox' ),
 				'safe_for_all' => true,
 			],
 		];
@@ -290,6 +295,9 @@ final class DTB_CacheOperationsService {
 			case 'page_cache':
 				return self::flush_page_cache();
 
+			case 'cdn_cache':
+				return self::flush_cdn_cache();
+
 			default:
 				return [ 'status' => 'skipped', 'message' => __( 'Unknown cache target.', 'drywall-toolbox' ) ];
 		}
@@ -346,7 +354,48 @@ final class DTB_CacheOperationsService {
 				return [ 'status' => 'skipped', 'message' => __( 'Endurance page-cache instance unavailable.', 'drywall-toolbox' ) ];
 			}
 			$instance->purge_all();
-			return [ 'status' => 'ok', 'message' => __( 'Full-site page cache purge requested (Endurance/nginx).', 'drywall-toolbox' ) ];
+			return [ 'status' => 'ok', 'message' => __( 'HostGator full-site page cache purge requested (Endurance/nginx).', 'drywall-toolbox' ) ];
+		} catch ( \Throwable $e ) {
+			return [ 'status' => 'failed', 'message' => $e->getMessage() ];
+		}
+	}
+
+	/**
+	 * Request a CDN purge through the active Endurance cache runtime when that
+	 * runtime exposes one. Some HostGator/Newfold environments do not expose
+	 * a separate callable CDN purge from WordPress; those are reported as
+	 * skipped rather than as a false success.
+	 */
+	private static function flush_cdn_cache(): array {
+		if ( ! class_exists( 'Endurance_Page_Cache' ) ) {
+			return [ 'status' => 'skipped', 'message' => __( 'Endurance cache plugin is not active; no host-managed CDN purge path is available.', 'drywall-toolbox' ) ];
+		}
+
+		try {
+			$instance = Endurance_Page_Cache::get_instance();
+			if ( ! is_object( $instance ) || ! method_exists( $instance, 'purge_cdn' ) ) {
+				return [ 'status' => 'skipped', 'message' => __( 'Active cache runtime does not expose a CDN purge method.', 'drywall-toolbox' ) ];
+			}
+
+			$cloudflare_enabled = (bool) get_option( 'endurance_cloudflare_enabled', false );
+			$file_based_enabled = (bool) get_option( 'endurance_file_enabled', false );
+			$brand              = (string) get_option( 'mm_brand', '' );
+
+			if ( $cloudflare_enabled && ! $file_based_enabled && method_exists( $instance, 'purge_request' ) ) {
+				$instance->purge_request( get_option( 'siteurl' ) . '/.*' );
+				return [ 'status' => 'ok', 'message' => __( 'Host-managed Cloudflare/CDN purge request queued through the Endurance cache runtime.', 'drywall-toolbox' ) ];
+			}
+
+			if ( 'BlueHost' !== $brand ) {
+				return [ 'status' => 'skipped', 'message' => __( 'No supported CDN purge integration is enabled in the active HostGator/Endurance configuration.', 'drywall-toolbox' ) ];
+			}
+
+			$instance->purge_cdn();
+
+			return [
+				'status'  => 'ok',
+				'message' => __( 'Sitelock CDN purge requested through the Endurance cache runtime.', 'drywall-toolbox' ),
+			];
 		} catch ( \Throwable $e ) {
 			return [ 'status' => 'failed', 'message' => $e->getMessage() ];
 		}

@@ -22,6 +22,7 @@
     max-height: calc(100vh - 32px) !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
+    padding-bottom: 28px !important;
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
     -webkit-overflow-scrolling: touch;
@@ -29,25 +30,18 @@
   }
 
   /*
-   * WordPress renders inactive top-level submenus as horizontal flyouts on hover.
-   * A scrollable #adminmenuwrap normally clips those flyouts. Temporarily release
-   * clipping while a submenu is hovered/open so admins can access nested pages.
+   * Keep the sidebar scrollable even while hovering submenu-heavy sections.
+   * Earlier rules released #adminmenuwrap overflow on hover, which made long
+   * admin menus unreachable near the bottom of the viewport.
    */
-  body.wp-admin:not(.folded) #adminmenuwrap:has(#adminmenu > li.wp-has-submenu:hover),
-  body.wp-admin:not(.folded) #adminmenuwrap:has(#adminmenu > li.opensub),
-  body.wp-admin:not(.folded) #adminmenuwrap:has(#adminmenu > li:hover > .wp-submenu) {
-    overflow: visible !important;
-  }
-
-  body.wp-admin:not(.folded) #adminmenuwrap:has(#adminmenu > li.wp-has-submenu:hover) #adminmenu,
-  body.wp-admin:not(.folded) #adminmenuwrap:has(#adminmenu > li.opensub) #adminmenu,
-  body.wp-admin:not(.folded) #adminmenuwrap:has(#adminmenu > li:hover > .wp-submenu) #adminmenu {
-    overflow: visible !important;
-  }
-
   body.wp-admin:not(.folded) #adminmenu > li.wp-has-submenu:hover > .wp-submenu,
   body.wp-admin:not(.folded) #adminmenu > li.opensub > .wp-submenu,
   body.wp-admin:not(.folded) #adminmenu > li:hover > .wp-submenu {
+    position: fixed !important;
+    left: 160px !important;
+    max-height: calc(100vh - 44px) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
     z-index: 10020 !important;
   }
 
