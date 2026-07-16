@@ -16,7 +16,6 @@ import MobileInstallNudge from './components/pwa/MobileInstallNudge.jsx';
 import SmartBackButton from './components/navigation/SmartBackButton.jsx';
 import { isRewardsEnabled } from './utils/featureFlags.js';
 import { initializeWebpackPublicPath } from './setWebpackPublicPath.js';
-import Checkout from './pages/Checkout';
 
 const HOMEPAGE_SIGNUP_CTA_SEEN_KEY = 'dtb:homepage-signup-cta-seen:v1';
 const HOMEPAGE_SIGNUP_CTA_DELAY_MS = 900;
@@ -83,6 +82,7 @@ const RepairStatus = lazyWithReload(() => import('./pages/RepairStatus'));
 const ReturnStatus = lazyWithReload(() => import('./pages/ReturnStatus'));
 const SupportStatus = lazyWithReload(() => import('./pages/SupportStatus'));
 const Cart = lazyWithReload(() => import('./pages/Cart'));
+const Checkout = lazyWithReload(() => import('./pages/Checkout'));
 const CheckoutReturn = lazyWithReload(() => import('./pages/CheckoutReturn'));
 const OrderConfirmation = lazyWithReload(() => import('./pages/OrderConfirmation'));
 const OrderTracking = lazyWithReload(() => import('./pages/OrderTracking'));
