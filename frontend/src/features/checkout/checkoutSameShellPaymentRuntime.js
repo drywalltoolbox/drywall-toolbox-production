@@ -1,11 +1,10 @@
 /**
  * frontend/src/features/checkout/checkoutSameShellPaymentRuntime.js
  *
- * Runtime adapter gate for future provider-owned same-shell payment execution.
- * This module never renders card fields and never processes payment. It only
- * prevents the legacy order-pay navigation when a verified provider-owned
- * adapter is present and the backend capability envelope says same-shell payment
- * is enabled for the active gateway stack.
+ * Runtime adapter gate for provider-owned same-shell payment execution.
+ * This module never renders card fields and never processes payment directly.
+ * It blocks the legacy order-pay navigation by default and only starts payment
+ * when an eligible provider-owned same-shell adapter is present and ready.
  */
 
 import { getCheckoutCapabilities } from '../../api/checkout.js';
@@ -31,7 +30,6 @@ let currentState = {
   capabilities: null,
   methods: [],
 };
-let bypassNextFallbackClick = false;
 let paymentInFlight = false;
 
 function isCheckoutRoute() {
@@ -57,6 +55,16 @@ function providerAdapter() {
   const adapter = window.dtbCheckoutSameShellProvider;
   if (!adapter || typeof adapter !== 'object') return null;
   return typeof adapter.startPayment === 'function' ? adapter : null;
+}
+
+function providerAdapterReady(adapter) {
+  if (!adapter) return false;
+  if (typeof adapter.sameShellReady !== 'function') return true;
+  try {
+    return adapter.sameShellReady() === true;
+  } catch {
+    return false;
+  }
 }
 
 function decodeDatasetJson(value) {
@@ -121,6 +129,7 @@ function activeProviderMethods(capabilities) {
 function evaluate(capabilities) {
   const architecture = capabilities?.payment_architecture || {};
   const methods = activeProviderMethods(capabilities);
+  const adapter = providerAdapter();
   if (architecture.contract_version !== '3') return { eligible: false, reason: 'contract_version_mismatch', methods };
   if (architecture.same_shell_supported !== true) return { eligible: false, reason: 'same_shell_not_enabled', methods };
   if (architecture.client_bridge_enabled !== true) return { eligible: false, reason: 'client_bridge_disabled', methods };
@@ -128,16 +137,18 @@ function evaluate(capabilities) {
   if (architecture.server_same_shell_ready !== true) return { eligible: false, reason: 'server_same_shell_unavailable', methods };
   if (!registryReady()) return { eligible: false, reason: 'client_blocks_registry_unavailable', methods };
   if (!methods.length) return { eligible: false, reason: 'provider_blocks_method_unavailable', methods };
-  if (!providerAdapter()) return { eligible: false, reason: 'provider_adapter_unavailable', methods };
+  if (!adapter) return { eligible: false, reason: 'provider_adapter_unavailable', methods };
+  if (!providerAdapterReady(adapter)) return { eligible: false, reason: 'provider_adapter_not_ready', methods };
   return { eligible: true, reason: 'provider_adapter_ready', methods };
 }
 
 function applyState(root) {
   if (!(root instanceof HTMLElement)) return;
-  root.dataset.dtbSameShellPayment = currentState.eligible ? 'ready' : 'fallback';
+  root.dataset.dtbSameShellPayment = currentState.eligible ? 'ready' : 'blocked';
   root.dataset.dtbSameShellReason = currentState.reason;
   root.classList.toggle('dtb-checkout--same-shell-ready', currentState.eligible);
-  root.classList.toggle('dtb-checkout--same-shell-fallback', !currentState.eligible);
+  root.classList.toggle('dtb-checkout--same-shell-fallback', false);
+  root.classList.toggle('dtb-checkout--same-shell-blocked', !currentState.eligible);
 }
 
 async function syncState(root, force = false) {
@@ -200,7 +211,7 @@ function ensureStatusPanel(root) {
   return panel;
 }
 
-function renderStatus(root, status, message, fallbackAction) {
+function renderStatus(root, status, message) {
   const panel = ensureStatusPanel(root);
   if (!panel) return;
   panel.dataset.status = status;
@@ -211,24 +222,12 @@ function renderStatus(root, status, message, fallbackAction) {
   const copy = document.createElement('p');
   copy.textContent = message;
   panel.append(title, copy);
-
-  if (typeof fallbackAction === 'function') {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'dtb-same-shell-payment-status__fallback';
-    button.textContent = 'Open protected fallback payment';
-    button.addEventListener('click', fallbackAction);
-    panel.appendChild(button);
-  }
 }
 
-function openFallback(action) {
-  if (!(action instanceof HTMLElement)) return;
-  bypassNextFallbackClick = true;
-  action.click();
-  window.setTimeout(() => {
-    bypassNextFallbackClick = false;
-  }, 0);
+function sameShellBlockedMessage(reason) {
+  const normalized = normalizeId(reason);
+  const reasonLabel = normalized ? ` (${normalized})` : '';
+  return `Same-page WooPayments checkout is not active${reasonLabel}. Payment redirects are disabled in this checkout shell until the provider-owned same-shell adapter is available and synchronized.`;
 }
 
 async function startSameShellPayment(root, action) {
@@ -238,8 +237,7 @@ async function startSameShellPayment(root, action) {
     renderStatus(
       root,
       'error',
-      'The provider-owned in-checkout payment adapter is not available. Use the protected fallback payment route.',
-      () => openFallback(action),
+      sameShellBlockedMessage('provider_adapter_unavailable'),
     );
     return;
   }
@@ -249,14 +247,13 @@ async function startSameShellPayment(root, action) {
     renderStatus(
       root,
       'error',
-      'The prepared WooCommerce order is missing the payment context required for in-checkout payment. Use the protected fallback payment route.',
-      () => openFallback(action),
+      'The prepared WooCommerce order is missing the payment context required for in-checkout payment. No payment redirect was opened.',
     );
     return;
   }
 
   paymentInFlight = true;
-  renderStatus(root, 'loading', 'Opening the provider-owned WooPayments controls inside checkout…');
+  renderStatus(root, 'loading', 'Synchronizing WooPayments-owned payment data inside checkout…');
   try {
     const result = await adapter.startPayment({
       root,
@@ -293,7 +290,11 @@ async function startSameShellPayment(root, action) {
 
     const redirectUrl = paymentResultRedirectUrl(processed);
     if (redirectUrl) {
-      window.location.assign(redirectUrl);
+      renderStatus(
+        root,
+        'error',
+        'The payment provider returned a redirect requirement. This checkout shell will not leave the page automatically; complete same-shell provider handling before enabling this flow.',
+      );
       return;
     }
 
@@ -301,7 +302,7 @@ async function startSameShellPayment(root, action) {
       throw new Error(processed?.message || processed?.payment_result?.message || 'Provider-owned payment did not complete.');
     }
 
-    renderStatus(root, 'ready', 'Provider-owned payment controls are active in this checkout step.');
+    renderStatus(root, 'ready', 'WooPayments-owned payment data was accepted for this checkout order.');
     window.dispatchEvent(new CustomEvent('dtb:checkout-same-shell-payment-started', {
       detail: {
         methods: currentState.methods.map((method) => normalizeId(method?.id)).filter(Boolean),
@@ -312,28 +313,33 @@ async function startSameShellPayment(root, action) {
     renderStatus(
       root,
       'error',
-      error?.message || 'Provider-owned in-checkout payment could not start. Use the protected fallback payment route.',
-      () => openFallback(action),
+      error?.message || 'Provider-owned in-checkout payment could not start. No payment redirect was opened.',
     );
   } finally {
     paymentInFlight = false;
   }
 }
 
-function handlePaymentClick(event) {
+async function handlePaymentClick(event) {
   if (!isCheckoutRoute()) return;
-  if (bypassNextFallbackClick) return;
   const action = paymentActionFromEvent(event);
   if (!action) return;
   const root = document.querySelector('.dtb-checkout');
   if (!(root instanceof HTMLElement)) return;
 
-  applyState(root);
-  if (!currentState.eligible) return;
-
   event.preventDefault();
   event.stopPropagation();
   if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+
+  const state = await syncState(root);
+  if (!state.eligible) {
+    renderStatus(root, 'error', sameShellBlockedMessage(state.reason));
+    window.dispatchEvent(new CustomEvent('dtb:checkout-same-shell-payment-blocked', {
+      detail: { reason: state.reason },
+    }));
+    return;
+  }
+
   void startSameShellPayment(root, action);
 }
 
@@ -350,6 +356,14 @@ export function installCheckoutSameShellPaymentRuntime() {
 
   document.addEventListener('click', handlePaymentClick, true);
   window.addEventListener('dtb:checkout-payment-method-selected', () => {
+    const root = document.querySelector('.dtb-checkout');
+    if (root instanceof HTMLElement) void syncState(root, true);
+  });
+  window.addEventListener('dtb:checkout-same-shell-provider-installed', () => {
+    const root = document.querySelector('.dtb-checkout');
+    if (root instanceof HTMLElement) void syncState(root, true);
+  });
+  window.addEventListener('dtb:checkout-woopayments-provider-sync', () => {
     const root = document.querySelector('.dtb-checkout');
     if (root instanceof HTMLElement) void syncState(root, true);
   });
