@@ -23,6 +23,8 @@ let unsubscribePaymentStore = null;
 let lastSnapshotKey = '';
 let mountedControlsKey = '';
 let mountedControlsRoot = null;
+let mountedControlsElement = null;
+let mountedControlsFailure = null;
 
 function normalizeId(value) {
   return String(value || '').trim().toLowerCase();
@@ -303,6 +305,18 @@ function setControlMountMessage(root, status, message) {
   body.appendChild(copy);
 }
 
+function unmountMountedControls() {
+  try {
+    if (mountedControlsRoot) {
+      mountedControlsRoot.unmount();
+    }
+  } finally {
+    mountedControlsKey = '';
+    mountedControlsRoot = null;
+    mountedControlsElement = null;
+  }
+}
+
 function mountedControlProps({ order = {}, snapshot = {}, paymentMethod = '', addresses = {} } = {}) {
   const billingAddress = addresses.billingAddress || normalizeStoreAddress(order.billingAddress || order.billing_address || {});
   const shippingAddress = addresses.shippingAddress || normalizeStoreAddress(order.shippingAddress || order.shipping_address || billingAddress);
@@ -340,12 +354,23 @@ function renderOfficialPaymentNode(root, definition, props, paymentMethod) {
   const mount = ensureControlMount(root);
   const body = mount?.querySelector?.(`.${CONTROL_BODY_CLASS}`);
   const wpElement = window.wp?.element;
-  if (!(body instanceof HTMLElement) || !wpElement) return false;
+  if (!(body instanceof HTMLElement) || !wpElement) {
+    mountedControlsFailure = Object.assign(new Error('WooPayments control mount element or WordPress element runtime is unavailable.'), {
+      code: 'dtb_woopayments_controls_runtime_missing',
+    });
+    return false;
+  }
 
   const node = definition?.content || definition?.edit || definition?.component || null;
-  if (!node) return false;
+  if (!node) {
+    mountedControlsFailure = Object.assign(new Error('WooPayments registered payment method does not expose a Blocks control node.'), {
+      code: 'dtb_woopayments_controls_node_missing',
+    });
+    return false;
+  }
 
   try {
+    mountedControlsFailure = null;
     let element = node;
     if (typeof node === 'function' && typeof wpElement.createElement === 'function') {
       element = wpElement.createElement(node, props);
@@ -353,16 +378,24 @@ function renderOfficialPaymentNode(root, definition, props, paymentMethod) {
       element = wpElement.cloneElement(node, props);
     }
 
-    if (mountedControlsRoot && mountedControlsKey === paymentMethod) {
+    if (mountedControlsRoot && mountedControlsKey === paymentMethod && mountedControlsElement === body) {
       mountedControlsRoot.render(element);
     } else if (window.ReactDOM?.createRoot) {
+      if (mountedControlsRoot) {
+        unmountMountedControls();
+      }
       body.replaceChildren();
       mountedControlsRoot = window.ReactDOM.createRoot(body);
+      mountedControlsElement = body;
       mountedControlsRoot.render(element);
     } else if (typeof wpElement.render === 'function') {
+      if (mountedControlsRoot) {
+        unmountMountedControls();
+      }
       body.replaceChildren();
       wpElement.render(element, body);
       mountedControlsRoot = null;
+      mountedControlsElement = body;
     } else {
       return false;
     }
@@ -376,6 +409,17 @@ function renderOfficialPaymentNode(root, definition, props, paymentMethod) {
       'error',
       error?.message || 'WooPayments registered Blocks controls could not mount in this checkout shell.',
     );
+    mountedControlsFailure = Object.assign(new Error('WooPayments registered Blocks controls could not mount in this checkout shell.'), {
+      code: 'dtb_woopayments_controls_render_failed',
+      cause: error,
+    });
+    try {
+      unmountMountedControls();
+    } catch {
+      mountedControlsKey = '';
+      mountedControlsRoot = null;
+      mountedControlsElement = null;
+    }
     return false;
   }
 }
@@ -384,6 +428,9 @@ function mountOfficialPaymentControls({ root, order = {}, snapshot, paymentMetho
   if (!(root instanceof HTMLElement)) return false;
   const definition = paymentMethodDefinition(snapshot, paymentMethod);
   if (!definition) {
+    mountedControlsFailure = Object.assign(new Error('WooPayments did not expose its registered Blocks payment method.'), {
+      code: 'dtb_woopayments_controls_definition_missing',
+    });
     setControlMountMessage(root, 'waiting', 'Waiting for WooPayments to expose its registered Blocks payment method.');
     return false;
   }
@@ -438,8 +485,12 @@ function waitForProviderPaymentData(paymentMethod, timeoutMs = STORE_WAIT_TIMEOU
           resolve({ snapshot, paymentData });
           return;
         }
-      } catch {
-        // Keep waiting while the mounted provider control hydrates.
+      } catch (error) {
+        reject(Object.assign(new Error('WooPayments provider store failed while waiting for provider-owned payment data.'), {
+          code: 'dtb_woopayments_provider_snapshot_failed',
+          cause: error,
+        }));
+        return;
       }
       if (Date.now() - startedAt >= timeoutMs) {
         reject(Object.assign(new Error('Provider-owned WooPayments controls did not produce payment data in time. Confirm the official WooPayments Blocks controls mounted inside the checkout payment step.'), {
@@ -519,16 +570,22 @@ async function startPayment({ root, methods = [], order = {}, visualMethod = 'ca
     });
   }
 
-  mountOfficialPaymentControls({ root, order, snapshot, paymentMethod, addresses: syncedAddresses });
+  const controlsMounted = mountOfficialPaymentControls({ root, order, snapshot, paymentMethod, addresses: syncedAddresses });
 
   let paymentData = normalizePaymentData(snapshot.paymentMethodData, paymentMethod);
-  if (!paymentData.length || !hasProviderTokenData(paymentData)) {
-    publishSnapshot(snapshot, { paymentDataReady: false, paymentMethod });
+  if (paymentData.length && hasProviderTokenData(paymentData)) {
+    publishSnapshot(snapshot, { paymentDataReady: true, paymentMethod });
+  } else {
+    publishSnapshot(snapshot, { paymentDataReady: false, paymentMethod, paymentControlsMounted: controlsMounted });
+    if (!controlsMounted) {
+      throw Object.assign(new Error('WooPayments registered Blocks controls did not mount, and provider-owned payment data is not available yet.'), {
+        code: 'dtb_woopayments_controls_mount_failed',
+        cause: mountedControlsFailure,
+      });
+    }
     const hydrated = await waitForProviderPaymentData(paymentMethod);
     paymentData = hydrated.paymentData;
     publishSnapshot(hydrated.snapshot, { paymentDataReady: true, paymentMethod });
-  } else {
-    publishSnapshot(snapshot, { paymentDataReady: true, paymentMethod });
   }
 
   return processPayment({
