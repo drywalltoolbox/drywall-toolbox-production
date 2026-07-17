@@ -78,12 +78,15 @@ drywalltoolbox/wp/wp-content/mu-plugins/dtb-customer-orders-api.php
 Required payment routing rules in the live/staging root `.htaccess`:
 
 ```apache
+RewriteRule ^checkout/?$ wp/index.php?pagename=checkout [QSA,L]
+RewriteRule ^staging/2972/checkout/?$ wp/index.php?pagename=checkout [QSA,L]
 RewriteRule ^checkout/order-pay/.*$ wp/index.php [QSA,L]
 RewriteRule ^checkout/.*order-pay.*$ wp/index.php [QSA,L]
 RewriteRule ^order-pay/.*$ wp/index.php [QSA,L]
+RewriteRule ^staging/2972/checkout/order-pay/([0-9]+)/?$ wp/index.php?pagename=checkout&order-pay=$1 [QSA,L]
 ```
 
-These rules ensure payment/order-pay URLs are handled by WordPress instead of the React SPA fallback.
+These rules ensure checkout and payment/order-pay URLs are handled by WordPress instead of the React SPA fallback.
 
 Checkout code also normalizes WooCommerce payment handoff URLs to `/wp/checkout/order-pay/...` before redirecting. This is required for both production checkout at `/checkout` and staging checkout at `/staging/2972/checkout`, because both use the same root WordPress/WooCommerce payment runtime.
 
