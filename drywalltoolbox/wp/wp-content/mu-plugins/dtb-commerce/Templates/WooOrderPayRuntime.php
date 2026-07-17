@@ -51,13 +51,13 @@ if ( ! $order instanceof WC_Order ) {
 				$title = is_object( $gateway ) && isset( $gateway->title ) ? strtolower( wp_strip_all_tags( (string) $gateway->title ) ) : '';
 				$key   = $id . ' ' . $title;
 
-				foreach ( [ 'apple' => 10, 'google' => 20, 'paypal' => 30, 'affirm' => 40, 'afterpay' => 50, 'cash app' => 55, 'klarna' => 60 ] as $needle => $value ) {
+				foreach ( [ 'apple' => 10, 'google' => 20, 'affirm' => 40, 'afterpay' => 50, 'cash app' => 55, 'klarna' => 60 ] as $needle => $value ) {
 					if ( false !== strpos( $key, $needle ) ) {
 						return $value;
 					}
 				}
 
-				return false !== strpos( $key, 'card' ) || false !== strpos( $key, 'woocommerce_payments' ) || false !== strpos( $key, 'woopayments' ) ? 90 : 80;
+				return false !== strpos( $key, 'card' ) || str_starts_with( $id, 'stripe_' ) ? 90 : 80;
 			};
 
 			return $rank( $left ) <=> $rank( $right );

@@ -2,8 +2,8 @@
  * frontend/src/features/checkout/checkoutSameShellPaymentRuntime.js
  *
  * Same-page payment surface runtime. This module does not render, clone, or
- * dispatch into WooPayments Blocks controls. It embeds a same-origin WordPress
- * document where the native WooCommerce Checkout Block/WooPayments runtime owns
+ * dispatch into payment-provider Blocks controls. It embeds a same-origin WordPress
+ * document where the native WooCommerce Checkout Block/provider runtime owns
  * card fields, wallets, tokenization, and payment processing.
  */
 
@@ -30,7 +30,9 @@ let surfaceRequestSeq = 0;
 
 function isCheckoutRoute() {
   if (typeof window === 'undefined') return false;
-  const path = window.location.pathname.replace(/^\/drywall-toolbox(?=\/|$)/, '') || '/';
+  const path = window.location.pathname
+    .replace(/^\/staging\/\d+(?=\/|$)/, '')
+    .replace(/^\/drywall-toolbox(?=\/|$)/, '') || '/';
   return CHECKOUT_PATH_RE.test(path);
 }
 
@@ -189,7 +191,7 @@ function ensureFrame(root) {
   if (!(frame instanceof HTMLIFrameElement)) {
     frame = document.createElement('iframe');
     frame.className = SURFACE_CLASS;
-    frame.title = 'Secure WooPayments checkout';
+    frame.title = 'Secure Stripe checkout';
     frame.setAttribute('loading', 'eager');
     frame.setAttribute('allow', 'payment *; publickey-credentials-get *');
     frame.setAttribute('sandbox', 'allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation');
@@ -226,12 +228,12 @@ async function mountPaymentSurface(root, action, { force = false } = {}) {
 
   const requestId = ++surfaceRequestSeq;
   surfaceInFlight = true;
-  renderStatus(root, 'loading', 'Loading the native WooPayments checkout surface inside checkout…');
+  renderStatus(root, 'loading', 'Loading the secure Stripe checkout surface inside checkout...');
   try {
     const state = await syncState(root, true);
     if (requestId !== surfaceRequestSeq || !document.contains(root)) return;
     if (!state.eligible) {
-      renderStatus(root, 'error', `Same-page WooPayments checkout is not active (${normalizeId(state.reason)}).`);
+      renderStatus(root, 'error', `Same-page Stripe checkout is not active (${normalizeId(state.reason)}).`);
       return;
     }
     const url = await resolveSurfaceUrl(context);
@@ -246,11 +248,11 @@ async function mountPaymentSurface(root, action, { force = false } = {}) {
     frame.dataset.dtbOrderId = String(context.orderId);
     frame.src = url;
     currentSurfaceKey = key;
-    renderStatus(root, 'loading', 'WooPayments is loading securely inside checkout…');
+    renderStatus(root, 'loading', 'Stripe is loading securely inside checkout...');
     window.dispatchEvent(new CustomEvent('dtb:checkout-payment-surface-mounted', { detail: { orderId: context.orderId } }));
   } catch (error) {
     if (requestId === surfaceRequestSeq && document.contains(root)) {
-      renderStatus(root, 'error', error?.message || 'The native WooPayments checkout surface could not be loaded.');
+      renderStatus(root, 'error', error?.message || 'The secure Stripe checkout surface could not be loaded.');
     }
   } finally {
     if (requestId === surfaceRequestSeq) surfaceInFlight = false;
@@ -286,10 +288,10 @@ function handleSurfaceMessage(event) {
     if (Number.isFinite(height) && height > 240) frame.style.height = `${Math.min(Math.ceil(height), 2400)}px`;
   }
   if (detail.type === 'dtb:payment-surface:ready') {
-    renderStatus(root, 'ready', 'WooPayments is available in the secure checkout payment surface.');
+    renderStatus(root, 'ready', 'Stripe is available in the secure checkout payment surface.');
   }
   if (detail.type === 'dtb:payment-surface:error') {
-    renderStatus(root, 'error', String(detail.message || 'WooPayments reported a recoverable payment-surface error.'));
+    renderStatus(root, 'error', String(detail.message || 'Stripe reported a recoverable payment-surface error.'));
   }
   if (detail.type === 'dtb:payment-surface:success') {
     renderStatus(root, 'ready', 'Payment was completed securely. Updating checkout status…');

@@ -109,13 +109,9 @@ if ( ! function_exists( 'dtb_payment_handoff_has_gateway_reference' ) ) {
 
 		$gateway_meta_keys = [
 			'_transaction_id',
-			'_wcpay_intent_id',
-			'_wcpay_charge_id',
 			'_stripe_intent_id',
 			'_stripe_charge_id',
 			'_payment_intent_id',
-			'_paypal_order_id',
-			'_paypal_transaction_id',
 		];
 
 		foreach ( $gateway_meta_keys as $key ) {
@@ -177,7 +173,7 @@ if ( ! function_exists( 'dtb_payment_handoff_preferred_gateway' ) ) {
 			return null;
 		}
 
-		$preferred_ids = [ 'woocommerce_payments', 'stripe', 'ppcp-gateway' ];
+		$preferred_ids = [ 'stripe_upm', 'stripe_cc', 'stripe' ];
 		foreach ( $preferred_ids as $preferred_id ) {
 			if ( isset( $available[ $preferred_id ] ) && is_object( $available[ $preferred_id ] ) ) {
 				return $available[ $preferred_id ];
@@ -417,5 +413,3 @@ add_filter(
 	PHP_INT_MAX,
 	2
 );
-
-

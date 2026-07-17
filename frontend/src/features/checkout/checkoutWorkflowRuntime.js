@@ -19,7 +19,6 @@ const STEP_LABELS = new Map([
 ]);
 const PAYMENT_VISUAL_METHODS = [
   { id: 'card', label: 'Credit Card', logos: ['visa', 'mastercard', 'amex'] },
-  { id: 'paypal', label: 'PayPal', logos: ['paypal'] },
   { id: 'apple-pay', label: 'Apple Pay', logos: ['apple-pay'] },
   { id: 'google-pay', label: 'Google Pay', logos: ['google-pay'] },
 ];
@@ -36,7 +35,9 @@ let lastPaymentReady = false;
 
 function isCheckoutRoute() {
   if (typeof window === 'undefined') return false;
-  const path = window.location.pathname.replace(/^\/drywall-toolbox(?=\/|$)/, '') || '/';
+  const path = window.location.pathname
+    .replace(/^\/staging\/\d+(?=\/|$)/, '')
+    .replace(/^\/drywall-toolbox(?=\/|$)/, '') || '/';
   return CHECKOUT_PATH_RE.test(path);
 }
 

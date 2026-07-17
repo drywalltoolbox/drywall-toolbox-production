@@ -326,7 +326,7 @@ function dtb_admin_assets_enqueue(): void {
  * Load the non-invasive global wp-admin visual skin.
  *
  * This is intentionally separate from the DTB component system. It gives core
- * WordPress, WooCommerce, WooPayments, and DTB admin pages a consistent modern
+ * WordPress, WooCommerce, payment-provider, and DTB admin pages a consistent modern
  * chrome without changing page callbacks, routes, capabilities, form fields, or
  * JavaScript behavior.
  */

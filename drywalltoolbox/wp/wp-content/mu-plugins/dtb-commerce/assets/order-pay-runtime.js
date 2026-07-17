@@ -9,7 +9,7 @@
 	var lastNoticeSignature = '';
 	var mobileQuery = window.matchMedia ? window.matchMedia('(max-width: 760px)') : null;
 	var motionReduceQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
-	var providerClasses = ['dtb-op-provider-apple', 'dtb-op-provider-google', 'dtb-op-provider-paypal', 'dtb-op-provider-wallet', 'dtb-op-provider-paylater', 'dtb-op-provider-card'];
+	var providerClasses = ['dtb-op-provider-apple', 'dtb-op-provider-google', 'dtb-op-provider-wallet', 'dtb-op-provider-paylater', 'dtb-op-provider-card'];
 
 	function runtimeRoot() { return document.querySelector('body.dtb-order-pay-runtime'); }
 	function orderForm() { return document.querySelector('.dtb-op-card form#order_review'); }
@@ -39,8 +39,7 @@
 		clearProviderClasses(method);
 		if (/apple/.test(key)) { method.classList.add('dtb-op-gateway-express', 'dtb-op-provider-apple'); method.setAttribute('data-dtb-provider', 'apple'); return 'express'; }
 		if (/google|gpay|g pay/.test(key)) { method.classList.add('dtb-op-gateway-express', 'dtb-op-provider-google'); method.setAttribute('data-dtb-provider', 'google'); return 'express'; }
-		if (/paypal/.test(key)) { method.classList.add('dtb-op-gateway-express', 'dtb-op-provider-paypal'); method.setAttribute('data-dtb-provider', 'paypal'); return 'express'; }
-		if (/wallet|woopay/.test(key)) { method.classList.add('dtb-op-gateway-express', 'dtb-op-provider-wallet'); method.setAttribute('data-dtb-provider', 'wallet'); return 'express'; }
+		if (/wallet|link/.test(key)) { method.classList.add('dtb-op-gateway-express', 'dtb-op-provider-wallet'); method.setAttribute('data-dtb-provider', 'wallet'); return 'express'; }
 		if (/affirm|klarna|afterpay|cash app|pay later|paylater/.test(key)) { method.classList.add('dtb-op-gateway-paylater', 'dtb-op-provider-paylater'); method.setAttribute('data-dtb-provider', 'paylater'); return 'paylater'; }
 		method.classList.add('dtb-op-gateway-card', 'dtb-op-provider-card');
 		method.setAttribute('data-dtb-provider', 'card');
@@ -49,7 +48,7 @@
 
 	function gatewayHasDetails(method) {
 		var box = method && method.querySelector('.payment_box');
-		return Boolean(box && (compactText(box) || box.querySelector('input, select, textarea, iframe, button, .StripeElement, .wcpay-upe-element, .wcpay-payment-element')));
+		return Boolean(box && (compactText(box) || box.querySelector('input, select, textarea, iframe, button, .StripeElement, .__PrivateStripeElement')));
 	}
 
 	function currencyText(value) {

@@ -20,7 +20,7 @@ export function readPendingCheckoutPayment() {
 }
 
 export function writePendingCheckoutPayment() {
-	// Do not persist resumable payment redirects. The WooPayments same-shell flow
+	// Do not persist resumable payment redirects. The same-shell payment-provider flow
 	// either completes inside /checkout or shows an in-shell provider readiness
 	// error without creating a legacy resume badge.
 	clearPendingCheckoutPayment();

@@ -41,7 +41,6 @@ import { makeCheckoutAttemptId } from '../utils/checkoutRecovery.js';
 import { normalizePaymentUrl } from '../utils/paymentUrl.js';
 
 const WOO_NATIVE_GATEWAY_ID = 'woo_native';
-const WOO_PAYMENTS_METHOD_ID = '';
 const MANUAL_PAYMENT_METHOD_IDS = new Set(['cod', 'bacs', 'cheque']);
 
 const BLANK_FORM = {
@@ -57,7 +56,7 @@ const BLANK_FORM = {
   customerNote: '',
 };
 
-const PREFERRED_ONLINE_PAYMENT_IDS = [WOO_PAYMENTS_METHOD_ID, 'stripe', 'ppcp-gateway'];
+const PREFERRED_ONLINE_PAYMENT_IDS = ['stripe_upm', 'stripe_cc', 'stripe'];
 const PUBLIC_PAYMENT_LABEL = 'Secure card payment';
 const PUBLIC_PAYMENT_TITLE = 'Secure Card Payment';
 const PAYMENT_LOGO_BASE = `${process.env.PUBLIC_URL || ''}/payment_logos`;
@@ -85,7 +84,6 @@ const CARD_BRAND_LOGOS = [
 ];
 
 const PAYMENT_METHOD_LOGOS = [
-  { key: 'paypal', src: `${PAYMENT_LOGO_BASE}/paypal.svg`, alt: 'PayPal' },
   { key: 'apple-pay', src: `${PAYMENT_LOGO_BASE}/apple-pay.svg`, alt: 'Apple Pay' },
   { key: 'google-pay', src: `${PAYMENT_LOGO_BASE}/google-pay.svg`, alt: 'Google Pay' },
   ...CARD_BRAND_LOGOS,
@@ -121,11 +119,7 @@ function isManualPaymentMethod(method) {
   return methodId ? MANUAL_PAYMENT_METHOD_IDS.has(String(methodId).toLowerCase()) || Boolean(method?.is_manual) : false;
 }
 
-function getPublicPaymentCopy(method) {
-  const methodId = String(method?.id || method || '').toLowerCase();
-  if (methodId.includes('paypal') || methodId.includes('ppcp')) {
-    return { label: 'Secure online payment', title: 'Secure Online Payment' };
-  }
+function getPublicPaymentCopy() {
   return { label: PUBLIC_PAYMENT_LABEL, title: PUBLIC_PAYMENT_TITLE };
 }
 
@@ -167,7 +161,7 @@ function resolveCartItemImage(item) {
   return item.image || item.image_src || item.thumbnail || item.image_url || item.product?.image || item.product?.thumbnail || item.images?.[0]?.src || item.images?.[0] || '';
 }
 
-function normalizeWooPaymentUrl(value) {
+function normalizeProviderPaymentUrl(value) {
   if (typeof value !== 'string' || !value.trim()) return '';
   return normalizePaymentUrl(value);
 }
@@ -504,7 +498,7 @@ export default function Checkout() {
   const [checkoutError, setCheckoutError] = useState(null);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState(WOO_PAYMENTS_METHOD_ID);
+  const [paymentMethod, setPaymentMethod] = useState('');
   const [paymentSetupError, setPaymentSetupError] = useState(null);
   const [checkoutCapabilities, setCheckoutCapabilities] = useState(null);
   const [capabilitiesLoading, setCapabilitiesLoading] = useState(true);
@@ -568,7 +562,7 @@ export default function Checkout() {
     [checkoutCapabilities],
   );
 
-  const paymentUrl = normalizeWooPaymentUrl(orderDetails?.order?.payment_url || '');
+  const paymentUrl = normalizeProviderPaymentUrl(orderDetails?.order?.payment_url || '');
   const paymentReady = Boolean(orderDetails?.order?.payment_required && paymentUrl);
 
   const canSubmitCheckout = useMemo(
@@ -669,7 +663,7 @@ export default function Checkout() {
 
   const handlePaymentRequired = useCallback((result) => {
     const orderPayload = result?.order || {};
-    const nextPaymentUrl = normalizeWooPaymentUrl(result?.paymentUrl || orderPayload?.payment_url || '');
+    const nextPaymentUrl = normalizeProviderPaymentUrl(result?.paymentUrl || orderPayload?.payment_url || '');
     if (!nextPaymentUrl) {
       setCheckoutError('Protected payment was prepared, but the payment URL was not returned. Please try again.');
       setSubmitStatus('idle');

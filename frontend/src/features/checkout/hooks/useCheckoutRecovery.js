@@ -25,7 +25,7 @@ export function useCheckoutRecovery() {
 		clearPendingCheckoutPayment();
 		setPendingPayment( null );
 		throw Object.assign(
-			new Error( 'Legacy order-pay resume has been retired. Start checkout again so payment remains inside the same-shell WooPayments flow.' ),
+			new Error( 'Legacy order-pay resume has been retired. Start checkout again so payment remains inside the same-shell Stripe flow.' ),
 			{ code: 'dtb_legacy_resume_retired' },
 		);
 	}, [] );

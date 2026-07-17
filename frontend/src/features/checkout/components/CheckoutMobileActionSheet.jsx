@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronRight, Loader2, ShieldCheck } from 'lucide-react';
+import { ChevronDown, ChevronUp, Loader2, ReceiptText, ShieldCheck } from 'lucide-react';
 
 function money(value) {
   return `$${Number(value || 0).toFixed(2)}`;
@@ -40,7 +40,6 @@ export function CheckoutMobileActionSheet({
     : taxStatus === 'loading'
       ? 'Calculating'
       : 'Needs address';
-  const compactContext = `Shipping ${shippingCopy} · Tax ${taxCopy}`;
 
   const handleSubmit = () => {
     if (processing || !canSubmitCheckout) return;
@@ -49,24 +48,8 @@ export function CheckoutMobileActionSheet({
 
   return (
     <div className={`dtb-co-mobile-cta dtb-co-mobile-cta--react${expanded ? ' dtb-co-mobile-cta--expanded' : ''} lg:hidden`}>
-      <div className="dtb-co-mobile-cta__handle" aria-hidden="true" />
       <div className="dtb-co-mobile-cta__inner">
-        <button
-          type="button"
-          className="dtb-co-mobile-cta__summary-toggle"
-          aria-expanded={expanded}
-          aria-controls="dtb-co-mobile-cta-totals"
-          onClick={() => setExpanded((value) => !value)}
-        >
-          <span className="dtb-co-mobile-cta__summary-label">
-            Estimated total
-            <span className="dtb-co-mobile-cta__summary-status">{primaryState}</span>
-          </span>
-          <strong className="dtb-co-mobile-cta__summary-amount">{amount}</strong>
-          <ChevronRight className="dtb-co-mobile-cta__summary-chevron" size={17} aria-hidden="true" />
-        </button>
-
-        <p className="dtb-co-mobile-cta__compact-context" aria-live="polite">{compactContext}</p>
+        <div className="dtb-co-mobile-cta__handle" aria-hidden="true" />
 
         <div className="dtb-co-mobile-cta__context" aria-label="Checkout total context" role="group">
           <span>
@@ -78,6 +61,25 @@ export function CheckoutMobileActionSheet({
             {taxCopy}
           </span>
         </div>
+
+        <button
+          type="button"
+          className="dtb-co-mobile-cta__summary-toggle"
+          aria-expanded={expanded}
+          aria-controls="dtb-co-mobile-cta-totals"
+          onClick={() => setExpanded((value) => !value)}
+        >
+          <span className="dtb-co-mobile-cta__summary-label">
+            Order summary
+            <span className="dtb-co-mobile-cta__summary-status">{primaryState}</span>
+          </span>
+          <strong className="dtb-co-mobile-cta__summary-amount">{amount}</strong>
+          {expanded ? (
+            <ChevronDown className="dtb-co-mobile-cta__summary-chevron" size={17} aria-hidden="true" />
+          ) : (
+            <ChevronUp className="dtb-co-mobile-cta__summary-chevron" size={17} aria-hidden="true" />
+          )}
+        </button>
 
         <div
           id="dtb-co-mobile-cta-totals"
@@ -93,18 +95,32 @@ export function CheckoutMobileActionSheet({
           <MoneyRow label="Est. total" value={amount} final />
         </div>
 
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={processing || !canSubmitCheckout}
-          aria-disabled={!canSubmitCheckout || processing}
-          data-ready={canSubmitCheckout ? 'true' : 'false'}
-          className="dtb-co-btn-primary dtb-co-btn-primary--wide"
-          aria-label={payButtonAriaLabel}
-        >
-          {processing ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : null}
-          {payButtonLabel}
-        </button>
+        <div className="dtb-co-mobile-cta__nav" aria-label="Checkout mobile navigation">
+          <button
+            type="button"
+            className="dtb-co-mobile-cta__summary-pill"
+            aria-expanded={expanded}
+            aria-controls="dtb-co-mobile-cta-totals"
+            onClick={() => setExpanded((value) => !value)}
+          >
+            <ReceiptText size={16} aria-hidden="true" />
+            Total
+            {expanded ? <ChevronDown size={15} aria-hidden="true" /> : <ChevronUp size={15} aria-hidden="true" />}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={processing || !canSubmitCheckout}
+            aria-disabled={!canSubmitCheckout || processing}
+            data-ready={canSubmitCheckout ? 'true' : 'false'}
+            className="dtb-co-btn-primary dtb-co-btn-primary--wide"
+            aria-label={payButtonAriaLabel}
+          >
+            {processing ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : null}
+            {payButtonLabel}
+          </button>
+        </div>
 
         <div className="dtb-co-mobile-cta__trust">
           <ShieldCheck size={13} aria-hidden="true" />

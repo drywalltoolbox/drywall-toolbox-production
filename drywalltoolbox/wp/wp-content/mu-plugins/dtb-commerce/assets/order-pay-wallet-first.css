@@ -65,22 +65,6 @@
 	grid-column: auto !important;
 }
 
-.dtb-op-card .wc_payment_method.dtb-op-provider-paypal {
-	order: 3 !important;
-	grid-column: 1 / -1 !important;
-}
-
-.dtb-op-card .wc_payment_method.dtb-op-provider-paypal > label {
-	justify-content: center !important;
-	min-height: 54px !important;
-	background: #fde59a !important;
-	color: #003087 !important;
-}
-
-.dtb-op-card .wc_payment_method.dtb-op-provider-paypal.dtb-op-payment-active > label {
-	background: #fedc69 !important;
-}
-
 .dtb-op-card .wc_payment_method.dtb-op-gateway-card {
 	order: 20 !important;
 	grid-column: 1 / -1 !important;
@@ -179,7 +163,6 @@
 		font-size: 14px !important;
 	}
 
-	.dtb-op-card .wc_payment_method.dtb-op-provider-paypal,
 	.dtb-op-card .wc_payment_method.dtb-op-gateway-card,
 	.dtb-op-card .wc_payment_method.dtb-op-payment-has-detail.dtb-op-payment-active {
 		grid-column: 1 / -1 !important;
@@ -233,7 +216,6 @@
 	.dtb-op-card .wc_payment_method,
 	.dtb-op-card .wc_payment_method.dtb-op-provider-apple,
 	.dtb-op-card .wc_payment_method.dtb-op-provider-google,
-	.dtb-op-card .wc_payment_method.dtb-op-provider-paypal,
 	.dtb-op-card .wc_payment_method.dtb-op-gateway-card,
 	.dtb-op-card .wc_payment_method.dtb-op-gateway-paylater {
 		grid-column: 1 / -1 !important;

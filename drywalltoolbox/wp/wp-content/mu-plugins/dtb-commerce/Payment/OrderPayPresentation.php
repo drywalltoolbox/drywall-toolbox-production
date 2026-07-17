@@ -184,7 +184,6 @@ final class DTB_OrderPayPresentation {
 			'dtb-payment-runtime-order-summary-polish',
 			'dtb-payment-runtime-pay-later-layout',
 			'dtb-payment-runtime-summary-title-cleanup',
-			'dtb-payment-runtime-mobile-fixes',
 		];
 
 		foreach ( $handles as $handle ) {

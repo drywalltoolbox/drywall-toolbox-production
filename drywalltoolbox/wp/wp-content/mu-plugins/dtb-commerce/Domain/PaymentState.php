@@ -14,7 +14,7 @@ function dtb_checkout_handoff_has_gateway_reference( WC_Order $order ): bool {
 	if ( '' !== trim( (string) $order->get_transaction_id() ) ) {
 		return true;
 	}
-	foreach ( [ '_wcpay_intent_id', '_wcpay_charge_id', '_stripe_intent_id', '_stripe_charge_id', '_payment_intent_id', '_paypal_order_id', '_paypal_transaction_id' ] as $meta_key ) {
+	foreach ( [ '_stripe_intent_id', '_stripe_charge_id', '_stripe_source_id', '_payment_intent_id' ] as $meta_key ) {
 		if ( '' !== trim( (string) $order->get_meta( $meta_key, true ) ) ) {
 			return true;
 		}

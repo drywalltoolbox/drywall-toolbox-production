@@ -12,14 +12,13 @@
  */
 
 const PROVIDER_LABELS = {
-  paypal: 'PayPal',
   'apple-pay': 'Apple Pay',
   'google-pay': 'Google Pay',
   visa: 'card',
   mastercard: 'card',
   amex: 'card',
 };
-const STATIC_LOGO_ORDER = ['apple-pay', 'google-pay', 'paypal', 'visa', 'mastercard', 'amex'];
+const STATIC_LOGO_ORDER = ['apple-pay', 'google-pay', 'visa', 'mastercard', 'amex'];
 
 const MOBILE_QUERY = '(max-width: 1023px)';
 const MOBILE_CLONE_SELECTOR = '.dtb-co-payment-section--mobile-reference';

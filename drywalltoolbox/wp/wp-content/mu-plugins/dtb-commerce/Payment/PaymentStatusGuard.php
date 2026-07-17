@@ -33,7 +33,7 @@ if ( ! function_exists( 'dtb_checkout_status_guard_is_gateway_payment_post' ) ) 
 	 * Detect the active native WooCommerce order-pay submit.
 	 *
 	 * Status normalization is a pre-payment/recovery guard. During the gateway
-	 * POST, WooPayments owns status and payment meta writes, and those writes can
+	 * POST, the configured payment provider owns status and payment meta writes, and those writes can
 	 * occur across multiple WooCommerce hooks before all gateway references are
 	 * visible on the order.
 	 */
@@ -123,7 +123,7 @@ if ( ! function_exists( 'dtb_checkout_status_guard_normalize_order' ) ) {
 	/**
 	 * Keep online-payment orders pending/payable until the native payment form is
 	 * completed. WooCommerce order-pay refuses orders that are already processing,
-	 * which prevents WooPayments test/live payments from loading.
+	 * which prevents provider-owned test/live payments from loading.
 	 */
 	function dtb_checkout_status_guard_normalize_order( int $order_id ): void {
 		static $running = false;
@@ -204,4 +204,3 @@ add_filter(
 	PHP_INT_MAX,
 	2
 );
-

@@ -10,13 +10,12 @@
 const STORAGE_KEY = 'dtb_checkout_visual_payment_method_v1';
 const DEFAULT_VISUAL_METHOD = 'card';
 
-const VISUAL_METHODS = new Set(['card', 'paypal', 'apple-pay', 'google-pay']);
+const VISUAL_METHODS = new Set(['card', 'apple-pay', 'google-pay']);
 
 const GATEWAY_PRIORITY = Object.freeze({
-  card: ['woocommerce_payments', 'stripe', 'woo_native'],
-  paypal: ['ppcp-gateway', 'paypal'],
-  'apple-pay': ['woocommerce_payments', 'stripe'],
-  'google-pay': ['woocommerce_payments', 'stripe'],
+  card: ['stripe_upm', 'stripe_cc', 'stripe'],
+  'apple-pay': ['stripe_applepay', 'stripe_upm', 'stripe_cc', 'stripe'],
+  'google-pay': ['stripe_googlepay', 'stripe_upm', 'stripe_cc', 'stripe'],
 });
 
 const WALLET_ALIASES = Object.freeze({
@@ -93,9 +92,9 @@ function methodHasWalletCapability(method, visualMethod) {
   if (explicitSupport) return true;
 
   const id = normalizeId(method.id);
-  // WooPayments/Stripe own wallet eligibility checks. Selecting these gateways is
+  // WooCommerce payment providers own wallet eligibility checks. Selecting these gateways is
   // safe because actual Apple Pay / Google Pay availability is still provider-owned.
-  return id === 'woocommerce_payments' || id === 'stripe';
+  return id === 'stripe' || id.startsWith('stripe_');
 }
 
 export function rememberCheckoutCapabilities(capabilities) {

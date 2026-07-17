@@ -1,7 +1,7 @@
 /**
  * DTB Global wp-admin Skin
  *
- * Visual-only modernization for core WordPress, WooCommerce, WooPayments, and
+ * Visual-only modernization for core WordPress, WooCommerce, payment-provider, and
  * DTB admin pages. This file must not hide controls, replace markup, change
  * workflow behavior, or depend on DTB-only page structures.
  */

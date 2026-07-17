@@ -4,8 +4,9 @@
  * WooCommerce payment collection is not a React route. The order-pay URL must
  * stay in the public WordPress/WooCommerce checkout URL space so the native
  * gateway template, gateway scripts, nonces, cookies, and payment callbacks are
- * resolved by WordPress. Staging React builds may live under /staging/{id}, but
- * order-pay must not be prefixed with that SPA base path.
+ * resolved by WordPress. Staging checkout orders carry a server-issued
+ * /staging/{id} prefix so HostGator routes the order-pay request into
+ * WordPress instead of the production SPA shell.
  *
  * Also normalises legacy /wp/checkout/order-pay/ and /order-pay/ variants that
  * some WooCommerce configurations emit.
@@ -26,13 +27,6 @@ export function normalizePaymentUrl( value ) {
 	} catch {
 		return value.trim();
 	}
-
-	// Native payment pages are served by WordPress/WooCommerce, not by the React
-	// SPA. Strip staging prefixes that earlier builds added so the browser lands
-	// on the canonical root payment runtime instead of the staging SPA namespace,
-	// which WordPress canonical redirects can collapse to /checkout/ and lose the
-	// order-pay endpoint context.
-	url.pathname = url.pathname.replace( /^\/staging\/\d+(?=\/checkout(?:\/order-pay)?(?:\/|$))/, '' );
 
 	// Normalise legacy /wp/checkout/order-pay/ → /checkout/order-pay/.
 	if ( /^\/wp\/checkout\/order-pay(?:\/|$)/.test( url.pathname ) ) {

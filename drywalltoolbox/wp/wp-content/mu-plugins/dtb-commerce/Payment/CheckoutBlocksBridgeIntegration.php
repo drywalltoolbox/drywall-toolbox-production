@@ -3,7 +3,7 @@
  * DTB Checkout Blocks bridge integration guard.
  *
  * DTB must not register a fake payment gateway for same-shell checkout. Official
- * provider-owned gateway integrations such as WooPayments, Stripe, or PayPal
+ * provider-owned Stripe gateway integrations
  * must register their own Checkout Blocks payment methods and own card fields,
  * wallets, tokenization, callbacks, and payment processing.
  *

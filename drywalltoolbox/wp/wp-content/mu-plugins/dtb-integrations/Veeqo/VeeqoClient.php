@@ -639,9 +639,6 @@ function dtb_veeqo_resolve_sellable_id_for_sku( string $sku, WC_Product $product
 function dtb_veeqo_payment_type_for_order( WC_Order $order ): string {
 	$method = sanitize_key( (string) $order->get_payment_method() );
 
-	if ( str_contains( $method, 'paypal' ) ) {
-		return 'paypal';
-	}
 	if ( str_contains( $method, 'bacs' ) || str_contains( $method, 'bank' ) ) {
 		return 'bank_transfer';
 	}

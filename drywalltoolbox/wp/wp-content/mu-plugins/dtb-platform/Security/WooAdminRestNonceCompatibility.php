@@ -3,7 +3,7 @@
  * WooCommerce admin REST nonce compatibility.
  *
  * Narrowly restores authenticated same-site wp-admin GET requests for official
- * WooCommerce/WooPayments payment-admin read endpoints when a stale wp_rest
+ * WooCommerce payment-admin read endpoints when a stale wp_rest
  * nonce causes WordPress REST cookie auth to fail.
  *
  * Disabled by default. Enable only with DTB_ENABLE_WOO_ADMIN_REST_NONCE_COMPAT
@@ -63,8 +63,6 @@ function dtb_woo_admin_rest_nonce_compat_route_allowed( string $route, string $m
 		'/wc/v3/payments/settings',
 		'/wc/v3/payments/pm-promotions',
 		'/wc/v3/payments/deposits/overview-all',
-		'/wc/v3/wc_paypal/settings',
-		'/wc/v3/wc_paypal/payment',
 		'/newfold-ctb/v2/ctb/url',
 	];
 

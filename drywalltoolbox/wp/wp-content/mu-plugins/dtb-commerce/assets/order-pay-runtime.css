@@ -1,5 +1,5 @@
 /*
- * DTB order-pay runtime: official WooCommerce/WooPayments payment shell.
+ * DTB order-pay runtime: official WooCommerce/payment-provider shell.
  * WooCommerce and gateway plugins retain ownership of fields, iframes, nonces,
  * tokenization, callbacks, submit handling, and payment lifecycle state.
  */
@@ -306,7 +306,6 @@ body.dtb-order-pay-runtime textarea {
 
 .dtb-op-card .wc_payment_method.dtb-op-gateway-express { order: 10; }
 .dtb-op-card .wc_payment_method.dtb-op-gateway-paylater { order: 30; }
-.dtb-op-card .wc_payment_method.dtb-op-provider-paypal,
 .dtb-op-card .wc_payment_method.dtb-op-gateway-card,
 .dtb-op-card .wc_payment_method.dtb-op-payment-active.dtb-op-payment-has-detail { grid-column: 1 / -1 !important; }
 
@@ -422,7 +421,6 @@ body.dtb-order-pay-runtime textarea {
 .dtb-op-card .payment_box fieldset,
 .dtb-op-card .payment_box form,
 .dtb-op-card .payment_box .wc-payment-form,
-.dtb-op-card .payment_box .wcpay-upe-form,
 .dtb-op-card .payment_box .woocommerce-SavedPaymentMethods { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; border: 0 !important; background: transparent !important; }
 .dtb-op-card .payment_box .form-row,
 .dtb-op-card .payment_box .woocommerce-SavedPaymentMethods li { margin: 0 0 10px !important; padding: 0 !important; }
@@ -439,10 +437,7 @@ body.dtb-order-pay-runtime textarea {
 .dtb-op-card .payment_box .input-text:focus { border-color: rgba(37, 99, 235, .7) !important; box-shadow: 0 0 0 3px rgba(37, 99, 235, .14) !important; outline: 0 !important; }
 .dtb-op-card .payment_box iframe,
 .dtb-op-card .payment_box .StripeElement,
-.dtb-op-card .payment_box .__PrivateStripeElement,
-.dtb-op-card .payment_box .wcpay-upe-element,
-.dtb-op-card .payment_box .wcpay-payment-element,
-.dtb-op-card .payment_box #wcpay-card-element { width: 100% !important; max-width: 100% !important; min-width: 0 !important; }
+.dtb-op-card .payment_box .__PrivateStripeElement { width: 100% !important; max-width: 100% !important; min-width: 0 !important; }
 
 .dtb-op-card table.shop_table {
 	grid-area: summary !important;
@@ -532,7 +527,6 @@ body.dtb-op-payment-submitting .dtb-op-card #place_order { cursor: wait !importa
 	.dtb-op-card .wc_payment_method,
 	.dtb-op-card .wc_payment_method.dtb-op-gateway-express,
 	.dtb-op-card .wc_payment_method.dtb-op-gateway-paylater { border-radius: 16px !important; }
-	.dtb-op-card .wc_payment_method.dtb-op-provider-paypal,
 	.dtb-op-card .wc_payment_method.dtb-op-gateway-card,
 	.dtb-op-card .wc_payment_method.dtb-op-payment-active.dtb-op-payment-has-detail { grid-column: 1 / -1 !important; }
 	.dtb-op-card .wc_payment_method > label { min-height: 50px !important; padding: 9px 38px 9px 12px !important; border-radius: 16px !important; font-size: 13px !important; }

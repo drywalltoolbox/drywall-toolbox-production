@@ -10,11 +10,11 @@ defined( 'ABSPATH' ) || exit;
 
 if ( ! function_exists( 'dtb_wc_payment_runtime_configure_wallets' ) ) {
 	/**
- * Retain a stable hook name for compatibility while WooCommerce owns gateway configuration.
+	 * Retain a stable hook name for compatibility while WooCommerce owns gateway configuration.
 	 *
-	 * Newer WooPayments releases can expose wallets as payment-method rows,
- * Payment capability data is read from the configured native gateway at quote time.
-*/
+	 * Newer provider gateways can expose wallets as payment-method rows,
+	 * Payment capability data is read from the configured native gateway at quote time.
+	 */
 	function dtb_wc_payment_runtime_configure_wallets(): void {
 		// Payment methods and wallet availability are configured in WooCommerce; this runtime never mutates gateway options.
 		return;
@@ -131,7 +131,7 @@ if ( ! function_exists( 'dtb_wc_payment_runtime_order_key_matches_request' ) ) {
 
 if ( ! function_exists( 'dtb_wc_payment_runtime_has_gateway_reference' ) ) {
 	function dtb_wc_payment_runtime_has_gateway_reference( WC_Order $order ): bool {
-		foreach ( [ '_transaction_id', '_wcpay_intent_id', '_wcpay_charge_id', '_stripe_intent_id', '_stripe_charge_id', '_payment_intent_id', '_paypal_order_id', '_paypal_transaction_id' ] as $meta_key ) {
+		foreach ( [ '_transaction_id', '_stripe_intent_id', '_stripe_charge_id', '_stripe_source_id', '_payment_intent_id' ] as $meta_key ) {
 			if ( '' !== trim( (string) $order->get_meta( $meta_key, true ) ) ) {
 				return true;
 			}
@@ -539,8 +539,8 @@ add_action(
 			remove_action( 'wp_enqueue_scripts', 'dtb_enqueue_react_app' );
 		}
 
-		$asset_dir = __DIR__ . '/dtb-platform/assets';
-		$asset_url = ( defined( 'WPMU_PLUGIN_URL' ) ? WPMU_PLUGIN_URL : content_url( '/mu-plugins' ) ) . '/dtb-platform/assets';
+		$asset_dir = dirname( __DIR__ ) . '/assets';
+		$asset_url = ( defined( 'WPMU_PLUGIN_URL' ) ? WPMU_PLUGIN_URL : content_url( '/mu-plugins' ) ) . '/dtb-commerce/assets';
 
 		$style_path = $asset_dir . '/payment-runtime.css';
 		if ( file_exists( $style_path ) ) {
@@ -585,7 +585,7 @@ add_filter(
 
 		dtb_wc_payment_runtime_prepare_current_order();
 
-		$runtime_template = __DIR__ . '/dtb-platform/Templates/WooPaymentRuntime.php';
+		$runtime_template = dirname( __DIR__ ) . '/Templates/WooOrderPayRuntime.php';
 		return file_exists( $runtime_template ) ? $runtime_template : $template;
 	},
 	1000

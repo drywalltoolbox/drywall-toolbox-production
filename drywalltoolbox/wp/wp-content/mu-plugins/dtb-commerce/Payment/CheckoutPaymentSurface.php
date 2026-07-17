@@ -3,7 +3,7 @@
  * Signed same-origin payment surface for the DTB checkout shell.
  *
  * This document is intentionally owned by WordPress/WooCommerce so the native
- * WooCommerce Checkout Block and WooPayments execute inside their supported
+ * WooCommerce Checkout Block and the configured payment provider execute inside their supported
  * runtime instead of being cloned into the external React tree.
  *
  * @package drywall-toolbox
@@ -54,11 +54,11 @@ final class DTB_CheckoutPaymentSurface {
 	 *
 	 * The client bridge rewrites Store API checkout submissions to the existing-order
 	 * endpoint before they leave the iframe. This hook is the defensive backstop: if
-	 * WooCommerce Blocks or WooPayments bypasses window.fetch/apiFetch and attempts a
+	 * WooCommerce Blocks or the payment provider bypasses window.fetch/apiFetch and attempts a
 	 * bare /wc/store/v1/checkout POST from the verified payment-surface session, DTB
 	 * internally re-dispatches that request to /wc/store/v1/checkout/{order_id} with
 	 * the signed order key. This prevents ambient-cart order creation while preserving
-	 * WooCommerce/WooPayments ownership of payment execution.
+		 * WooCommerce/provider ownership of payment execution.
 	 */
 	public static function route_payment_surface_checkout_request( $result, WP_REST_Server $server, WP_REST_Request $request ) {
 		if ( null !== $result || 'POST' !== strtoupper( (string) $request->get_method() ) ) {

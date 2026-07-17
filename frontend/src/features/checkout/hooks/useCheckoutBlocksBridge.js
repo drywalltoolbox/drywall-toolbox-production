@@ -5,8 +5,7 @@
  * This file intentionally does not register payment methods or render card
  * fields. WooCommerce/payment providers must own those pieces through the
  * official Blocks registry. DTB only decides whether the current runtime is
- * eligible to activate a same-shell payment step or must keep order-pay as the
- * fallback.
+ * eligible to activate a same-shell payment step.
  */
 
 function registryFromWindow() {
@@ -31,9 +30,9 @@ export function normalizePaymentArchitecture( capabilities = {} ) {
 	const registeredMethods = Array.isArray( architecture.registered_methods ) ? architecture.registered_methods : [];
 	return {
 		contractVersion: String( architecture.contract_version || '' ),
-		primaryFlow: String( architecture.primary_flow || 'classic_order_pay_fallback' ),
+		primaryFlow: String( architecture.primary_flow || 'stripe_same_shell' ),
 		sameShellSupported: architecture.same_shell_supported === true,
-		fallbackOrderPayEnabled: architecture.fallback_order_pay_enabled !== false,
+		fallbackOrderPayEnabled: false,
 		serverBlocksReady: architecture.server_blocks_ready === true,
 		serverSameShellReady: architecture.server_same_shell_ready === true,
 		clientBridgeEnabled: architecture.client_bridge_enabled === true,
@@ -75,7 +74,7 @@ export function resolveCheckoutBlocksBridge( capabilities = {} ) {
 		clientRegistryReady,
 		eligibleMethods,
 		sameShellReady,
-		fallbackRequired: !sameShellReady && architecture.fallbackOrderPayEnabled,
+		fallbackRequired: false,
 		reason,
 	};
 }

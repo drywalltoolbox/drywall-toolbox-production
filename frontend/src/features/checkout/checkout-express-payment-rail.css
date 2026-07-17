@@ -87,16 +87,10 @@
 }
 
 .dtb-checkout .dtb-checkout-payment-logo--apple-pay,
-.dtb-checkout .dtb-checkout-payment-logo--google-pay,
-.dtb-checkout .dtb-checkout-payment-logo--paypal {
+.dtb-checkout .dtb-checkout-payment-logo--google-pay {
   height: 52px;
   border-radius: 14px;
   padding: 12px 18px;
-}
-
-.dtb-checkout .dtb-checkout-payment-logo--paypal {
-  border-color: rgba(245, 158, 11, .42);
-  background: #ffc439;
 }
 
 .dtb-checkout .dtb-checkout-payment-logo--apple-pay {
@@ -198,15 +192,10 @@
     border-radius: 17px;
   }
 
-  .dtb-checkout .dtb-checkout-payment-logo--paypal,
   .dtb-checkout .dtb-checkout-payment-logo--apple-pay,
   .dtb-checkout .dtb-checkout-payment-logo--google-pay {
     height: 58px;
     border-radius: 18px;
-  }
-
-  .dtb-checkout .dtb-checkout-payment-logo--paypal {
-    grid-column: span 1;
   }
 
   .dtb-checkout .dtb-checkout-payment-logo--visa,
@@ -235,7 +224,6 @@
     padding-inline: 12px;
   }
 
-  .dtb-checkout .dtb-checkout-payment-logo--paypal,
   .dtb-checkout .dtb-checkout-payment-logo--apple-pay,
   .dtb-checkout .dtb-checkout-payment-logo--google-pay {
     height: 54px;

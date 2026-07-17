@@ -188,7 +188,6 @@ function dtb_admin_security_auth_diagnostics(): array {
 	$sample_routes = [
 		'/wc-admin/settings/payments/providers',
 		'/wc-analytics/admin/notes',
-		'/wc/v3/wc_paypal/settings',
 		'/wp/v2/users/me',
 		'/newfold-ctb/v2/ctb/url',
 		'/dtb/v1/checkout/session',
@@ -350,7 +349,7 @@ function dtb_admin_security_render_cookie_path_notice(): void {
 
 	echo '<div class="notice notice-warning"><p>';
 	echo esc_html__(
-		'Drywall Toolbox detected that WordPress auth cookie paths may not cover root /wp-json REST requests. WooCommerce Admin and WooPayments require native WordPress auth cookies plus X-WP-Nonce; configure COOKIEPATH, SITECOOKIEPATH, and ADMIN_COOKIE_PATH to "/" in wp-config.php for this root-mounted /wp-admin and /wp-json topology.',
+		'Drywall Toolbox detected that WordPress auth cookie paths may not cover root /wp-json REST requests. WooCommerce Admin and payment provider settings require native WordPress auth cookies plus X-WP-Nonce; configure COOKIEPATH, SITECOOKIEPATH, and ADMIN_COOKIE_PATH to "/" in wp-config.php for this root-mounted /wp-admin and /wp-json topology.',
 		'drywall-toolbox'
 	);
 	echo '</p></div>';

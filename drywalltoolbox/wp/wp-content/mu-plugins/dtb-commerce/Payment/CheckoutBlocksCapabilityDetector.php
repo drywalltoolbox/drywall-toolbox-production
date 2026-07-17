@@ -4,7 +4,7 @@
  *
  * Reports whether the current WooCommerce runtime can support DTB's signed,
  * same-origin payment surface. The surface renders the native WooCommerce
- * Checkout Block document so WooPayments stays inside its supported provider
+ * Checkout Block document so the configured payment provider stays inside its supported
  * context; DTB does not clone registered Blocks nodes into the React SPA.
  *
  * @package drywall-toolbox
@@ -15,22 +15,25 @@ defined( 'ABSPATH' ) || exit;
 final class DTB_CheckoutBlocksCapabilityDetector {
 	/** Known active payment method ids that commonly provide Checkout Blocks integrations. */
 	private const KNOWN_BLOCKS_GATEWAY_IDS = [
-		'woocommerce_payments',
-		'woopayments',
 		'stripe',
-		'ppcp-gateway',
-		'ppec_paypal',
-		'paypal',
-		'affirm',
-		'klarna_payments',
-		'klarna',
+		'stripe_cc',
+		'stripe_upm',
+		'stripe_applepay',
+		'stripe_googlepay',
+		'stripe_link',
+		'stripe_affirm',
+		'stripe_klarna',
+		'stripe_afterpay',
 	];
 
 	/** Gateway ids that DTB can route through the native payment surface. */
 	private const SURFACE_PROVIDER_GATEWAY_IDS = [
-		'woocommerce_payments',
-		'woopayments',
 		'stripe',
+		'stripe_cc',
+		'stripe_upm',
+		'stripe_applepay',
+		'stripe_googlepay',
+		'stripe_link',
 	];
 
 	/** Return the current payment architecture capability envelope. */
@@ -108,8 +111,8 @@ final class DTB_CheckoutBlocksCapabilityDetector {
 			'client_provider_adapter'      => '',
 			'methods'                      => $methods,
 			'notes'                        => [
-				'DTB same-page payment uses a signed same-origin WordPress payment surface, not cloned WooPayments Blocks nodes in React.',
-				'WooPayments controls, wallet sheets, tokenization, and payment execution remain inside the native WooCommerce Checkout Block document.',
+				'DTB same-page payment uses a signed same-origin WordPress payment surface, not cloned provider Blocks nodes in React.',
+				'Gateway controls, wallet sheets, tokenization, and payment execution remain inside the native WooCommerce Checkout Block document.',
 			],
 		];
 	}
@@ -217,6 +220,9 @@ final class DTB_CheckoutBlocksCapabilityDetector {
 	/** Return whether an enabled method id is a known Blocks-capable candidate. */
 	private static function is_known_blocks_candidate( string $method_id ): bool {
 		$normalized = strtolower( $method_id );
+		if ( str_starts_with( $normalized, 'stripe_' ) ) {
+			return true;
+		}
 		foreach ( self::KNOWN_BLOCKS_GATEWAY_IDS as $candidate ) {
 			if ( $normalized === $candidate || false !== strpos( $normalized, $candidate ) ) {
 				return true;
@@ -229,7 +235,7 @@ final class DTB_CheckoutBlocksCapabilityDetector {
 	private static function has_surface_provider_method( array $methods ): bool {
 		foreach ( $methods as $method ) {
 			$id = strtolower( (string) ( $method['id'] ?? '' ) );
-			if ( '' === $id || ! in_array( $id, self::SURFACE_PROVIDER_GATEWAY_IDS, true ) ) {
+			if ( '' === $id || ( ! in_array( $id, self::SURFACE_PROVIDER_GATEWAY_IDS, true ) && ! str_starts_with( $id, 'stripe_' ) ) ) {
 				continue;
 			}
 			if ( ! empty( $method['is_manual'] ) ) {

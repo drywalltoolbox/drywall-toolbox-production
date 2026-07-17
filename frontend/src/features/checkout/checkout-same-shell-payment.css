@@ -2,7 +2,7 @@
  * frontend/src/features/checkout/checkout-same-shell-payment.css
  *
  * Same-shell payment surface status and iframe shell. Provider-owned payment
- * controls are rendered by the native WooCommerce/WooPayments document loaded
+ * controls are rendered by the native WooCommerce/payment-provider document loaded
  * inside the same-origin frame.
  */
 

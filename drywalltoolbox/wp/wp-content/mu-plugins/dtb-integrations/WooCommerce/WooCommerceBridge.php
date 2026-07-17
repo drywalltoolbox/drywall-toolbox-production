@@ -4,7 +4,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Plugin Name: DTB WooCommerce Configuration
  * Description: WooCommerce loopback, REST URL rewriting, wizard suppression,
- *              checkout customisation, PayPal appearance, webhook
+ *              checkout customisation and webhook
  *              auto-registration, and server-side validation.
  * Version: 8.0.0
  * Author: Drywall Toolbox
@@ -702,31 +702,7 @@ add_filter( 'woocommerce_checkout_fields', function ( $fields ) {
 
 
 // ============================================================================
-// SECTION 10 — PAYPAL EXPRESS BUTTON PLACEMENT
-//
-// Moves PayPal Payments Express buttons (Apple Pay / Google Pay / PayPal)
-// above the checkout form fields to match the headless React layout.
-// Requires the WooCommerce PayPal Payments plugin.
-// Guard: only registers if the PayPal Payments plugin class exists.
-// ============================================================================
-if ( class_exists( 'WooCommerce\PayPalCommerce\PluginModule' ) ) {
-	add_action( 'woocommerce_before_checkout_form', function () {
-		do_action( 'woocommerce_paypal_payments_checkout_button_renderer_hook' );
-	}, 5 );
-
-	add_filter( 'woocommerce_paypal_payments_button_style', function ( $style ) {
-		return array_merge( $style, [
-			'layout' => 'vertical',
-			'shape'  => 'rect',
-			'color'  => 'black',
-			'label'  => 'pay',
-		] );
-	} );
-}
-
-
-// ============================================================================
-// SECTION 11 — SERVER-SIDE CHECKOUT VALIDATION
+// SECTION 10 — SERVER-SIDE CHECKOUT VALIDATION
 //
 // Runs after WooCommerce's own validation. Complements client-side checks
 // in the React frontend. Disposable email domain list should be expanded in

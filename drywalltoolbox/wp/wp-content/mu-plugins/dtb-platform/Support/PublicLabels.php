@@ -3,7 +3,7 @@
  * Customer-facing label normalization.
  *
  * Prevents backend implementation identifiers such as dtb_veeqo_rates:standard,
- * woocommerce_payments, or woo_native from appearing in customer emails, order
+ * stripe_cc, stripe_upm, or woo_native from appearing in customer emails, order
  * totals, and public order views.
  *
  * @package drywall-toolbox
@@ -80,11 +80,13 @@ if ( ! function_exists( 'dtb_public_payment_method_label' ) ) {
 
 		$normalized = strtolower( trim( $raw ) );
 		$known      = [
-			'woocommerce_payments' => 'Secure Card Payment',
 			'woo_native'           => 'Secure Card Payment',
 			'stripe'               => 'Secure Card Payment',
-			'ppcp-gateway'         => 'Secure Online Payment',
-			'paypal'               => 'Secure Online Payment',
+			'stripe_cc'            => 'Secure Card Payment',
+			'stripe_upm'           => 'Secure Card Payment',
+			'stripe_applepay'      => 'Apple Pay',
+			'stripe_googlepay'     => 'Google Pay',
+			'stripe_link'          => 'Link',
 		];
 
 		return $known[ $normalized ] ?? $raw;
@@ -109,8 +111,13 @@ if ( ! function_exists( 'dtb_public_replace_internal_tokens' ) ) {
 			'dtb_veeqo_rates_intl_express',
 			'dtb_veeqo_rates:repair_standard',
 			'dtb_veeqo_rates_repair_standard',
-			'woocommerce_payments',
 			'woo_native',
+			'stripe',
+			'stripe_cc',
+			'stripe_upm',
+			'stripe_applepay',
+			'stripe_googlepay',
+			'stripe_link',
 		];
 
 		$clean = $value;

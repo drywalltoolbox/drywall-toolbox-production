@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: DTB Payment BNPL and Cart Finalization
- * Description: Enables WooPayments BNPL methods, keeps BNPL order-pay flows payable until gateway authorization, and clears the headless cart after successful payment.
+ * Description: Keeps provider BNPL order-pay flows payable until gateway authorization and clears the headless cart after successful payment.
  * Version: 1.0.2
  * Author: Drywall Toolbox
  */
@@ -15,14 +15,14 @@ if ( ! function_exists( 'dtb_payment_bnpl_method_ids' ) ) {
 	}
 }
 
-if ( ! function_exists( 'dtb_payment_bnpl_configure_wcpay' ) ) {
+if ( ! function_exists( 'dtb_payment_bnpl_configure_provider' ) ) {
 	/** Payment availability remains owned by the configured WooCommerce gateway. */
-	function dtb_payment_bnpl_configure_wcpay(): void {
+	function dtb_payment_bnpl_configure_provider(): void {
 		return;
 	}
 }
 
-add_action( 'woocommerce_init', 'dtb_payment_bnpl_configure_wcpay', 120 );
+add_action( 'woocommerce_init', 'dtb_payment_bnpl_configure_provider', 120 );
 
 if ( ! function_exists( 'dtb_payment_bnpl_is_dtb_checkout_order' ) ) {
 	function dtb_payment_bnpl_is_dtb_checkout_order( WC_Order $order ): bool {
@@ -39,7 +39,7 @@ if ( ! function_exists( 'dtb_payment_bnpl_has_gateway_reference' ) ) {
 			return true;
 		}
 
-		foreach ( [ '_wcpay_intent_id', '_wcpay_charge_id', '_stripe_intent_id', '_stripe_charge_id', '_payment_intent_id', '_paypal_order_id', '_paypal_transaction_id' ] as $meta_key ) {
+		foreach ( [ '_stripe_intent_id', '_stripe_charge_id', '_stripe_source_id', '_payment_intent_id' ] as $meta_key ) {
 			if ( '' !== trim( (string) $order->get_meta( $meta_key, true ) ) ) {
 				return true;
 			}

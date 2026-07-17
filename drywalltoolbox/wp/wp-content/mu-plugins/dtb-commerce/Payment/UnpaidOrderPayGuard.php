@@ -12,7 +12,7 @@ if ( ! function_exists( 'dtb_unpaid_order_pay_guard_is_gateway_payment_post' ) )
 	/**
 	 * Detect the active native WooCommerce order-pay submit.
 	 *
-	 * WooPayments owns status and payment-reference writes during this POST.
+	 * The configured payment provider owns status and payment-reference writes during this POST.
 	 * The unpaid-order guard should run before/after payment processing, not in
 	 * the middle of the gateway's capture/update sequence.
 	 */
@@ -49,7 +49,7 @@ if ( ! function_exists( 'dtb_unpaid_order_pay_guard_is_native_unpaid_order' ) ) 
 			return false;
 		}
 
-		foreach ( [ '_transaction_id', '_wcpay_intent_id', '_wcpay_charge_id', '_stripe_intent_id', '_stripe_charge_id', '_payment_intent_id', '_paypal_order_id', '_paypal_transaction_id' ] as $meta_key ) {
+		foreach ( [ '_transaction_id', '_stripe_intent_id', '_stripe_charge_id', '_stripe_source_id', '_payment_intent_id' ] as $meta_key ) {
 			if ( '' !== trim( (string) $order->get_meta( $meta_key, true ) ) ) {
 				return false;
 			}
@@ -119,4 +119,3 @@ foreach ( [
 		2
 	);
 }
-
