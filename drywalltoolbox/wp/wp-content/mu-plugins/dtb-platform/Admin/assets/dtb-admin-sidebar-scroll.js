@@ -4,6 +4,8 @@
   var menu;
   var menuWrap;
   var activeItem = null;
+  var hoverTimer = null;
+  var HOVER_INTENT_DELAY = 180;
 
   function isDesktopAdminMenu() {
     return window.innerWidth >= 783 &&
@@ -66,6 +68,13 @@
     if (activeItem === item) activeItem = null;
   }
 
+  function clearHoverTimer() {
+    if (!hoverTimer) return;
+
+    window.clearTimeout(hoverTimer);
+    hoverTimer = null;
+  }
+
   function closestMenuItem(target) {
     while (target && target !== menu) {
       if (target.tagName === 'LI' && target.classList.contains('wp-has-submenu')) {
@@ -85,8 +94,14 @@
     menu.addEventListener('mouseover', function (event) {
       var item = closestMenuItem(event.target);
       if (!item || item === activeItem) return;
+      if (item.contains(event.relatedTarget)) return;
       if (activeItem) clearFlyout(activeItem);
-      positionFlyout(item);
+
+      clearHoverTimer();
+      hoverTimer = window.setTimeout(function () {
+        hoverTimer = null;
+        positionFlyout(item);
+      }, HOVER_INTENT_DELAY);
     });
 
     menu.addEventListener('focusin', function (event) {
@@ -99,6 +114,7 @@
     menu.addEventListener('mouseout', function (event) {
       var item = closestMenuItem(event.target);
       if (!item || item.contains(event.relatedTarget)) return;
+      clearHoverTimer();
       clearFlyout(item);
     });
 

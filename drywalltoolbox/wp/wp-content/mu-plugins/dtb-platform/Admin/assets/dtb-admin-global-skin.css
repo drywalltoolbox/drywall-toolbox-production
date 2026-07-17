@@ -232,6 +232,13 @@ body.dtb-admin-global-skin .woocommerce-button:hover {
 	box-shadow: 0 8px 18px rgba(15, 23, 42, .08);
 }
 
+body.dtb-admin-global-skin.woocommerce_page_wc-settings .woocommerce-layout .components-button:hover,
+body.dtb-admin-global-skin.woocommerce_page_wc-settings .woocommerce-layout .woocommerce-button:hover,
+body.dtb-admin-global-skin.toplevel_page_wc-admin .woocommerce-layout .components-button:hover,
+body.dtb-admin-global-skin.toplevel_page_wc-admin .woocommerce-layout .woocommerce-button:hover {
+	transform: none;
+}
+
 body.dtb-admin-global-skin .button-primary,
 body.dtb-admin-global-skin .components-button.is-primary {
 	border-color: var(--dtb-wp-primary-strong);

@@ -30,13 +30,11 @@
   }
 
   /*
-   * Keep the sidebar scrollable even while hovering submenu-heavy sections.
-   * Earlier rules released #adminmenuwrap overflow on hover, which made long
-   * admin menus unreachable near the bottom of the viewport.
+   * Keep the sidebar scrollable while preserving WordPress' intentional submenu
+   * state. Do not bind this fixed flyout treatment to plain li:hover; that makes
+   * flyouts open while the operator is just scrolling or crossing the sidebar.
    */
-  body.wp-admin:not(.folded) #adminmenu > li.wp-has-submenu:hover > .wp-submenu,
   body.wp-admin:not(.folded) #adminmenu > li.opensub > .wp-submenu,
-  body.wp-admin:not(.folded) #adminmenu > li:hover > .wp-submenu,
   body.wp-admin:not(.folded) #adminmenu > li.dtb-admin-menu-flyout-active > .wp-submenu {
     position: fixed !important;
     top: var(--dtb-admin-flyout-top, 32px) !important;
