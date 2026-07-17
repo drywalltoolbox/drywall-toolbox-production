@@ -313,7 +313,7 @@ Deployment never overwrites:
 - runtime secrets;
 - uncontrolled database dumps.
 
-Order-pay cleanup deployments must remove retired root-level `zz*order-pay*`, `dtb-wc-payment-runtime*`, `dtb-checkout-payment-status-guard.php`, and legacy DTB payment-webhook files from the live `mu-plugins/` directory. The clean runtime state is deletion, not coexistence.
+Order-pay cleanup deployments must remove retired root-level `zz*order-pay*`, `dtb-wc-payment-runtime*`, `dtb-checkout-payment-status-guard.php`, `dtb-checkout-customer-association.php`, and legacy DTB payment-webhook files from the live `mu-plugins/` directory. The clean runtime state is deletion, not coexistence.
 
 ## 13. Validation
 
