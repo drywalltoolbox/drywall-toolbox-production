@@ -21,7 +21,7 @@ final class DTB_PaymentPluginsStripeIntegration {
 		'stripe_upm',
 		'stripe_applepay',
 		'stripe_googlepay',
-		'stripe_link',
+		'stripe_link_checkout',
 		'stripe_payment_request',
 		'stripe_affirm',
 		'stripe_afterpay',

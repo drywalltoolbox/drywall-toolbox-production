@@ -86,7 +86,7 @@ if ( ! function_exists( 'dtb_public_payment_method_label' ) ) {
 			'stripe_upm'           => 'Secure Card Payment',
 			'stripe_applepay'      => 'Apple Pay',
 			'stripe_googlepay'     => 'Google Pay',
-			'stripe_link'          => 'Link',
+			'stripe_link_checkout' => 'Link',
 		];
 
 		return $known[ $normalized ] ?? $raw;
@@ -117,7 +117,7 @@ if ( ! function_exists( 'dtb_public_replace_internal_tokens' ) ) {
 			'stripe_upm',
 			'stripe_applepay',
 			'stripe_googlepay',
-			'stripe_link',
+			'stripe_link_checkout',
 		];
 
 		$clean = $value;

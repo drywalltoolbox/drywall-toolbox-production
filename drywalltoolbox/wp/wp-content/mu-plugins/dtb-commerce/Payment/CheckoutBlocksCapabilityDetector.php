@@ -20,7 +20,7 @@ final class DTB_CheckoutBlocksCapabilityDetector {
 		'stripe_upm',
 		'stripe_applepay',
 		'stripe_googlepay',
-		'stripe_link',
+		'stripe_link_checkout',
 		'stripe_affirm',
 		'stripe_klarna',
 		'stripe_afterpay',
@@ -33,7 +33,7 @@ final class DTB_CheckoutBlocksCapabilityDetector {
 		'stripe_upm',
 		'stripe_applepay',
 		'stripe_googlepay',
-		'stripe_link',
+		'stripe_link_checkout',
 	];
 
 	/** Return the current payment architecture capability envelope. */
