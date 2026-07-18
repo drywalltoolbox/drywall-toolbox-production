@@ -2,43 +2,49 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 
 import { navigateDocument } from '../../utils/documentNavigation.js';
 
-const MOBILE_QUERY = '(max-width: 767px)';
-const SURFACE_MESSAGE_TYPE = 'dtb:express-checkout-surface';
+const SURFACE_MESSAGE_TYPE = 'dtb:woopayments-express-surface';
 const SURFACE_TIMEOUT_MS = 8000;
-const MIN_SURFACE_HEIGHT = 52;
-const MAX_SURFACE_HEIGHT = 128;
+const MIN_SURFACE_HEIGHT = 54;
+const MAX_SURFACE_HEIGHT = 180;
 
-function useMobileViewport() {
-  const [isMobile, setIsMobile] = useState(() => (
-    typeof window !== 'undefined' ? window.matchMedia(MOBILE_QUERY).matches : false
-  ));
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-    const mediaQuery = window.matchMedia(MOBILE_QUERY);
-    const update = (event) => setIsMobile(event.matches);
-    mediaQuery.addEventListener?.('change', update);
-    return () => mediaQuery.removeEventListener?.('change', update);
-  }, []);
-
-  return isMobile;
+function getBaseCheckoutPath() {
+  const basePath = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
+  return `${basePath}/checkout/`;
 }
 
-function getCartSignature(cartItems) {
+function getCartSignature(cartItems = []) {
   return cartItems
     .map((item) => `${String(item?.cartKey || item?.key || item?.id || '')}:${Number(item?.quantity) || 1}`)
     .join('|');
 }
 
-function buildSurfaceUrl(surfaceId, cartSignature) {
+function getNumericId(...values) {
+  for (const value of values) {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed) && parsed > 0) return parsed;
+  }
+  return null;
+}
+
+function buildSurfaceUrl({ context, surfaceId, cartSignature, productId, variationId, quantity }) {
   if (typeof window === 'undefined') return '';
-  const basePath = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
-  const checkoutPath = `${basePath}/checkout/`.replace(/\/{2,}/g, '/');
-  const url = new URL(checkoutPath, window.location.origin);
-  url.searchParams.set('dtb_woo_checkout', '1');
-  url.searchParams.set('dtb_express_surface', '1');
+
+  const url = new URL(getBaseCheckoutPath(), window.location.origin);
+  url.searchParams.set('dtb_wcpay_express_surface', '1');
   url.searchParams.set('dtb_surface_id', surfaceId);
-  url.searchParams.set('dtb_cart_version', cartSignature || 'empty');
+  url.searchParams.set('dtb_context', context);
+
+  if (context === 'product') {
+    if (!productId) return '';
+    url.searchParams.set('product_id', String(productId));
+    if (variationId) url.searchParams.set('variation_id', String(variationId));
+    url.searchParams.set('quantity', String(Math.max(1, Number(quantity) || 1)));
+    url.searchParams.set('dtb_product_version', `${productId}:${variationId || 'parent'}:${Math.max(1, Number(quantity) || 1)}`);
+  } else {
+    if (!cartSignature) return '';
+    url.searchParams.set('dtb_cart_version', cartSignature);
+  }
+
   return url.toString();
 }
 
@@ -46,24 +52,47 @@ function isOrderConfirmationUrl(url) {
   return /\/checkout\/order-received\//i.test(url.pathname);
 }
 
-export default function MobileExpressCheckout({
+export default function WooPaymentsExpressCheckout({
+  context = 'cart',
   cartItems = [],
-  variant = 'card',
+  product = null,
+  selectedVariation = null,
+  quantity = 1,
+  disabled = false,
+  className = '',
   onAvailabilityChange,
 }) {
-  const isMobile = useMobileViewport();
   const iframeRef = useRef(null);
   const timeoutRef = useRef(null);
   const reactId = useId();
   const surfaceId = useMemo(
-    () => `dtb-express-${reactId.replace(/[^a-z0-9_-]/gi, '') || 'surface'}`,
+    () => `dtb-wcpay-${reactId.replace(/[^a-z0-9_-]/gi, '') || 'surface'}`,
     [reactId]
   );
+  const normalizedContext = context === 'drawer' || context === 'product' ? context : 'cart';
   const cartSignature = useMemo(() => getCartSignature(cartItems), [cartItems]);
-  const surfaceUrl = useMemo(
-    () => (isMobile && cartItems.length > 0 ? buildSurfaceUrl(surfaceId, cartSignature) : ''),
-    [cartItems.length, cartSignature, isMobile, surfaceId]
+  const productId = useMemo(
+    () => getNumericId(product?.id, selectedVariation?.parent_id),
+    [product?.id, selectedVariation?.parent_id]
   );
+  const variationId = useMemo(
+    () => getNumericId(selectedVariation?.id),
+    [selectedVariation?.id]
+  );
+  const normalizedQuantity = Math.max(1, Number(quantity) || 1);
+  const productSignature = productId ? `${productId}:${variationId || 'parent'}:${normalizedQuantity}` : '';
+
+  const surfaceUrl = useMemo(() => {
+    if (disabled) return '';
+    return buildSurfaceUrl({
+      context: normalizedContext,
+      surfaceId,
+      cartSignature,
+      productId,
+      variationId,
+      quantity: normalizedQuantity,
+    });
+  }, [cartSignature, disabled, normalizedContext, normalizedQuantity, productId, surfaceId, variationId]);
 
   const [surfaceState, setSurfaceState] = useState({
     url: '',
@@ -135,35 +164,43 @@ export default function MobileExpressCheckout({
         navigateDocument(currentUrl.toString(), { replace: true });
       }
     } catch {
-      // Stripe-controlled cross-origin authentication can temporarily make the
-      // frame location unreadable. The official gateway owns that flow.
+      // Provider-owned wallet authentication can temporarily navigate cross-origin.
+      // DTB does not inspect or control that payment flow.
     }
   };
 
   if (!surfaceUrl || status === 'unavailable') return null;
 
+  const classes = [
+    'dtb-wcpay-express',
+    `dtb-wcpay-express--${normalizedContext}`,
+    className,
+  ].filter(Boolean).join(' ');
+
   return (
     <section
-      className={`dtb-mobile-express dtb-mobile-express--${variant}`}
+      className={classes}
       data-status={status}
+      data-cart-version={normalizedContext === 'product' ? undefined : cartSignature}
+      data-product-version={normalizedContext === 'product' ? productSignature : undefined}
       aria-label="Express checkout"
       aria-busy={status === 'loading' ? 'true' : 'false'}
     >
-      <div className="dtb-mobile-express__heading-row">
-        <h3 className="dtb-mobile-express__heading">Express checkout</h3>
-        <span className="dtb-mobile-express__secure">Secure wallets</span>
+      <div className="dtb-wcpay-express__heading-row">
+        <h3 className="dtb-wcpay-express__heading">Express checkout</h3>
+        <span className="dtb-wcpay-express__secure">WooPayments</span>
       </div>
 
-      <div className="dtb-mobile-express__surface-shell">
-        <div className="dtb-mobile-express__skeleton" aria-hidden="true">
+      <div className="dtb-wcpay-express__surface-shell">
+        <div className="dtb-wcpay-express__skeleton" aria-hidden="true">
           <span />
           <span />
         </div>
         <iframe
           ref={iframeRef}
-          className="dtb-mobile-express__frame"
+          className="dtb-wcpay-express__frame"
           src={surfaceUrl}
-          title="Apple Pay and Google Pay express checkout"
+          title="WooPayments express checkout"
           allow="payment *"
           loading="eager"
           referrerPolicy="same-origin"
@@ -176,10 +213,10 @@ export default function MobileExpressCheckout({
       <p className="sr-only" aria-live="polite">
         {status === 'ready'
           ? 'Eligible express checkout methods are ready.'
-          : 'Checking Apple Pay and Google Pay availability.'}
+          : 'Checking express checkout availability.'}
       </p>
 
-      <div className="dtb-mobile-express__divider" aria-hidden="true">
+      <div className="dtb-wcpay-express__divider" aria-hidden="true">
         <span />
         <strong>or</strong>
         <span />

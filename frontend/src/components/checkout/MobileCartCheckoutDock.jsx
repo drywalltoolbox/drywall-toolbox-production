@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Lock } from 'lucide-react';
 
-import MobileExpressCheckout from './MobileExpressCheckout.jsx';
+import WooPaymentsExpressCheckout from '../payments/WooPaymentsExpressCheckout.jsx';
 
 const CHECKOUT_HREF = `${(process.env.PUBLIC_URL || '').replace(/\/+$/, '')}/checkout`;
 
@@ -14,40 +14,32 @@ function getSubtotal(cartItems) {
 }
 
 export default function MobileCartCheckoutDock({ isOpen, onClose, cartItems = [] }) {
-  const [walletAvailable, setWalletAvailable] = useState(null);
   const subtotal = useMemo(() => getSubtotal(cartItems), [cartItems]);
 
   if (!isOpen || cartItems.length === 0) return null;
 
-  const walletState = walletAvailable === true
-    ? 'ready'
-    : walletAvailable === false
-      ? 'unavailable'
-      : 'loading';
-
   return (
     <aside
-      className="dtb-mobile-cart-checkout-dock hidden"
-      data-wallet-state={walletState}
-      aria-label="Cart checkout options"
+      className="dtb-cart-express-dock"
+      aria-label="Cart express checkout options"
     >
-      <MobileExpressCheckout
+      <WooPaymentsExpressCheckout
+        context="drawer"
         cartItems={cartItems}
-        variant="drawer"
-        onAvailabilityChange={setWalletAvailable}
+        className="dtb-cart-express-dock__express"
       />
 
-      <div className="dtb-mobile-cart-checkout-dock__total-row">
+      <div className="dtb-cart-express-dock__total-row">
         <div>
-          <span className="dtb-mobile-cart-checkout-dock__label">Subtotal</span>
-          <span className="dtb-mobile-cart-checkout-dock__hint">Shipping and tax at checkout</span>
+          <span className="dtb-cart-express-dock__label">Subtotal</span>
+          <span className="dtb-cart-express-dock__hint">Shipping and tax at checkout</span>
         </div>
         <strong>${subtotal.toFixed(2)}</strong>
       </div>
 
       <a
         href={CHECKOUT_HREF}
-        className="dtb-mobile-cart-checkout-dock__checkout"
+        className="dtb-cart-express-dock__checkout"
         onClick={onClose}
       >
         <Lock size={15} strokeWidth={2.4} aria-hidden="true" />
@@ -57,7 +49,7 @@ export default function MobileCartCheckoutDock({ isOpen, onClose, cartItems = []
 
       <Link
         to="/cart"
-        className="dtb-mobile-cart-checkout-dock__view-cart"
+        className="dtb-cart-express-dock__view-cart"
         onClick={onClose}
       >
         View full cart

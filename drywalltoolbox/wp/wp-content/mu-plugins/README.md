@@ -2,7 +2,7 @@
 
 # Drywall Toolbox MU-Plugin Architecture and Runtime Contract
 
-Last verified against source: 2026-07-17.
+Last verified against source: 2026-07-18.
 
 This document is the canonical operational map for:
 
@@ -62,7 +62,7 @@ Canonical module order:
 - WooCommerce Store API cart extension data;
 - toolset/order-line metadata persistence;
 - WooCommerce Checkout Block handoff and DTB-branded checkout shell/styling;
-- official WooCommerce Stripe gateway readiness notices and checkout-order metadata tagging;
+- WooPayments readiness notices, same-origin provider-owned express checkout surfaces, and checkout-order metadata tagging;
 - order-type and order-admin query services;
 - branded WooCommerce email integration;
 - commerce-facing order REST/admin surfaces.
@@ -126,11 +126,11 @@ React SPA
 Checkout is the intentional exception to React rendering ownership:
 
 ```text
-React cart/cart sidebar
-  -> full-document navigation to /checkout/
+React cart/cart sidebar/product surfaces
+  -> provider-owned WooPayments express iframe where eligible, or full-document navigation to /checkout/
   -> .htaccess routes /checkout/ to WordPress
   -> WooCommerce Checkout Block
-  -> official WooCommerce Stripe Payment Gateway
+  -> WooPayments
   -> WooCommerce order/payment lifecycle
   -> DTB order observation and downstream queues
 ```
