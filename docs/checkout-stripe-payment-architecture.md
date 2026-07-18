@@ -142,6 +142,8 @@ The public root `.htaccess` must route these to WordPress before the React SPA c
 
 This prevents React from rendering the checkout route and prevents API calls from returning SPA HTML instead of JSON.
 
+`GET /wp-json/dtb/v1/checkout/capabilities` is a public, read-only DTB compatibility route owned by `DTB_WooNativeStripeCheckout`. It returns non-secret checkout contract metadata and enabled official WooCommerce Stripe gateway identifiers for legacy storefront capability probes. It does not create orders, render payment fields, expose gateway secrets, or replace WooCommerce Checkout Block as the checkout authority.
+
 ## Deployment checklist
 
 Before production use:
