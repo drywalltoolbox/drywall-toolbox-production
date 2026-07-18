@@ -62,11 +62,11 @@ body.dtb-woo-native-checkout * {
   max-width: 760px;
   margin: 18px 0 0;
   color: rgba(226, 232, 240, 0.92);
-  font-size: clamp(0.98rem, 1.4vw, 1.12rem);
-  line-height: 1.65;
+  font-size: clamp(0.96rem, 1.25vw, 1.1rem);
+  line-height: 1.68;
 }
 
-.dtb-woo-checkout-trust {
+.dtb-checkout-hero__card {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -108,7 +108,7 @@ body.dtb-woo-native-checkout * {
   display: flex;
   align-items: center;
   margin: 0;
-  padding: 15px 20px;
+  padding: 17px 22px;
   list-style: none;
 }
 
@@ -134,11 +134,16 @@ body.dtb-woo-native-checkout * {
   font-weight: 950;
 }
 
+.dtb-woo-checkout-progress__step.is-complete .dtb-woo-checkout-progress__circle,
 .dtb-woo-checkout-progress__step.is-active .dtb-woo-checkout-progress__circle {
   border-color: #2563eb;
   background: #2563eb;
   color: #fff;
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.dtb-woo-checkout-progress__step.is-pending .dtb-woo-checkout-progress__circle {
+  background: #f8fafc;
 }
 
 .dtb-woo-checkout-progress__info {
@@ -162,10 +167,12 @@ body.dtb-woo-native-checkout * {
   font-weight: 950;
 }
 
+.dtb-woo-checkout-progress__step.is-complete .dtb-woo-checkout-progress__info span,
 .dtb-woo-checkout-progress__step.is-active .dtb-woo-checkout-progress__info span {
   color: #2563eb;
 }
 
+.dtb-woo-checkout-progress__step.is-complete .dtb-woo-checkout-progress__info strong,
 .dtb-woo-checkout-progress__step.is-active .dtb-woo-checkout-progress__info strong {
   color: #0f172a;
 }
@@ -186,9 +193,17 @@ body.dtb-woo-native-checkout * {
   inset: 0;
   width: 100%;
   border-radius: inherit;
-  background: #2563eb;
+  background: linear-gradient(90deg, #2563eb, #0ea5e9);
   content: '';
   opacity: 0.62;
+}
+
+.dtb-woo-checkout-progress__connector.is-complete::after {
+  width: 100%;
+}
+
+.dtb-woo-checkout-progress__connector.is-active::after {
+  width: 65%;
 }
 
 .dtb-woo-checkout-progress__summary {
@@ -273,6 +288,27 @@ body.dtb-woo-native-checkout * {
   color: #0f172a;
   font-weight: 950;
   letter-spacing: -0.025em;
+}
+
+.dtb-woo-checkout-card .wc-block-components-express-payment {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #dbeafe;
+  background:
+    linear-gradient(180deg, rgba(239, 246, 255, 0.82), rgba(255, 255, 255, 0.96));
+  padding: clamp(16px, 2vw, 22px);
+  box-shadow: 0 12px 34px rgba(37, 99, 235, 0.08);
+}
+
+.dtb-woo-checkout-card .wc-block-components-express-payment::before {
+  display: block;
+  margin-bottom: 10px;
+  color: #2563eb;
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  content: 'Express checkout options';
 }
 
 .dtb-woo-checkout-card input,
@@ -382,9 +418,33 @@ body.dtb-woo-native-checkout * {
     padding: 14px 0 calc(36px + env(safe-area-inset-bottom, 0px));
   }
 
-  .dtb-woo-checkout-hero,
+  .dtb-checkout-topbar {
+    flex-direction: column;
+    align-items: stretch;
+    margin: 0;
+    padding:
+      14px
+      max(14px, env(safe-area-inset-right, 0px))
+      12px
+      max(14px, env(safe-area-inset-left, 0px));
+  }
+
+  .dtb-checkout-topbar__actions {
+    justify-content: flex-start;
+  }
+
+  .dtb-checkout-topbar__actions span,
+  .dtb-checkout-topbar__actions a {
+    min-height: 30px;
+    font-size: 0.66rem;
+  }
+
+  .dtb-checkout-hero,
+  .dtb-woo-checkout-progress,
   .dtb-woo-checkout-card {
-    border-radius: 22px;
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
   }
 
   .dtb-woo-checkout-hero__content {
@@ -400,8 +460,27 @@ body.dtb-woo-native-checkout * {
     justify-content: center;
   }
 
-  .dtb-woo-checkout-progress {
-    border-radius: 18px;
+  .dtb-checkout-hero h1 {
+    font-size: clamp(2.05rem, 10vw, 3.15rem);
+  }
+
+  .dtb-checkout-hero__card {
+    display: none;
+  }
+
+  .dtb-woo-checkout-progress__steps {
+    overflow-x: auto;
+    padding: 14px;
+    scroll-snap-type: x proximity;
+  }
+
+  .dtb-woo-checkout-progress__step {
+    scroll-snap-align: start;
+  }
+
+  .dtb-woo-checkout-progress__connector {
+    min-width: 18px;
+    margin-inline: 8px;
   }
 
   .dtb-woo-checkout-progress__steps {
@@ -414,13 +493,15 @@ body.dtb-woo-native-checkout * {
   }
 
   .dtb-woo-checkout-progress__info {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
+    min-width: 86px;
+  }
+
+  .dtb-woo-checkout-progress__info span {
+    font-size: 0.58rem;
+  }
+
+  .dtb-woo-checkout-progress__info strong {
+    font-size: 0.72rem;
   }
 
   .dtb-woo-checkout-progress__summary {
@@ -444,7 +525,10 @@ body.dtb-woo-native-checkout * {
 
 @media (prefers-reduced-motion: reduce) {
   .dtb-woo-checkout-progress__circle,
-  .dtb-woo-checkout-progress__track span {
-    transition: none;
+  .dtb-woo-checkout-progress__track span,
+  .dtb-woo-checkout-card button,
+  .dtb-woo-checkout-card .button,
+  .dtb-woo-checkout-card .wc-block-components-button {
+    transition: none !important;
   }
 }
