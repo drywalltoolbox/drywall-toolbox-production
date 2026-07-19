@@ -39,11 +39,6 @@ ErrorDocument 511 __DTB_PUBLIC_URL__/errors/511.html
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Native WooCommerce purchasing surface. Keep this ahead of the SPA fallback
-  # so the official Stripe gateway owns eligible product-page wallet buttons.
-  RewriteRule ^products/([A-Za-z0-9_-]+)/variations/([0-9]+)/?$ /wp/index.php?post_type=product&name=$1&variation_id=$2 [QSA,L]
-  RewriteRule ^products/(?!brands/?$)([A-Za-z0-9_-]+)/?$ /wp/index.php?post_type=product&name=$1 [QSA,L]
-
   # Serve uploaded static assets directly.
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d

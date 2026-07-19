@@ -23,7 +23,7 @@ import { getBrandLogo } from '../../utils/brandAssets.js';
 import { toProductDetailDTO } from '../../utils/catalogDtoAdapters.js';
 import { BRAND_TO_SLUG, BRAND_ALIASES } from '../../utils/catalogUrlState.js';
 import { getSchematicLinkForProduct } from '../../data/schematicMappings';
-import { getWooProductUrl } from '../../utils/checkoutUrl.js';
+import { getWooCheckoutUrl } from '../../utils/checkoutUrl.js';
 import { navigateDocument } from '../../utils/documentNavigation.js';
 import DOMPurify from 'dompurify';
 
@@ -820,17 +820,22 @@ export default function ProductDetail({
     }
   };
 
-  const handleExpressCheckout = () => {
-    if (!canAddToCart || !product?.slug || isExpressCheckoutPending) return;
-    setAddToCartError('');
-    setIsExpressCheckoutPending(true);
-    navigateDocument(
-      getWooProductUrl(product.slug, {
-        variationId: selectedVariation?.id,
-        quantity,
-      }),
-      { transition: 'checkout' }
-    );
+  const handleExpressCheckout = async () => {
+    if (!canAddToCart || isExpressCheckoutPending) return;
+    const productToAdd = selectedVariation ? effectiveProduct : product;
+
+    try {
+      setAddToCartError('');
+      setIsExpressCheckoutPending(true);
+      await addToCart(productToAdd, quantity);
+      navigateDocument(getWooCheckoutUrl(), { transition: 'checkout' });
+    } catch (err) {
+      setIsExpressCheckoutPending(false);
+      setAddToCartError(
+        err?.message ||
+        'Unable to prepare checkout. Please check your selection and try again.'
+      );
+    }
   };
   const clearAddToCartError = () => {
     if (addToCartError) setAddToCartError('');
@@ -965,7 +970,7 @@ export default function ProductDetail({
                 onAddToCart={handleAddToCart}
                 onExpressCheckout={handleExpressCheckout}
                 isExpressCheckoutPending={isExpressCheckoutPending}
-                canExpressCheckout={canAddToCart && Boolean(product?.slug)}
+                canExpressCheckout={canAddToCart}
                 canAddToCart={canAddToCart}
                 isOutOfStock={isOutOfStock}
                 needsVariation={needsVariation}

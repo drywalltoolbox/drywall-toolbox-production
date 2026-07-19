@@ -60,11 +60,11 @@ React owns cart interaction only.
 - The cart drawer, compatibility route, and native checkout document share one fail-open loading presentation so intermediate document rewrites do not expose blank or partially hydrated checkout frames.
 - The React `/checkout` route is compatibility-only. It performs a document handoff and has a one-shot direct WordPress fallback if a routing error serves the SPA at `/checkout/`.
 
-React catalog browsing, product quick-view modals, full cart, and mini-cart do not mount Stripe/Woo payment iframes or fabricate express wallet buttons.
+React product pages, product quick-view modals, full cart, and mini-cart do not mount Stripe/Woo payment iframes or fabricate express wallet buttons.
 
-Full `/products/{slug}/` and `/products/{slug}/variations/{variationId}/` purchasing routes are explicit native WooCommerce exceptions to the headless React theme. `DTB_WooNativeProductRuntime` preserves the native Woo product form and official Stripe extension assets, while `WooNativeProductPage.php` supplies branded document chrome without rendering or cloning payment controls.
+The quick-view and full-product **Buy now** action first awaits the authoritative Woo Store API cart mutation for the selected product or variation and quantity, then performs the normal full-document checkout handoff. Eligible Apple Pay, Google Pay, Link, and other provider controls render only inside the official Woo checkout runtime.
 
-The React quick-view modal offers a neutral **View express payment options** handoff. It carries only the selected variation and quantity to the native product route; it does not mutate the cart or create a payment. WooCommerce validates the selection and owns the eventual cart mutation. The official Stripe extension renders eligible Apple Pay, Google Pay, Link, Amazon Pay, Klarna, or other enabled methods through its supported product-page Express Checkout Element.
+The official Stripe extension can render express buttons on a conventional WooCommerce single-product template, but it does not expose a supported independent mount contract for a headless React modal. Adding Stripe's standalone Express Checkout Element would require DTB-owned server-side Stripe Checkout Session or PaymentIntent orchestration and would create a second payment authority, so that integration is not approved while the official Woo gateway owns storefront payments.
 
 ## Official Stripe gateway identity
 
@@ -187,7 +187,6 @@ Configure the official extension through WooCommerce settings. Before live accep
 3. verify test/live mode explicitly;
 4. enable only intended payment methods;
 5. verify Stripe webhook status for both test and live modes as applicable;
-6. enable the Stripe express-checkout **Product page** location if product-page methods are desired;
 6. verify HTTPS across the entire site;
 7. verify payment-method domain registration and Apple Pay domain association when wallets are enabled;
 8. disable competing storefront card/wallet authorities;

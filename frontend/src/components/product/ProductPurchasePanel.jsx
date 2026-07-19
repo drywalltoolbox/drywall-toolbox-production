@@ -75,11 +75,11 @@ export default function ProductPurchasePanel({
       >
         <LockKeyhole size={15} aria-hidden="true" />
         <span aria-live="polite">
-          {isExpressCheckoutPending ? 'Opening secure payment options…' : 'View express payment options'}
+          {isExpressCheckoutPending ? 'Preparing secure checkout…' : 'Buy now'}
         </span>
       </button>
       <p className="dtb-pdp-express-checkout__note">
-        Apple Pay, Google Pay, Link, and other eligible methods appear on the secure product page.
+        Eligible express payment methods are shown securely at checkout.
       </p>
     </div>
   );

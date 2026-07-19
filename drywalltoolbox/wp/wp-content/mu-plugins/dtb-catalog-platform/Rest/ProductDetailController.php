@@ -17,6 +17,8 @@ defined( 'ABSPATH' ) || exit;
 
 final class DTB_ProductDetailController {
 
+	private const RELATED_PRODUCT_LIMIT = 4;
+
 	public static function register_routes(): void {
 		register_rest_route( 'dtb/v1', '/catalog/products/(?P<slug>[a-zA-Z0-9_-]+)/detail', [
 			'methods'             => 'GET',
@@ -78,11 +80,13 @@ final class DTB_ProductDetailController {
 		$variation_diagnostics = method_exists( 'DTB_VariationReadModelService', 'get_last_diagnostics' )
 			? DTB_VariationReadModelService::get_last_diagnostics()
 			: [ 'available' => false ];
+		$related_products = self::get_related_products( $product['id'] );
 
 		return new WP_REST_Response( [
-			'product'    => $product,
-			'variations' => $variations,
-			'computed'   => [
+			'product'         => $product,
+			'variations'      => $variations,
+			'relatedProducts' => $related_products,
+			'computed'        => [
 				'defaultVariation'      => $default_var,
 				'hasInStockVariation'   => $in_stock_count > 0,
 				'variationCount'        => count( $variations ),
@@ -91,6 +95,47 @@ final class DTB_ProductDetailController {
 				'variationDiagnostics'  => $variation_diagnostics,
 			],
 		], 200 );
+	}
+
+	/**
+	 * Build the public PDP merchandising rail from WooCommerce relationships.
+	 *
+	 * Curated upsells take precedence. WooCommerce's category/tag related-product
+	 * algorithm fills any remaining slots. Products are visibility-checked before
+	 * the single batched catalog read so this public route cannot expose drafts or
+	 * catalog-hidden records.
+	 *
+	 * @return array[]
+	 */
+	private static function get_related_products( int $product_id ): array {
+		$source_product = wc_get_product( $product_id );
+		if ( ! $source_product ) {
+			return [];
+		}
+
+		$candidate_ids = array_merge(
+			$source_product->get_upsell_ids(),
+			wc_get_related_products( $product_id, self::RELATED_PRODUCT_LIMIT * 2, [ $product_id ] )
+		);
+		$candidate_ids = array_values( array_unique( array_filter( array_map( 'absint', $candidate_ids ) ) ) );
+		$visible_ids   = [];
+
+		foreach ( $candidate_ids as $candidate_id ) {
+			$candidate = wc_get_product( $candidate_id );
+			if ( ! $candidate || 'publish' !== get_post_status( $candidate_id ) || ! $candidate->is_visible() ) {
+				continue;
+			}
+
+			$visible_ids[] = $candidate_id;
+			if ( count( $visible_ids ) >= self::RELATED_PRODUCT_LIMIT ) {
+				break;
+			}
+		}
+
+		return array_values( array_map(
+			'dtb_catalog_normalize_product',
+			dtb_catalog_wc_fetch_products_by_ids( $visible_ids )
+		) );
 	}
 
 	/** GET /dtb/v1/catalog/products/:id/variations */

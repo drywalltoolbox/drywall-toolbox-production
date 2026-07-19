@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Package, User, X, ShoppingBag, ChevronRight, AlertCircle, Loader, Wrench, RotateCcw, ChevronDown, LayoutDashboard, Calculator, LifeBuoy, BookOpen } from 'lucide-react';
+import { Home, Package, User, X, ShoppingBag, ChevronRight, AlertCircle, Loader, Wrench, RotateCcw, ChevronDown, LayoutDashboard, Calculator, LifeBuoy, BookOpen, Bell, CheckCheck } from 'lucide-react';
 import { getCustomerOrders } from '../../api/orders.js';
 import { getCustomerRepairs } from '../../api/repairs.js';
 import { getCustomerReturns } from '../../api/returns.js';
@@ -147,7 +147,7 @@ function historyFilterEmptyCopy(filter) {
   return 'Product orders, repair requests, returns, and support tickets will appear here.';
 }
 
-export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
+export default function AccountHubSheet({ isOpen, onClose, user, onLogout, onUnreadCountChange }) {
   const navigate = useNavigate();
   const sheetRef = useRef(null);
   const closeButtonRef = useRef(null);
@@ -162,6 +162,8 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [historyErrors, setHistoryErrors] = useState({ orders: '', repairs: '', returns: '', support: '' });
   const [accountSections, setAccountSections] = useState({ services: false, support: false });
+  const [readNotificationKeys, setReadNotificationKeys] = useState([]);
+  const [notificationReadUserId, setNotificationReadUserId] = useState('');
 
   const showOrdersTab = useCallback((filter = 'product') => {
     setHistoryFilter(filter);
@@ -189,7 +191,7 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
   }, []);
 
   const loadOrders = useCallback(async () => {
-    if (!isOpen || !user) return;
+    if (!user) return;
     setOrdersLoading(true);
     setHistoryErrors({ orders: '', repairs: '', returns: '', support: '' });
 
@@ -202,7 +204,7 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
 
     applyHistoryResults(results);
     setOrdersLoading(false);
-  }, [applyHistoryResults, isOpen, user]);
+  }, [applyHistoryResults, user]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -211,7 +213,7 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
 
   useEffect(() => {
     let cancelled = false;
-    if (!isOpen || !user) return undefined;
+    if (!user) return undefined;
 
     async function load() {
       setOrdersLoading(true);
@@ -229,7 +231,7 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
 
     load();
     return () => { cancelled = true; };
-  }, [applyHistoryResults, isOpen, user]);
+  }, [applyHistoryResults, user]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -274,10 +276,51 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
     return String(preferredName).trim().split(/\s+/)[0] || 'there';
   }, [displayName, user]);
   const activity = useMemo(() => buildAccountActivity({ orders, repairs, returns, supportTickets }), [orders, repairs, returns, supportTickets]);
+  const notifications = useMemo(() => activity.slice(0, 6), [activity]);
+  const notificationKeys = useMemo(() => notifications.map((item) => `${item.id}:${item.status}:${item.sortDate}`), [notifications]);
+  const unreadCount = useMemo(() => notificationReadUserId === String(user?.id || '') ? notificationKeys.filter((key) => !readNotificationKeys.includes(key)).length : 0, [notificationKeys, notificationReadUserId, readNotificationKeys, user?.id]);
   const filteredHistoryActivity = useMemo(() => filterAccountHistory(activity, historyFilter), [activity, historyFilter]);
   const historyErrorText = useMemo(() => Object.values(historyErrors).filter(Boolean).join(' '), [historyErrors]);
   const activeHistoryError = useMemo(() => historyFilterError(historyErrors, historyFilter), [historyErrors, historyFilter]);
   const allHistoryFailed = Boolean(historyErrorText) && activity.length === 0;
+
+  useEffect(() => {
+    if (!user?.id || ordersLoading) return;
+    let cancelled = false;
+    window.queueMicrotask(() => {
+      if (cancelled) return;
+      const storageKey = `dtb-account-notifications-read:${user.id}`;
+      try {
+        const stored = window.localStorage.getItem(storageKey);
+        if (stored === null) {
+          window.localStorage.setItem(storageKey, JSON.stringify(notificationKeys));
+          setReadNotificationKeys(notificationKeys);
+          setNotificationReadUserId(String(user.id));
+          return;
+        }
+        const parsed = JSON.parse(stored);
+        setReadNotificationKeys(Array.isArray(parsed) ? parsed : []);
+      } catch {
+        setReadNotificationKeys([]);
+      }
+      setNotificationReadUserId(String(user.id));
+    });
+    return () => { cancelled = true; };
+  }, [notificationKeys, ordersLoading, user?.id]);
+
+  useEffect(() => {
+    onUnreadCountChange?.(user ? unreadCount : 0);
+  }, [onUnreadCountChange, unreadCount, user]);
+
+  const markAllNotificationsRead = useCallback(() => {
+    if (!user?.id) return;
+    setReadNotificationKeys(notificationKeys);
+    try {
+      window.localStorage.setItem(`dtb-account-notifications-read:${user.id}`, JSON.stringify(notificationKeys));
+    } catch {
+      // Read state is presentation-only; account history remains available without storage.
+    }
+  }, [notificationKeys, user?.id]);
 
   return (
     <div
@@ -318,6 +361,32 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
                 title={`Welcome back, ${firstName}`}
                 Icon={Home}
               />
+              <section className="account-hub__notifications" aria-labelledby="account-hub-notifications-title">
+                <div className="account-hub__notifications-heading">
+                  <div>
+                    <span className="account-hub__notifications-icon" aria-hidden="true"><Bell size={17} /></span>
+                    <h3 id="account-hub-notifications-title">Notifications</h3>
+                    {unreadCount > 0 ? <span className="account-hub__notifications-count">{unreadCount}</span> : null}
+                  </div>
+                  {unreadCount > 0 ? <button type="button" onClick={markAllNotificationsRead} className="account-hub__mark-read"><CheckCheck size={14} /> Mark all read</button> : null}
+                </div>
+                {ordersLoading ? (
+                  <div className="account-hub__notification-state"><Loader size={16} className="animate-spin" /> Checking for updates…</div>
+                ) : notifications.length ? (
+                  <div className="account-hub__notification-list">
+                    {notifications.slice(0, 3).map((item) => {
+                      const itemKey = `${item.id}:${item.status}:${item.sortDate}`;
+                      return (
+                        <Link key={itemKey} to={item.href} onClick={closeSheet} className={`account-hub__notification${readNotificationKeys.includes(itemKey) ? '' : ' is-unread'}`}>
+                          <span className="account-hub__notification-dot" aria-hidden="true" />
+                          <span className="account-hub__notification-copy"><strong>{item.title}</strong><span>{item.statusLabel}{item.detail ? ` · ${item.detail}` : ''}</span></span>
+                          <ChevronRight size={15} aria-hidden="true" />
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : <div className="account-hub__notification-state"><CheckCheck size={17} /> You’re all caught up.</div>}
+              </section>
               <div className="account-hub__home-header">
                 <div className="account-hub__summary-grid">
                   <button type="button" onClick={() => showOrdersTab('product')} className="account-hub__summary-card">

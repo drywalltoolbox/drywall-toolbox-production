@@ -95,6 +95,8 @@ module.exports = (envFlags, argv) => {
   // Now that env vars are loaded, continue with the rest of config
   const isDev  = mode !== 'production';
   const analyze = process.env.ANALYZE === 'true';
+  const useFilesystemCache = isDev || env('DTB_WEBPACK_FS_CACHE') === '1';
+  const emitSourceMaps = isDev || env('DTB_SOURCE_MAPS') === '1';
 
   // Production: assets are served from / at the domain root.
   // Development: serve from / (webpack-dev-server).
@@ -235,18 +237,20 @@ module.exports = (envFlags, argv) => {
   return {
     mode,
     bail: !isDev,
-    cache: {
-      type: 'filesystem',
-      name: cacheName,
-      buildDependencies: {
-        config: [
-          __filename,
-          path.resolve(__dirname, 'babel.config.json'),
-          path.resolve(__dirname, 'postcss.config.js'),
-          path.resolve(__dirname, 'package-lock.json'),
-        ],
-      },
-    },
+    cache: useFilesystemCache
+      ? {
+          type: 'filesystem',
+          name: cacheName,
+          buildDependencies: {
+            config: [
+              __filename,
+              path.resolve(__dirname, 'babel.config.json'),
+              path.resolve(__dirname, 'postcss.config.js'),
+              path.resolve(__dirname, 'package-lock.json'),
+            ],
+          },
+        }
+      : false,
 
     // ─── Entry ─────────────────────────────────────────────────────────────
     entry: './src/main.jsx',
@@ -290,12 +294,14 @@ module.exports = (envFlags, argv) => {
       rules: [
         {
           test:    /\.(js|jsx)$/,
-          exclude: /node_modules/,
+          exclude: [ /node_modules/, /\.generated\.js$/ ],
           use: {
             loader: 'babel-loader',
             options: {
-              cacheDirectory: true,
-              cacheCompression: false,
+              cacheDirectory: isDev
+                ? path.resolve(__dirname, 'node_modules', '.cache', 'babel-loader')
+                : false,
+              cacheCompression: isDev ? false : undefined,
             },
           },
         },
@@ -374,6 +380,8 @@ module.exports = (envFlags, argv) => {
                 // CSV data files — served via WooCommerce REST API, not bundled
                 '**/*.csv',
                 '**/*.bak',
+                // Source/download archives must never inflate deploy payloads.
+                '**/*.zip',
                 '**/products_catalog.csv',
                 '**/products_catalog_*.csv',
                 // Dev/build scripts — never ship to dist
@@ -623,7 +631,11 @@ module.exports = (envFlags, argv) => {
       },
     },
 
-    devtool: isDev ? 'eval-cheap-module-source-map' : 'hidden-source-map',
+    // Production/staging maps are opt-in. Hidden maps are useful only when an
+    // error-monitoring upload consumes them; otherwise they add deploy weight.
+    devtool: isDev
+      ? 'eval-cheap-module-source-map'
+      : (emitSourceMaps ? 'hidden-source-map' : false),
 
     performance: {
       hints:             isDev ? false : 'warning',

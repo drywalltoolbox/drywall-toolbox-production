@@ -10,6 +10,7 @@ export function useCatalogProductDetail(slug) {
       return {
         product: null,
         variations: [],
+        relatedProducts: [],
         computed: null,
       };
     }
@@ -17,9 +18,10 @@ export function useCatalogProductDetail(slug) {
     return toProductDetailDTO({
       product: state.product,
       variations: state.variations,
+      relatedProducts: state.relatedProducts,
       computed: state.computed,
     });
-  }, [state.product, state.variations, state.computed]);
+  }, [state.product, state.variations, state.relatedProducts, state.computed]);
 
   return {
     ...state,

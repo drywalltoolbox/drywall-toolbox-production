@@ -684,15 +684,15 @@
   align-items: center;
   gap: 14px;
   min-height: 116px;
-  margin-bottom: 24px;
+  margin: -20px -18px 24px;
   padding: 22px 64px 22px 22px;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: 0;
   background:
     radial-gradient(circle at 88% 0%, rgba(59, 130, 246, 0.38), transparent 34%),
     linear-gradient(140deg, #071329 0%, #0f2150 52%, #1d4ed8 100%);
   color: #fff;
-  box-shadow: 0 16px 32px rgba(15, 33, 80, 0.2);
+  box-shadow: 0 12px 28px rgba(15, 33, 80, 0.16);
 }
 
 .account-hub__hero-pattern {
@@ -1449,5 +1449,58 @@
   .account-settings__save {
     width: 100%;
   }
+}
+
+/* Account drawer overview notifications and full-bleed section headers. */
+.account-hub__notifications {
+  margin-bottom: 20px;
+  overflow: hidden;
+  border: 1px solid #dbe5f2;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.055);
+}
+
+.account-hub__notifications-heading,
+.account-hub__notifications-heading > div,
+.account-hub__mark-read,
+.account-hub__notification,
+.account-hub__notification-state { display: flex; align-items: center; }
+
+.account-hub__notifications-heading {
+  min-height: 52px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.account-hub__notifications-heading > div { gap: 8px; min-width: 0; }
+.account-hub__notifications-heading h3 { margin: 0; color: #0f172a; font-size: 0.92rem; font-weight: 820; }
+.account-hub__notifications-icon { display: inline-flex; width: 30px; height: 30px; align-items: center; justify-content: center; border-radius: 9px; background: #eff6ff; color: #2563eb; }
+.account-hub__notifications-count { min-width: 20px; padding: 2px 6px; border-radius: 999px; background: #2563eb; color: #fff; font-size: 0.66rem; font-weight: 800; text-align: center; }
+.account-hub__mark-read { gap: 5px; padding: 6px 8px; border: 0; border-radius: 8px; background: transparent; color: #2563eb; font-size: 0.69rem; font-weight: 750; cursor: pointer; }
+.account-hub__mark-read:hover { background: #eff6ff; }
+.account-hub__notification-list { display: grid; }
+.account-hub__notification { position: relative; min-width: 0; gap: 10px; min-height: 58px; padding: 10px 13px; color: #0f172a; text-decoration: none; }
+.account-hub__notification + .account-hub__notification { border-top: 1px solid #f1f5f9; }
+.account-hub__notification:hover { background: #f8fafc; }
+.account-hub__notification.is-unread { background: #f5f9ff; }
+.account-hub__notification-dot { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: #cbd5e1; }
+.account-hub__notification.is-unread .account-hub__notification-dot { background: #2563eb; box-shadow: 0 0 0 4px #dbeafe; }
+.account-hub__notification-copy { display: grid; min-width: 0; flex: 1; gap: 2px; }
+.account-hub__notification-copy strong { overflow: hidden; font-size: 0.78rem; font-weight: 780; text-overflow: ellipsis; white-space: nowrap; }
+.account-hub__notification-copy span { overflow: hidden; color: #64748b; font-size: 0.68rem; text-transform: capitalize; text-overflow: ellipsis; white-space: nowrap; }
+.account-hub__notification > svg { flex: 0 0 auto; color: #94a3b8; }
+.account-hub__notification-state { min-height: 66px; justify-content: center; gap: 7px; padding: 12px; color: #64748b; font-size: 0.75rem; }
+
+@media (min-width: 768px) {
+  .account-hub__hero { margin: -22px -22px 20px; border-radius: 0; }
+}
+
+@media (max-width: 640px) {
+  .account-hub__hero { margin: -24px -16px 20px; border-radius: 0; }
+  .account-hub__notifications-heading { padding-inline: 12px; }
+  .account-hub__mark-read { font-size: 0.65rem; }
 }
 

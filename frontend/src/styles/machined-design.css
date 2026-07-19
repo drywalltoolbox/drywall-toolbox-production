@@ -4052,6 +4052,30 @@ a.header-contact-icon {
     }
 }
 
+.header-account-toggle,
+.header-mobile-account-toggle { position: relative; }
+
+.account-alert-badge {
+  position: absolute;
+  top: -6px;
+  right: -7px;
+  z-index: 2;
+  display: inline-flex;
+  min-width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border: 2px solid #08142b;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 850;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.38);
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
    PRODUCT SKELETON CARDS & STAGGERED FADE-IN
    Industry-standard shimmer placeholders that match the real product grid

@@ -1599,3 +1599,74 @@
   }
 }
 
+/* Full-page merchandising rail. WooCommerce owns relationship selection; React owns presentation. */
+.product-related {
+  margin-top: clamp(2.5rem, 5vw, 4.5rem);
+  padding-top: clamp(1.75rem, 3vw, 2.5rem);
+  border-top: 1px solid #dbe3ef;
+}
+
+.product-related__heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.product-related__eyebrow {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: #2563eb;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.product-related__heading h2 {
+  margin: 0;
+  color: #0b1730;
+  font-size: clamp(1.65rem, 3vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.product-related__browse {
+  flex: 0 0 auto;
+  color: #1d4ed8;
+  font-size: 0.9rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.product-related__browse:hover,
+.product-related__browse:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+}
+
+.product-related__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(0.9rem, 1.6vw, 1.25rem);
+}
+
+@media (max-width: 960px) {
+  .product-related__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .product-related__heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .product-related__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

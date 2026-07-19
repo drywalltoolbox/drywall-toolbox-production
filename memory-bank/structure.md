@@ -138,7 +138,7 @@ Frontend ownership rules:
 
 ## Public route groups
 
-- Storefront: `/`, `/products`, brand/category selectors, and React quick-view product detail. Full `/products/{slug}` and `/products/{slug}/variations/{variationId}` purchasing routes hand off to native WooCommerce.
+- Storefront: `/`, `/products`, brand/category selectors, and React full-product/quick-view product detail.
 - Parts/schematics: `/parts`, `/product/:partNumber`, `/schematics`.
 - Repairs: intake, packages, tracking, status, authenticated dashboard detail.
 - Commerce: `/cart`, `/checkout` handoff, checkout return states, order confirmation and tracking.
@@ -177,9 +177,11 @@ Shared configuration, support primitives, origin/CORS policy, API security, auth
 
 Catalog domain models, Woo/product repositories, normalization, facets, variation read models, product relationships, compatible/universal parts, inventory intelligence, validation, REST controllers, and catalog admin tools.
 
+`GET /wp-json/dtb/v1/catalog/products/{slug}/detail` is the React PDP read model. It returns the normalized product, variation state, computed selection data, and up to four public `relatedProducts`; curated WooCommerce upsells are ordered first and WooCommerce category/tag relationships fill remaining positions through one batched catalog read.
+
 ### `dtb-commerce/`
 
-WooCommerce Store API cart extensions, native Woo checkout and full-product runtime exceptions for the headless theme, checkout capability metadata, official Stripe checkout/product-page presentation boundaries, Woo order tagging, toolset/order-line metadata, order type/query services, branded WooCommerce email integration, and commerce-facing order REST/admin surfaces.
+WooCommerce Store API cart extensions, native Woo checkout runtime exception for the headless theme, checkout capability metadata, official Stripe checkout presentation boundaries, Woo order tagging, toolset/order-line metadata, order type/query services, branded WooCommerce email integration, and commerce-facing order REST/admin surfaces.
 
 ### `dtb-order-platform/`
 

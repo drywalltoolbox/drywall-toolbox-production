@@ -71,7 +71,7 @@ const Home = lazyWithReload(() => import('./pages/Home'));
 const Products = lazyWithReload(() => import('./pages/Products'));
 const Parts = lazyWithReload(() => import('./pages/Parts'));
 const Product = lazyWithReload(() => import('./pages/Product'));
-const ProductDetailPage = lazyWithReload(() => import('./pages/WooNativeProduct'));
+const ProductDetailPage = lazyWithReload(() => import('./pages/ProductDetailPage'));
 const CategoryPage = lazyWithReload(() => import('./pages/CategoryPage'));
 const Schematics = lazyWithReload(() => import('./pages/Schematics'));
 const Repairs = lazyWithReload(() => import('./pages/Repairs'));

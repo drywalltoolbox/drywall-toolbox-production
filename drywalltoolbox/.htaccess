@@ -138,14 +138,6 @@ ErrorDocument 511 /errors/511.html
   RewriteRule ^checkout/?$ wp/index.php?pagename=checkout [QSA,L]
   RewriteRule ^staging/2972/checkout/?$ wp/index.php?pagename=checkout [QSA,L]
 
-  # Native WooCommerce product purchasing surfaces. React retains catalog and
-  # quick-view ownership; these routes preserve Woo's native product form and
-  # official Stripe Express Checkout Element lifecycle.
-  RewriteRule ^products/([A-Za-z0-9_-]+)/variations/([0-9]+)/?$ wp/index.php?post_type=product&name=$1&variation_id=$2 [QSA,L]
-  RewriteRule ^products/(?!brands/?$)([A-Za-z0-9_-]+)/?$ wp/index.php?post_type=product&name=$1 [QSA,L]
-  RewriteRule ^staging/2972/products/([A-Za-z0-9_-]+)/variations/([0-9]+)/?$ wp/index.php?post_type=product&name=$1&variation_id=$2 [QSA,L]
-  RewriteRule ^staging/2972/products/(?!brands/?$)([A-Za-z0-9_-]+)/?$ wp/index.php?post_type=product&name=$1 [QSA,L]
-
   # Canonicalize wp-prefixed WooCommerce payment endpoints back to the public checkout URL.
   RewriteRule ^wp/checkout/order-pay/(.*)$ /checkout/order-pay/$1 [R=302,L,QSA]
   RewriteRule ^wp/order-pay/(.*)$ /checkout/order-pay/$1 [R=302,L,QSA]
@@ -183,6 +175,10 @@ ErrorDocument 511 /errors/511.html
   RewriteRule ^favicon\.ico$ logos/favicon.ico [L]
 
   # WordPress admin/login aliases.
+  # admin-ajax must be internally rewritten before the general wp-admin 302.
+  # Redirecting WooCommerce importer batches changes POST to GET in browsers,
+  # dropping the action, nonce, mapping, file, and current import position.
+  RewriteRule ^wp-admin/admin-ajax\.php$ wp/wp-admin/admin-ajax.php [L,QSA]
   RewriteRule ^wp-admin/?$ /wp/wp-admin/ [R=302,L,QSA]
   RewriteRule ^wp-admin/(.*)$ /wp/wp-admin/$1 [R=302,L,QSA]
   RewriteRule ^wp-login\.php$ /wp/wp-login.php [R=302,L,QSA]

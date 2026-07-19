@@ -891,9 +891,11 @@ function dtb_should_skip_import_images(): bool {
 }
 
 // B1 — Keep batch sizes small when image sideloading is enabled, but allow
-// larger batches when we are in the shared-hosting safe "skip images" mode.
+// moderately larger batches in shared-hosting safe mode. WooCommerce updates
+// its progress bar only after an AJAX batch returns, so ten rows keeps the
+// first visible update responsive without creating excessive request overhead.
 add_filter( 'woocommerce_product_import_batch_size', function (): int {
-	return dtb_should_skip_import_images() ? 25 : 5;
+	return dtb_should_skip_import_images() ? 10 : 5;
 } );
 
 // B1.5 — Prevent Action Scheduler's default queue runner from competing with
@@ -913,12 +915,9 @@ add_action( 'init', function (): void {
 	}
 }, 20 );
 
-// B2 — Enforce execution time and memory limits for each import Ajax call.
-//
-// Two hooks cover both mod_php and CGI/FPM environments:
-//   admin_init  — fires early in the request, before WC processing begins.
-//   woocommerce_product_import_start — fires immediately before the batch
-//     loop, giving a fresh 300 s window from the moment work starts.
+// B2 — Enforce execution time and memory limits early in each import Ajax call.
+// Current WooCommerce runs the batch directly from its importer controller and
+// does not expose the older product-import start/end lifecycle hooks.
 //
 // Server-level limits (max_execution_time, memory_limit, upload_max_filesize)
 // are also set in wp/.user.ini to override the host php.ini on HostGator
@@ -934,14 +933,6 @@ add_action( 'admin_init', function (): void {
 		}
 	}
 } );
-
-// Give each batch a fresh 300 s window right as processing starts.
-add_action( 'woocommerce_product_import_start', function (): void {
-	if ( function_exists( 'set_time_limit' ) ) {
-		set_time_limit( 300 );
-	}
-} );
-
 
 // ============================================================================
 // SECTION 14 — CSV IMPORTER: SKIP-IMAGES MODE

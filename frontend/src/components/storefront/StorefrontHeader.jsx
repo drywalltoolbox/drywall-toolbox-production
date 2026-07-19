@@ -4,7 +4,6 @@ import { useCart } from '../../context/CartContext';
 import { useAuthContext } from '../../auth/AuthContext.js';
 import { ShoppingCart, X, ChevronRight, User, LogIn, UserPlus, LogOut, Phone } from 'lucide-react';
 import LogoWhite from '/logo-white.svg';
-import NotificationsBell from '../shell/NotificationsBell';
 import StorefrontSearchOverlay from './StorefrontSearchOverlay';
 import StorefrontMobileDrawer from './StorefrontMobileDrawer';
 import AccountHubSheet from '../account/AccountHubSheet.jsx';
@@ -89,6 +88,7 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
   const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const [accountHubOpen, setAccountHubOpen] = useState(false);
+  const [accountUnreadCount, setAccountUnreadCount] = useState(0);
   const [desktopSearchOpen, setDesktopSearchOpen] = useState(false);
   const [desktopSearchQuery, setDesktopSearchQuery] = useState('');
   const [desktopSearchResults, setDesktopSearchResults] = useState([]);
@@ -433,6 +433,7 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
                 aria-label={isAuthenticated ? 'Open account hub' : 'Sign in'}
               >
                 <User size={20} />
+                {isAuthenticated && accountUnreadCount > 0 ? <span className="account-alert-badge">{accountUnreadCount > 99 ? '99+' : accountUnreadCount}</span> : null}
               </button>
               <button
                 type="button"
@@ -477,10 +478,9 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
                   </div>
                 )}
               </div>
-              {!isLoading && <div ref={accountDropdownRef} className="header-account"><button onClick={() => { if (isAuthenticated) { setAccountHubOpen(true); } else { setAccountDropdownOpen((o) => !o); } }} aria-label={isAuthenticated ? 'Open account hub' : 'Account menu'} aria-expanded={!isAuthenticated && accountDropdownOpen} className="header-account-toggle header-icon"><User size={20} /></button>{!isAuthenticated && <div className={`header-account-panel${accountDropdownOpen ? ' is-open' : ''}`}><div className="header-account-guest-header"><p className="header-account-guest-title">My Account</p></div><Link to="/login" onClick={() => setAccountDropdownOpen(false)} className="header-account-link header-account-link--strong"><LogIn size={14} />Sign In</Link><div className="header-account-divider header-account-divider--inset" /><div className="header-account-guest-body"><Link to="/register" onClick={() => setAccountDropdownOpen(false)} className="header-account-cta"><UserPlus size={13} />Create Account</Link><p className="header-account-note">No account needed to browse or checkout.</p></div></div>}</div>}
-              {!isLoading && isAuthenticated && <NotificationsBell />}
-              <Link to="/contact" className="header-icon header-contact-icon" aria-label="Contact support" title="Contact Support" onClick={() => setShopDropdownOpen(false)}><Phone size={19} /></Link>
+              {!isLoading && <div ref={accountDropdownRef} className="header-account"><button onClick={() => { if (isAuthenticated) { setAccountHubOpen(true); } else { setAccountDropdownOpen((o) => !o); } }} aria-label={isAuthenticated ? `Open account hub${accountUnreadCount ? `, ${accountUnreadCount} unread notifications` : ''}` : 'Account menu'} aria-expanded={!isAuthenticated && accountDropdownOpen} className="header-account-toggle header-icon"><User size={20} />{isAuthenticated && accountUnreadCount > 0 ? <span className="account-alert-badge">{accountUnreadCount > 99 ? '99+' : accountUnreadCount}</span> : null}</button>{!isAuthenticated && <div className={`header-account-panel${accountDropdownOpen ? ' is-open' : ''}`}><div className="header-account-guest-header"><p className="header-account-guest-title">My Account</p></div><Link to="/login" onClick={() => setAccountDropdownOpen(false)} className="header-account-link header-account-link--strong"><LogIn size={14} />Sign In</Link><div className="header-account-divider header-account-divider--inset" /><div className="header-account-guest-body"><Link to="/register" onClick={() => setAccountDropdownOpen(false)} className="header-account-cta"><UserPlus size={13} />Create Account</Link><p className="header-account-note">No account needed to browse or checkout.</p></div></div>}</div>}
               <div className="cart-area"><button onClick={handleCartToggle} className="cart-toggle header-icon" aria-label="Toggle cart"><ShoppingCart size={20} />{getCartCount() > 0 && <span className="cart-badge">{getCartCount()}</span>}</button></div>
+              <Link to="/contact" className="header-icon header-contact-icon" aria-label="Contact support" title="Contact Support" onClick={() => setShopDropdownOpen(false)}><Phone size={19} /></Link>
             </div>
           </div>
         </div>
@@ -585,6 +585,7 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
         onClose={() => setAccountHubOpen(false)}
         user={user}
         onLogout={logout}
+        onUnreadCountChange={setAccountUnreadCount}
       />
     </>
   );

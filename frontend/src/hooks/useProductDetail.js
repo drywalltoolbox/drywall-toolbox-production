@@ -5,7 +5,7 @@
  * GET /wp-json/dtb/v1/catalog/products/:slug/detail.
  *
  * Returns:
- *   { product, variations, computed, status, error }
+ *   { product, variations, relatedProducts, computed, status, error }
  *
  * Status values:
  *   'idle'      — no slug provided
@@ -18,7 +18,7 @@
 import { useReducer, useEffect } from 'react';
 import { apiClient } from '../api/client.js';
 
-const INIT = { product: null, variations: [], computed: null, status: 'idle', error: null };
+const INIT = { product: null, variations: [], relatedProducts: [], computed: null, status: 'idle', error: null };
 const DETAIL_CACHE_TTL = 2 * 60 * 1000;
 const detailCache = new Map();
 
@@ -48,7 +48,14 @@ function reducer(_state, action) {
     case 'idle':
       return { ...INIT, status: 'idle' };
     case 'ready':
-      return { product: action.product, variations: action.variations, computed: action.computed, status: 'ready', error: null };
+      return {
+        product: action.product,
+        variations: action.variations,
+        relatedProducts: action.relatedProducts,
+        computed: action.computed,
+        status: 'ready',
+        error: null,
+      };
     case 'not_found':
       return { ...INIT, status: 'not_found', error: action.error || null };
     case 'error':
@@ -65,6 +72,7 @@ function initialStateForSlug(slug) {
   return {
     product: cached.product,
     variations: Array.isArray(cached.variations) ? cached.variations : [],
+    relatedProducts: Array.isArray(cached.relatedProducts) ? cached.relatedProducts : [],
     computed: cached.computed ?? null,
     status: 'ready',
     error: null,
@@ -87,6 +95,7 @@ export function useProductDetail(slug) {
         type: 'ready',
         product: cached.product,
         variations: Array.isArray(cached.variations) ? cached.variations : [],
+        relatedProducts: Array.isArray(cached.relatedProducts) ? cached.relatedProducts : [],
         computed: cached.computed ?? null,
       });
     } else {
@@ -109,6 +118,7 @@ export function useProductDetail(slug) {
           type: 'ready',
           product: data.product,
           variations: Array.isArray(data.variations) ? data.variations : [],
+          relatedProducts: Array.isArray(data.relatedProducts) ? data.relatedProducts : [],
           computed: data.computed ?? null,
         });
       })

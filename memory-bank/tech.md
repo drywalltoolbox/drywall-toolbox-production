@@ -118,11 +118,14 @@ React owns the cart page, cart drawer, and checkout CTA/handoff only. `/checkout
 
 The active headless WordPress theme normally forces frontend requests into React and strips non-React assets. `dtb-commerce/Payment/WooNativeCheckoutRuntime.php` is the explicit checkout exception: it disables those theme overrides for checkout/endpoints and hosts the assigned Checkout page content without manually rendering payment controls.
 
-Full `/products/{slug}/` purchasing pages are a second narrow native exception implemented by `dtb-commerce/Product/WooNativeProductRuntime.php`. React retains catalog discovery and quick-view UI, but product purchase links perform a full-document handoff. The native Woo product template preserves product-form, variation, gallery, cart, and official Stripe extension assets. React never mounts or initializes the Express Checkout Element itself.
-
 The actual checkout is the assigned WooCommerce Checkout page containing the Checkout Block. The official WooCommerce Stripe Payment Gateway renders payment methods, Link, eligible wallets, tokenization, and 3DS/SCA. `DTB_OfficialStripeNativeCheckout` owns readiness metadata, responsive checkout presentation, mobile route-stable step navigation, supported Stripe Appearance API configuration, order tagging, strict official-gateway detection, and non-secret paid reference mirroring. The mobile step script only changes interaction state on existing Checkout Block section wrappers; it never renders, moves, submits, or replaces provider payment controls.
 
-Frontend checkout work must not reintroduce React checkout forms, Stripe Elements wrappers, Stripe Checkout Sessions, payment iframes, copied plugin builds, DOM observer payment runtimes, or fake Apple Pay/Google Pay/Link buttons. Product-page express methods appear only when the official Stripe extension considers the browser/customer eligible and its Product page location is enabled.
+Frontend checkout work must not reintroduce React checkout forms, Stripe Elements wrappers, Stripe Checkout Sessions, payment iframes, copied plugin builds, DOM observer payment runtimes, or fake Apple Pay/Google Pay/Link buttons. React product pages and quick-view modals use Woo Store API cart mutations and hand off to the official checkout runtime for eligible express methods.
+
+Production and staging frontend builds disable webpack/Babel disk caches and source maps by default. Development retains filesystem caches. `DTB_WEBPACK_FS_CACHE=1` and `DTB_SOURCE_MAPS=1` are explicit diagnostic opt-ins; build scripts pre-clean only their generated output and matching stale webpack cache, while `npm run clean:build-cache` clears all frontend build caches on demand. Public ZIP archives are excluded from deployment copying.
+
+WooCommerce 10.9 fires `woocommerce_product_import_inserted_product_object` as an action after both new and updated product saves; it does not expose the older start/end hooks around each current CSV batch. DTB marks catalog caches dirty from that action, suppresses repeated invalidation during importer saves, and flushes once on WordPress shutdown for the AJAX request.
+Safe-mode CSV imports use ten rows per AJAX batch so the native WooCommerce progress bar receives frequent percentage updates on shared hosting; image-sideloading mode remains capped at five rows.
 
 ## Backend API surface
 

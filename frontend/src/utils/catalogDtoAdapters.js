@@ -493,6 +493,9 @@ export function toProductDetailDTO(payload = {}) {
   const variations = Array.isArray(payload?.variations)
     ? payload.variations.map((variation) => toLegacyVariationDTO(variation, payload?.product || null))
     : [];
+  const relatedProducts = Array.isArray(payload?.relatedProducts)
+    ? payload.relatedProducts.map((relatedProduct) => toLegacyProductCardDTO(relatedProduct))
+    : [];
 
   const defaultVariation = payload?.computed?.defaultVariation
     ? toLegacyVariationDTO(payload.computed.defaultVariation, payload?.product || null)
@@ -502,6 +505,7 @@ export function toProductDetailDTO(payload = {}) {
   return {
     product,
     variations,
+    relatedProducts,
     computed: {
       ...(payload?.computed || {}),
       defaultVariation,

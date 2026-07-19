@@ -6,8 +6,9 @@
   "homepage": "https://drywalltoolbox.com",
   "scripts": {
     "dev": "webpack serve --config webpack.config.cjs --mode development",
-    "build": "node scripts/assert-public-env-safe.cjs pre && webpack --config webpack.config.cjs --mode production && node scripts/assert-public-env-safe.cjs post",
-    "build:staging": "cross-env APP_ENV=staging PUBLIC_URL=/staging/2972 node scripts/assert-public-env-safe.cjs pre && cross-env APP_ENV=staging PUBLIC_URL=/staging/2972 webpack --config webpack.config.cjs --mode production && cross-env APP_ENV=staging node scripts/assert-public-env-safe.cjs post",
+    "build": "node scripts/assert-public-env-safe.cjs pre && node scripts/clean-build-artifacts.cjs production && webpack --config webpack.config.cjs --mode production && node scripts/assert-public-env-safe.cjs post",
+    "build:staging": "cross-env APP_ENV=staging PUBLIC_URL=/staging/2972 node scripts/assert-public-env-safe.cjs pre && node scripts/clean-build-artifacts.cjs staging && cross-env APP_ENV=staging PUBLIC_URL=/staging/2972 webpack --config webpack.config.cjs --mode production && cross-env APP_ENV=staging node scripts/assert-public-env-safe.cjs post",
+    "clean:build-cache": "node scripts/clean-build-artifacts.cjs cache",
     "reviews-server": "node server/index.js",
     "lint": "eslint src",
     "preview": "webpack serve --config webpack.config.cjs --mode production"

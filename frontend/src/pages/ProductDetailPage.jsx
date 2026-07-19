@@ -32,6 +32,7 @@ import ProductDetail from '../components/product/ProductDetail';
 import SEOHead from '../components/shared/SEOHead';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import Toast from '../components/ui/Toast';
+import ProductShoppingCard from '../components/ui/ProductShoppingCard';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { addRecentlyViewed } from '../utils/recentlyViewed.js';
 import { buildVariantSearch, getVariantParam, resolveInitialVariation } from '../utils/variationUrl.js';
@@ -71,7 +72,7 @@ export default function ProductDetailPage() {
   const [toast, setToast] = useState(null);
   const [locallySelectedVariation, setLocallySelectedVariation] = useState(null);
 
-  const { product, variations, computed, status, error } = useCatalogProductDetail(slug);
+  const { product, variations, relatedProducts, computed, status, error } = useCatalogProductDetail(slug);
 
   const urlVariantId = useMemo(
     () => legacyPathVariantId ?? getVariantParam(location.search),
@@ -247,6 +248,30 @@ export default function ProductDetailPage() {
           initialComputedData={computed}
           disableLegacyDetailFetch
         />
+
+        {relatedProducts.length > 0 && (
+          <section className="product-related" aria-labelledby="product-related-title">
+            <div className="product-related__heading">
+              <div>
+                <span className="product-related__eyebrow">Recommended for this product</span>
+                <h2 id="product-related-title">Related products</h2>
+              </div>
+              <Link to="/products" className="product-related__browse">Browse all products</Link>
+            </div>
+            <div className="product-related__grid">
+              {relatedProducts.map((relatedProduct, index) => (
+                <ProductShoppingCard
+                  key={relatedProduct.id}
+                  product={relatedProduct}
+                  cardProduct={relatedProduct.cardProduct}
+                  index={index}
+                  onOpenModal={() => navigate(`/products/${relatedProduct.slug}`)}
+                  onAddToCart={() => handleAddToCart(relatedProduct.cardProduct || relatedProduct, 1)}
+                />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
       {toast && (
