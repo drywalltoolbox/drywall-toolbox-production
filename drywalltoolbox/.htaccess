@@ -138,16 +138,19 @@ ErrorDocument 511 /errors/511.html
   RewriteRule ^checkout/?$ wp/index.php?pagename=checkout [QSA,L]
   RewriteRule ^staging/2972/checkout/?$ wp/index.php?pagename=checkout [QSA,L]
 
-  # Canonicalize wp-prefixed WooCommerce payment endpoints back to the public
-  # checkout URL.
+  # Canonicalize wp-prefixed WooCommerce payment endpoints back to the public checkout URL.
   RewriteRule ^wp/checkout/order-pay/(.*)$ /checkout/order-pay/$1 [R=302,L,QSA]
   RewriteRule ^wp/order-pay/(.*)$ /checkout/order-pay/$1 [R=302,L,QSA]
+  RewriteRule ^wp/checkout/order-received/(.*)$ /checkout/order-received/$1 [R=302,L,QSA]
 
-  # WooCommerce payment/order-pay endpoints must be handled by WordPress, not by
-  # the React SPA shell.
+  # WooCommerce payment/order-pay endpoints must be handled by WordPress, not by the React SPA shell.
   RewriteRule ^checkout/order-pay/([0-9]+)/?$ wp/index.php?pagename=checkout&order-pay=$1 [QSA,L]
   RewriteRule ^order-pay/([0-9]+)/?$ wp/index.php?pagename=checkout&order-pay=$1 [QSA,L]
   RewriteRule ^staging/2972/checkout/order-pay/([0-9]+)/?$ wp/index.php?pagename=checkout&order-pay=$1 [QSA,L]
+
+  # WooCommerce order-received/thank-you endpoints must also remain in WordPress.
+  RewriteRule ^checkout/order-received/([0-9]+)/?$ wp/index.php?pagename=checkout&order-received=$1 [QSA,L]
+  RewriteRule ^staging/2972/checkout/order-received/([0-9]+)/?$ wp/index.php?pagename=checkout&order-received=$1 [QSA,L]
 
   # Reduced/query-string order-pay shapes must also remain in WooCommerce.
   RewriteCond %{QUERY_STRING} (^|&)(pay_for_order=true|order-pay=[0-9]+)(&|$) [NC]
@@ -185,8 +188,7 @@ ErrorDocument 511 /errors/511.html
   RewriteRule ^wp-cron\.php$ wp/wp-cron.php [L,QSA]
   RewriteRule ^xmlrpc\.php$ wp/xmlrpc.php [L,QSA]
 
-  # Staging SPA deep-link fallback. Checkout is already consumed by the explicit
-  # rules above and therefore cannot fall through to this shell.
+  # Staging SPA deep-link fallback. Checkout is already consumed by the explicit rules above.
   RewriteCond %{REQUEST_URI} ^/staging/2972/ [NC]
   RewriteCond %{REQUEST_URI} !^/staging/2972/(?:wp-json|dtb)(?:/|$) [NC]
   RewriteCond %{REQUEST_URI} !^/staging/2972/checkout(?:/|$) [NC]
@@ -234,8 +236,7 @@ ErrorDocument 511 /errors/511.html
     Header set Expires "0"
   </FilesMatch>
 
-  # Official Stripe/Apple Pay domain association should be revalidated during
-  # gateway/domain setup rather than served from a stale public cache.
+  # Official Stripe/Apple Pay domain association should be revalidated during gateway/domain setup.
   <FilesMatch "^apple-developer-merchantid-domain-association$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"
