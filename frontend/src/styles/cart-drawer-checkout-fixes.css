@@ -1,11 +1,96 @@
 /*
  * Cart drawer checkout placement hardening.
  *
- * The WooPayments express dock is provider-owned payment UI framed by React,
- * but the drawer layout must remain stable on desktop and mobile. These rules
- * keep the desktop dock aligned to the right cart sheet instead of floating as
- * a detached card over the page, while preserving the mobile bottom-sheet model.
+ * The drawer remains a checkout handoff surface only. WooPayments and express
+ * wallet controls render on the native WooCommerce Checkout page.
  */
+
+.dtb-cart-checkout-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10004;
+  border: 1px solid #dbe3f1;
+  border-bottom: 0;
+  border-radius: 22px 22px 0 0;
+  background:
+    radial-gradient(circle at 16% -28%, rgba(59, 130, 246, 0.16), transparent 50%),
+    rgba(255, 255, 255, 0.985);
+  padding: 16px 18px calc(16px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -18px 54px rgba(15, 23, 42, 0.16);
+}
+
+.dtb-cart-checkout-dock__total-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.dtb-cart-checkout-dock__label,
+.dtb-cart-checkout-dock__hint {
+  display: block;
+}
+
+.dtb-cart-checkout-dock__label {
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dtb-cart-checkout-dock__hint {
+  margin-top: 2px;
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+
+.dtb-cart-checkout-dock__total-row strong {
+  color: #0f172a;
+  font-size: clamp(1.28rem, 3vw, 1.62rem);
+  font-weight: 950;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+
+.dtb-cart-checkout-dock__checkout {
+  display: inline-flex;
+  width: 100%;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1e40af, #2563eb);
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 16px 34px rgba(37, 99, 235, 0.28);
+}
+
+.dtb-cart-checkout-dock__checkout:hover {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  color: #fff;
+}
+
+.dtb-cart-checkout-dock__view-cart {
+  display: block;
+  margin-top: 12px;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+}
+
+.dtb-cart-checkout-dock__view-cart:hover {
+  color: #1d4ed8;
+}
 
 @media (min-width: 768px) {
   .cart-overlay.active .cart-panel.storefront-cart-sheet {
@@ -26,7 +111,7 @@
 
   .cart-overlay.active .cart-panel.storefront-cart-sheet .scs-body {
     background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
-    padding: 8px 0 330px !important;
+    padding: 8px 0 250px !important;
   }
 
   .cart-overlay.active .cart-panel.storefront-cart-sheet .scs-item-list {
@@ -54,47 +139,23 @@
     background: #f8fafc !important;
   }
 
-  body:has(.dtb-cart-express-dock) .cart-overlay.active .storefront-cart-sheet .scs-footer {
+  body:has(.dtb-cart-checkout-dock) .cart-overlay.active .storefront-cart-sheet .scs-footer {
     display: none !important;
   }
 
-  body:has(.dtb-cart-express-dock) .dtb-cart-express-dock {
+  body:has(.dtb-cart-checkout-dock) .dtb-cart-checkout-dock {
+    left: auto;
     right: 0 !important;
-    bottom: 0 !important;
-    z-index: 10004 !important;
     width: min(430px, 100vw) !important;
-    max-height: 340px !important;
     border-right: 0 !important;
     border-bottom: 0 !important;
     border-radius: 20px 0 0 0 !important;
-    background:
-      radial-gradient(circle at 16% -28%, rgba(59, 130, 246, 0.16), transparent 50%),
-      rgba(255, 255, 255, 0.985) !important;
-    padding: 16px 18px calc(16px + env(safe-area-inset-bottom, 0px)) !important;
     box-shadow: -18px -18px 54px rgba(15, 23, 42, 0.16) !important;
-  }
-
-  body:has(.dtb-cart-express-dock) .dtb-cart-express-dock .dtb-wcpay-express__heading-row {
-    margin-bottom: 8px;
-  }
-
-  body:has(.dtb-cart-express-dock) .dtb-cart-express-dock .dtb-wcpay-express__heading {
-    color: #0f172a;
-    font-size: 0.82rem;
-    font-weight: 900;
-  }
-
-  body:has(.dtb-cart-express-dock) .dtb-cart-express-dock .dtb-wcpay-express__divider {
-    margin-top: 10px;
-  }
-
-  body:has(.dtb-cart-express-dock) .dtb-cart-express-dock__checkout {
-    min-height: 50px;
   }
 }
 
 @media (max-width: 767px) {
-  body:has(.dtb-cart-express-dock) .cart-overlay.active .storefront-cart-sheet .scs-body {
-    padding-bottom: 310px !important;
+  body:has(.dtb-cart-checkout-dock) .cart-overlay.active .storefront-cart-sheet .scs-body {
+    padding-bottom: 240px !important;
   }
 }
