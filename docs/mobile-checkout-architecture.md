@@ -36,9 +36,9 @@ Before visual branding work, mobile checkout must satisfy these invariants:
 
 ## Express checkout
 
-The official Stripe extension supports eligible express checkout methods in WooCommerce-supported contexts. Drywall Toolbox currently approves the native WooCommerce Checkout Block as the production express-payment surface.
+The official Stripe extension supports eligible express checkout methods in WooCommerce-supported contexts. Drywall Toolbox approves the native WooCommerce Checkout Block and native full-product pages as production express-payment surfaces.
 
-React product pages, product modals, full cart, and mini-cart must not fabricate or iframe provider wallet controls. Additional locations may be added only through an officially supported WooCommerce/Stripe integration that preserves cart/session and variation/quantity authority.
+React catalog and product quick-view modals, full cart, and mini-cart must not fabricate or iframe provider wallet controls. The modal hands selected variation and quantity to the native `/products/{slug}/` purchasing page, where WooCommerce preserves product-form/cart authority and the official Stripe extension renders eligible product-page Express Checkout Element controls.
 
 ## Styling boundary
 

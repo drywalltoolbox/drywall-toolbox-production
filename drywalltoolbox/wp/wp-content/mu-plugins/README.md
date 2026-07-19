@@ -39,9 +39,10 @@ Catalog/product/variation/brand/taxonomy models and normalization, relationships
 - WooCommerce Store API cart extension data;
 - toolset/order-line metadata;
 - native Woo checkout runtime exception for the headless theme;
+- native Woo full-product purchasing runtime for official product-page Stripe express methods;
 - official WooCommerce Stripe gateway readiness/capability metadata;
 - checkout-order contract tagging and non-secret paid reference mirroring;
-- conservative checkout presentation CSS;
+- responsive checkout presentation, cross-document handoff loading, mobile progressive step navigation, and official Stripe Appearance API configuration;
 - DTB shipping policy method;
 - order-type/query and branded email support;
 - commerce-facing REST/admin surfaces.
@@ -59,6 +60,15 @@ dtb-commerce/Templates/WooNativeCheckoutPage.php
 ```
 
 It does not manually create Checkout Block state, Stripe fields, PaymentIntents, Stripe Checkout Sessions, or orders.
+
+Full-product purchasing routes use the parallel native adapter:
+
+```text
+dtb-commerce/Product/WooNativeProductRuntime.php
+dtb-commerce/Templates/WooNativeProductPage.php
+```
+
+React continues to own catalog discovery and quick-view presentation. The quick-view CTA hands selected variation and quantity to `/products/{slug}/`; WooCommerce owns the product form/cart mutation and the official Stripe extension owns eligible product-page Express Checkout Element controls. The Stripe gateway's Product page location must be enabled operationally for those controls to appear.
 
 Official Stripe observation/readiness lives at:
 

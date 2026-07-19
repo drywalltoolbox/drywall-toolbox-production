@@ -114,13 +114,15 @@ For production/staging same-origin cart traffic, WooCommerce's cookie-backed ses
 
 ## Checkout runtime architecture
 
-React owns the cart page, cart drawer, and checkout CTA/handoff only. `/checkout` in React is compatibility routing that immediately performs full-document navigation to the WordPress/WooCommerce checkout.
+React owns the cart page, cart drawer, and checkout CTA/handoff only. `/checkout` in React is compatibility routing that immediately performs full-document navigation to the WordPress/WooCommerce checkout. The cart, compatibility route, and native document use a shared fail-open loading presentation to mask intermediate document rewrites without changing routing authority.
 
 The active headless WordPress theme normally forces frontend requests into React and strips non-React assets. `dtb-commerce/Payment/WooNativeCheckoutRuntime.php` is the explicit checkout exception: it disables those theme overrides for checkout/endpoints and hosts the assigned Checkout page content without manually rendering payment controls.
 
-The actual checkout is the assigned WooCommerce Checkout page containing the Checkout Block. The official WooCommerce Stripe Payment Gateway renders payment methods, Link, eligible wallets, tokenization, and 3DS/SCA. `DTB_OfficialStripeNativeCheckout` owns only readiness metadata, checkout CSS scoping, order tagging, strict official-gateway detection, and non-secret paid reference mirroring.
+Full `/products/{slug}/` purchasing pages are a second narrow native exception implemented by `dtb-commerce/Product/WooNativeProductRuntime.php`. React retains catalog discovery and quick-view UI, but product purchase links perform a full-document handoff. The native Woo product template preserves product-form, variation, gallery, cart, and official Stripe extension assets. React never mounts or initializes the Express Checkout Element itself.
 
-Frontend checkout work must not reintroduce React checkout forms, Stripe Elements wrappers, Stripe Checkout Sessions, payment iframes, copied plugin builds, DOM observer payment runtimes, or fake Apple Pay/Google Pay/Link buttons.
+The actual checkout is the assigned WooCommerce Checkout page containing the Checkout Block. The official WooCommerce Stripe Payment Gateway renders payment methods, Link, eligible wallets, tokenization, and 3DS/SCA. `DTB_OfficialStripeNativeCheckout` owns readiness metadata, responsive checkout presentation, mobile route-stable step navigation, supported Stripe Appearance API configuration, order tagging, strict official-gateway detection, and non-secret paid reference mirroring. The mobile step script only changes interaction state on existing Checkout Block section wrappers; it never renders, moves, submits, or replaces provider payment controls.
+
+Frontend checkout work must not reintroduce React checkout forms, Stripe Elements wrappers, Stripe Checkout Sessions, payment iframes, copied plugin builds, DOM observer payment runtimes, or fake Apple Pay/Google Pay/Link buttons. Product-page express methods appear only when the official Stripe extension considers the browser/customer eligible and its Product page location is enabled.
 
 ## Backend API surface
 

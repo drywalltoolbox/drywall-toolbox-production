@@ -42,3 +42,39 @@ export function getWooCheckoutFallbackUrl() {
   const path = '/wp/index.php?pagename=checkout';
   return origin ? new URL(path, origin).toString() : path;
 }
+
+function appendProductSelection(url, { variationId, quantity } = {}) {
+  const selectedVariationId = Number.parseInt(variationId, 10);
+  const selectedQuantity = Number.parseInt(quantity, 10);
+
+  if (Number.isInteger(selectedVariationId) && selectedVariationId > 0) {
+    url.searchParams.set('variation_id', String(selectedVariationId));
+  }
+  if (Number.isInteger(selectedQuantity) && selectedQuantity > 1) {
+    url.searchParams.set('quantity', String(Math.min(selectedQuantity, 99)));
+  }
+
+  return url;
+}
+
+/** Native WooCommerce product URL used for official product-page Stripe methods. */
+export function getWooProductUrl(slug, selection = {}) {
+  const safeSlug = encodeURIComponent(String(slug || '').trim());
+  const basePath = storefrontBasePath();
+  const path = `${basePath}/products/${safeSlug}/`.replace(/\/{2,}/g, '/');
+  const origin = backendOrigin();
+  const url = appendProductSelection(new URL(path, origin || 'http://localhost'), selection);
+
+  return origin ? url.toString() : `${url.pathname}${url.search}`;
+}
+
+/** Direct WordPress fallback when a host has not yet applied the product rewrite. */
+export function getWooProductFallbackUrl(slug, selection = {}) {
+  const origin = backendOrigin();
+  const url = new URL('/wp/index.php', origin || 'http://localhost');
+  url.searchParams.set('post_type', 'product');
+  url.searchParams.set('name', String(slug || '').trim());
+  appendProductSelection(url, selection);
+
+  return origin ? url.toString() : `${url.pathname}${url.search}`;
+}

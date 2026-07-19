@@ -23,6 +23,8 @@ import { getBrandLogo } from '../../utils/brandAssets.js';
 import { toProductDetailDTO } from '../../utils/catalogDtoAdapters.js';
 import { BRAND_TO_SLUG, BRAND_ALIASES } from '../../utils/catalogUrlState.js';
 import { getSchematicLinkForProduct } from '../../data/schematicMappings';
+import { getWooProductUrl } from '../../utils/checkoutUrl.js';
+import { navigateDocument } from '../../utils/documentNavigation.js';
 import DOMPurify from 'dompurify';
 
 function buildSeedVariations(initialVariations = [], initialResolvedVariation = null) {
@@ -538,6 +540,7 @@ export default function ProductDetail({
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState('description');
   const [addToCartError, setAddToCartError] = useState('');
+  const [isExpressCheckoutPending, setIsExpressCheckoutPending] = useState(false);
   const seededVariations = buildSeedVariations(initialVariations, initialResolvedVariation);
   const initialVariationSelection = buildInitialVariationSelection({
     autoSelectDefaultVariation,
@@ -816,6 +819,19 @@ export default function ProductDetail({
       );
     }
   };
+
+  const handleExpressCheckout = () => {
+    if (!canAddToCart || !product?.slug || isExpressCheckoutPending) return;
+    setAddToCartError('');
+    setIsExpressCheckoutPending(true);
+    navigateDocument(
+      getWooProductUrl(product.slug, {
+        variationId: selectedVariation?.id,
+        quantity,
+      }),
+      { transition: 'checkout' }
+    );
+  };
   const clearAddToCartError = () => {
     if (addToCartError) setAddToCartError('');
   };
@@ -947,6 +963,9 @@ export default function ProductDetail({
                   setQuantity(val);
                 }}
                 onAddToCart={handleAddToCart}
+                onExpressCheckout={handleExpressCheckout}
+                isExpressCheckoutPending={isExpressCheckoutPending}
+                canExpressCheckout={canAddToCart && Boolean(product?.slug)}
                 canAddToCart={canAddToCart}
                 isOutOfStock={isOutOfStock}
                 needsVariation={needsVariation}

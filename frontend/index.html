@@ -46,6 +46,25 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Drywall Toolbox">
 
+    <!-- Covers an intermediate SPA document if the checkout route is rewritten before WordPress takes ownership. -->
+    <style>
+      #dtb-checkout-route-loader{position:fixed;z-index:2147483000;inset:0;display:none;min-height:100vh;background:#f8fafc;color:#0f172a;align-items:center;justify-content:center}
+      html.dtb-checkout-route-booting #dtb-checkout-route-loader{display:flex}
+      .dtb-checkout-route-loader__content{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+      .dtb-checkout-route-loader__spinner{display:grid;width:46px;height:46px;border:1px solid #dbe3ee;border-radius:999px;background:#fff;box-shadow:0 12px 34px rgba(15,23,42,.1);place-items:center}
+      .dtb-checkout-route-loader__spinner:before{width:20px;height:20px;border:2px solid #bfdbfe;border-top-color:#1d4ed8;border-radius:999px;content:"";animation:dtb-route-spin .9s cubic-bezier(.45,0,.55,1) infinite}
+      .dtb-checkout-route-loader__content p{margin:0;color:#475569;font:650 14px/1.5 system-ui,sans-serif}
+      @keyframes dtb-route-spin{to{transform:rotate(360deg)}}
+    </style>
+    <script>
+      if (/\/checkout\/?$/.test(window.location.pathname)) {
+        document.documentElement.classList.add('dtb-checkout-route-booting');
+        window.setTimeout(function () {
+          document.documentElement.classList.remove('dtb-checkout-route-booting');
+        }, 8000);
+      }
+    </script>
+
     <!-- Establish connections to font servers as early as possible -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -84,6 +103,12 @@
     </script>
   </head>
   <body>
+    <div id="dtb-checkout-route-loader" aria-live="polite" role="status">
+      <div class="dtb-checkout-route-loader__content">
+        <span class="dtb-checkout-route-loader__spinner" aria-hidden="true"></span>
+        <p>Preparing your secure checkout…</p>
+      </div>
+    </div>
     <div id="root"></div>
   </body>
 </html>

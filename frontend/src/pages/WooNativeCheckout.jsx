@@ -35,7 +35,7 @@ export default function WooNativeCheckout() {
       } catch {
         // Session storage is optional; direct document navigation remains valid.
       }
-      navigateDocument(getWooCheckoutFallbackUrl(), { replace: true });
+      navigateDocument(getWooCheckoutFallbackUrl(), { replace: true, transition: 'checkout' });
       return;
     }
 
@@ -44,21 +44,21 @@ export default function WooNativeCheckout() {
     } catch {
       // Session storage is optional; the canonical checkout handoff still works.
     }
-    navigateDocument(getWooCheckoutUrl(), { replace: true });
+    navigateDocument(getWooCheckoutUrl(), { replace: true, transition: 'checkout' });
   }, []);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-6 text-white">
+    <div className="dtb-checkout-handoff-screen">
       <SEOHead noindex title="Checkout" />
-      <div className="flex flex-col items-center gap-4 text-center" role="status" aria-live="polite">
-        <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-blue-200 shadow-[0_8px_30px_rgba(0,0,0,0.18)]">
+      <div className="dtb-checkout-handoff-screen__content" role="status" aria-live="polite">
+        <span className="dtb-checkout-handoff-screen__spinner">
           <Loader2
             size={20}
-            className="animate-[spin_1.15s_cubic-bezier(0.45,0,0.55,1)_infinite]"
+            className="dtb-checkout-handoff-screen__spinner-icon"
             aria-hidden="true"
           />
         </span>
-        <p className="text-sm font-medium tracking-wide text-slate-200">Opening secure checkout…</p>
+        <p>Preparing your secure checkout…</p>
       </div>
     </div>
   );

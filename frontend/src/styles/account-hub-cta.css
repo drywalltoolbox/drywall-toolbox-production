@@ -4,7 +4,7 @@
 ───────────────────────────────────────────── */
 
 .account-hub__panel--guest {
-  padding: 64px 16px 16px;
+  padding: 20px 18px 24px;
 }
 
 .account-hub__close {
@@ -17,7 +17,7 @@
   isolation: isolate;
   overflow: hidden;
   padding: 1px;
-  border-radius: 28px;
+  border-radius: 20px;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(37, 99, 235, 0.95) 38%, rgba(29, 78, 216, 0.98) 68%, rgba(15, 23, 42, 1) 100%);
   box-shadow:

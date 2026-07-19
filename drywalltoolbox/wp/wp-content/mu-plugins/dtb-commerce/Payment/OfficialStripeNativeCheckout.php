@@ -19,12 +19,16 @@ final class DTB_OfficialStripeNativeCheckout {
 	public const CONTRACT_VERSION = 'woo-stripe-v1';
 
 	private const STRIPE_GATEWAY_ID = 'stripe';
-	private const ASSET_VERSION     = '2026.07.19.2';
+	private const ASSET_VERSION     = '2026.07.19.6';
+	private const STRIPE_APPEARANCE_VERSION = '2026.07.19.1';
+	private const STRIPE_APPEARANCE_OPTION  = 'dtb_stripe_appearance_version';
 
 	public static function register(): void {
 		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_routes' ] );
 		add_action( 'wp_enqueue_scripts', [ __CLASS__, 'enqueue_checkout_assets' ], 20 );
+		add_action( 'init', [ __CLASS__, 'maybe_refresh_stripe_appearance_cache' ], 20 );
 		add_filter( 'body_class', [ __CLASS__, 'body_class' ] );
+		add_filter( 'wc_stripe_upe_params', [ __CLASS__, 'stripe_upe_params' ], 20 );
 		add_action( 'woocommerce_checkout_create_order', [ __CLASS__, 'tag_checkout_order' ], 20, 2 );
 		add_action( 'woocommerce_store_api_checkout_order_processed', [ __CLASS__, 'tag_store_api_order' ], 20 );
 		add_action( 'woocommerce_payment_complete', [ __CLASS__, 'mirror_verified_stripe_payment' ], 9 );
@@ -91,6 +95,15 @@ final class DTB_OfficialStripeNativeCheckout {
 			[],
 			self::ASSET_VERSION
 		);
+
+		wp_enqueue_script(
+			'dtb-woo-native-checkout-steps',
+			content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-steps.js' ),
+			[],
+			self::ASSET_VERSION,
+			true
+		);
+		wp_script_add_data( 'dtb-woo-native-checkout-steps', 'strategy', 'defer' );
 	}
 
 	public static function body_class( array $classes ): array {
@@ -100,6 +113,97 @@ final class DTB_OfficialStripeNativeCheckout {
 			$classes[] = 'dtb-checkout-native-page';
 		}
 		return $classes;
+	}
+
+	/**
+	 * Configure the provider-hosted Payment Element through Stripe's supported
+	 * Appearance API. Payment method rendering and behavior remain Stripe-owned.
+	 */
+	public static function stripe_upe_params( $stripe_params ) {
+		if ( ! is_array( $stripe_params ) ) {
+			return $stripe_params;
+		}
+
+		$existing            = isset( $stripe_params['blocksAppearance'] ) ? (array) $stripe_params['blocksAppearance'] : [];
+		$existing_variables  = isset( $existing['variables'] ) ? (array) $existing['variables'] : [];
+		$existing_rules      = isset( $existing['rules'] ) ? (array) $existing['rules'] : [];
+		$appearance_variables = [
+			'colorPrimary'          => '#1d4ed8',
+			'colorBackground'       => '#ffffff',
+			'colorText'             => '#0f172a',
+			'colorTextSecondary'    => '#475569',
+			'colorDanger'           => '#b91c1c',
+			'fontFamily'            => 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+			'borderRadius'          => '6px',
+			'gridColumnSpacing'     => '10px',
+			'gridRowSpacing'        => '10px',
+			'tabSpacing'            => '8px',
+			'tabIconColor'          => '#334155',
+			'tabIconHoverColor'     => '#1d4ed8',
+			'tabIconSelectedColor'  => '#1d4ed8',
+			'tabLogoColor'          => 'dark',
+			'tabLogoSelectedColor'  => 'dark',
+		];
+		$appearance_rules = [
+			'.Tab' => (object) [
+				'backgroundColor' => '#f8fafc',
+				'border'          => '1px solid transparent',
+				'boxShadow'       => 'none',
+				'padding'         => '10px 12px',
+				'transition'      => 'background-color 160ms ease, border-color 160ms ease, color 160ms ease',
+			],
+			'.Tab:hover' => (object) [
+				'backgroundColor' => '#f1f5f9',
+				'border'          => '1px solid #cbd5e1',
+			],
+			'.Tab:focus' => (object) [
+				'outline'       => '2px solid #93c5fd',
+				'outlineOffset' => '2px',
+			],
+			'.Tab--selected' => (object) [
+				'backgroundColor' => '#eff6ff',
+				'border'          => '1px solid #2563eb',
+				'boxShadow'       => 'none',
+			],
+			'.TabLabel' => (object) [
+				'fontWeight' => '600',
+			],
+			'.TabIcon' => (object) [
+				'paddingBottom' => '4px',
+			],
+			'.Input' => (object) [
+				'border'    => '1px solid #cbd5e1',
+				'boxShadow' => 'none',
+				'padding'   => '13px 14px',
+			],
+			'.Input:focus' => (object) [
+				'border'    => '1px solid #2563eb',
+				'boxShadow' => '0 0 0 3px rgba(37, 99, 235, 0.12)',
+			],
+		];
+
+		$stripe_params['blocksAppearance'] = (object) array_merge(
+			$existing,
+			[
+				'theme'     => 'flat',
+				'labels'    => 'floating',
+				'variables' => (object) array_merge( $existing_variables, $appearance_variables ),
+				'rules'     => (object) array_merge( $existing_rules, $appearance_rules ),
+			]
+		);
+
+		return $stripe_params;
+	}
+
+	/** Clear the official Stripe extension's cached appearance once per version. */
+	public static function maybe_refresh_stripe_appearance_cache(): void {
+		if ( self::STRIPE_APPEARANCE_VERSION === get_option( self::STRIPE_APPEARANCE_OPTION, '' ) ) {
+			return;
+		}
+
+		delete_transient( 'wc_stripe_blocks_appearance' );
+		delete_transient( 'wc_stripe_appearance' );
+		update_option( self::STRIPE_APPEARANCE_OPTION, self::STRIPE_APPEARANCE_VERSION, false );
 	}
 
 	public static function tag_checkout_order( WC_Order $order, array $data = [] ): void {

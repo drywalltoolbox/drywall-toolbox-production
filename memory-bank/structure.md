@@ -138,7 +138,7 @@ Frontend ownership rules:
 
 ## Public route groups
 
-- Storefront: `/`, `/products`, brand/category selectors, product and variation detail.
+- Storefront: `/`, `/products`, brand/category selectors, and React quick-view product detail. Full `/products/{slug}` and `/products/{slug}/variations/{variationId}` purchasing routes hand off to native WooCommerce.
 - Parts/schematics: `/parts`, `/product/:partNumber`, `/schematics`.
 - Repairs: intake, packages, tracking, status, authenticated dashboard detail.
 - Commerce: `/cart`, `/checkout` handoff, checkout return states, order confirmation and tracking.
@@ -179,7 +179,7 @@ Catalog domain models, Woo/product repositories, normalization, facets, variatio
 
 ### `dtb-commerce/`
 
-WooCommerce Store API cart extensions, native Woo checkout runtime exception for the headless theme, checkout capability metadata, official Stripe checkout styling/diagnostics, Woo order tagging, toolset/order-line metadata, order type/query services, branded WooCommerce email integration, and commerce-facing order REST/admin surfaces.
+WooCommerce Store API cart extensions, native Woo checkout and full-product runtime exceptions for the headless theme, checkout capability metadata, official Stripe checkout/product-page presentation boundaries, Woo order tagging, toolset/order-line metadata, order type/query services, branded WooCommerce email integration, and commerce-facing order REST/admin surfaces.
 
 ### `dtb-order-platform/`
 

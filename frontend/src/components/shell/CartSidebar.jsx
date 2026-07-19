@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useCart } from '../../context/CartContext';
 import StorefrontCartSheet from '../storefront/StorefrontCartSheet';
 import { getWooCheckoutUrl } from '../../utils/checkoutUrl.js';
+import { navigateDocument } from '../../utils/documentNavigation.js';
 
 const CART_DEBOUNCE_DRAIN_MS = 350;
 const CART_MUTATION_WAIT_LIMIT_MS = 8000;
@@ -55,8 +56,8 @@ export default function CartSidebar({ isOpen, onClose }) {
         return;
       }
 
+      navigateDocument(getWooCheckoutUrl(), { transition: 'checkout' });
       onClose?.();
-      window.location.assign(getWooCheckoutUrl());
     };
 
     document.addEventListener('click', interceptCheckout, true);

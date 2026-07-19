@@ -1,4 +1,4 @@
-import { Minus, Plus, ShoppingCart } from 'lucide-react';
+import { LockKeyhole, Minus, Plus, ShoppingCart } from 'lucide-react';
 
 export default function ProductPurchasePanel({
   quantity,
@@ -6,6 +6,9 @@ export default function ProductPurchasePanel({
   onIncrease,
   onQuantityChange,
   onAddToCart,
+  onExpressCheckout,
+  isExpressCheckoutPending,
+  canExpressCheckout,
   canAddToCart,
   isOutOfStock,
   needsVariation,
@@ -63,6 +66,21 @@ export default function ProductPurchasePanel({
           </span>
         </button>
       </div>
+
+      <button
+        type="button"
+        onClick={onExpressCheckout}
+        disabled={!canExpressCheckout || isExpressCheckoutPending}
+        className="dtb-pdp-express-checkout"
+      >
+        <LockKeyhole size={15} aria-hidden="true" />
+        <span aria-live="polite">
+          {isExpressCheckoutPending ? 'Opening secure payment options…' : 'View express payment options'}
+        </span>
+      </button>
+      <p className="dtb-pdp-express-checkout__note">
+        Apple Pay, Google Pay, Link, and other eligible methods appear on the secure product page.
+      </p>
     </div>
   );
 }

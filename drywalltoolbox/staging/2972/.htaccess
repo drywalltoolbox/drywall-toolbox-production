@@ -59,6 +59,11 @@ DirectoryIndex index.html index.php
 	RewriteCond %{QUERY_STRING} (^|&)rest_route= [NC]
 	RewriteRule ^(?:index\.php)?$ /wp/index.php [QSA,L]
 
+	# Full product purchasing routes belong to native WooCommerce so the
+	# official Stripe gateway can mount its product-page Express Checkout Element.
+	RewriteRule ^products/([A-Za-z0-9_-]+)/variations/([0-9]+)/?$ /wp/index.php?post_type=product&name=$1&variation_id=$2 [QSA,L]
+	RewriteRule ^products/(?!brands/?$)([A-Za-z0-9_-]+)/?$ /wp/index.php?post_type=product&name=$1 [QSA,L]
+
 	# Checkout order-pay endpoints are WordPress/WooCommerce endpoints, not SPA
 	# routes. Pass the order id explicitly so WooCommerce resolves the
 	# order-pay query var deterministically instead of relying on the
@@ -94,6 +99,7 @@ DirectoryIndex index.html index.php
 	# by the WordPress rewrite above and must never fall through here.
 	RewriteCond %{REQUEST_URI} !^/staging/2972/checkout/order-pay/ [NC]
 	RewriteCond %{REQUEST_URI} !^/staging/2972/order-pay/ [NC]
+	RewriteCond %{REQUEST_URI} !^/staging/2972/products/(?!brands(?:/|$))[A-Za-z0-9_-]+(?:/variations/[0-9]+)?/?$ [NC]
 	RewriteRule ^(?:products|all-products|parts|product|category|schematics|repairs|faq|calculators|shipping-policy|returns|policies|preview|cart|checkout|order|order-tracking|contact|support|settings|login|register|forgot-password|reset-password|dashboard|orders|rewards|account-settings|addresses|notifications)(?:/.*)?$ index.html [QSA,L]
 </IfModule>
 # END Drywall Toolbox Staging SPA

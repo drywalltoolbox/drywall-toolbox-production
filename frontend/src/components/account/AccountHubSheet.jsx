@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Home, Package, User, X, ShoppingBag, ChevronRight, AlertCircle, Loader, Wrench, RotateCcw, ChevronDown, LayoutDashboard, Calculator, LifeBuoy, BookOpen } from 'lucide-react';
 import { getCustomerOrders } from '../../api/orders.js';
@@ -149,6 +149,9 @@ function historyFilterEmptyCopy(filter) {
 
 export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
   const navigate = useNavigate();
+  const sheetRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const previouslyFocusedRef = useRef(null);
   const [activeTab, setActiveTab] = useState('home');
   const [historyFilter, setHistoryFilter] = useState('product');
   const [recentlyViewed, setRecentlyViewed] = useState([]);
@@ -231,12 +234,37 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
   useEffect(() => {
     if (!isOpen) return undefined;
     const previousOverflow = document.body.style.overflow;
-    const onKeyDown = (e) => { if (e.key === 'Escape') closeSheet(); };
+    previouslyFocusedRef.current = document.activeElement;
+    const focusTimer = window.requestAnimationFrame(() => closeButtonRef.current?.focus?.());
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        closeSheet();
+        return;
+      }
+      if (event.key !== 'Tab' || !sheetRef.current) return;
+
+      const focusable = Array.from(sheetRef.current.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )).filter((element) => element.getClientRects().length > 0);
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
     document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', onKeyDown);
     return () => {
+      window.cancelAnimationFrame(focusTimer);
       document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', onKeyDown);
+      previouslyFocusedRef.current?.focus?.();
     };
   }, [isOpen, closeSheet]);
 
@@ -252,13 +280,27 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
   const allHistoryFailed = Boolean(historyErrorText) && activity.length === 0;
 
   return (
-    <div className={`account-hub${isOpen ? ' account-hub--open' : ''}`} role="dialog" aria-modal="true" aria-label="Account hub" aria-hidden={!isOpen}>
-      <button type="button" className="account-hub__backdrop" onClick={closeSheet} aria-label="Close account hub" tabIndex={isOpen ? 0 : -1} />
+    <div
+      className={`account-hub${isOpen ? ' account-hub--open' : ''}`}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Account hub"
+      aria-hidden={!isOpen}
+      inert={!isOpen ? '' : undefined}
+    >
+      <button type="button" className="account-hub__backdrop" onClick={closeSheet} aria-label="Close account hub" tabIndex={-1} />
 
-      <section className="account-hub__sheet">
-        <button type="button" className="account-hub__close" onClick={closeSheet} aria-label="Close" tabIndex={isOpen ? 0 : -1}>
-          <X size={18} strokeWidth={2.5} />
-        </button>
+      <section ref={sheetRef} className="account-hub__sheet">
+        <header className="account-hub__drawer-header">
+          <span className="account-hub__drawer-icon" aria-hidden="true"><User size={18} strokeWidth={2.2} /></span>
+          <div className="account-hub__drawer-copy">
+            <h2>{user ? 'Account hub' : 'Your account'}</h2>
+            <p>{user ? `Welcome, ${firstName}` : 'Sign in or continue browsing'}</p>
+          </div>
+          <button ref={closeButtonRef} type="button" className="account-hub__close" onClick={closeSheet} aria-label="Close account hub" tabIndex={isOpen ? 0 : -1}>
+            <X size={18} strokeWidth={2.5} />
+          </button>
+        </header>
 
         <div className="account-hub__content">
           {!user && (
@@ -440,6 +482,7 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout }) {
             {TABS.map(({ id, label, Icon }) => (
               <button key={id} type="button" className={`account-hub-nav__item${activeTab === id ? ' account-hub-nav__item--active' : ''}`} onClick={() => setActiveTab(id)} aria-selected={activeTab === id} aria-label={label} tabIndex={isOpen ? 0 : -1}>
                 <span className="account-hub-nav__pill"><Icon size={22} strokeWidth={activeTab === id ? 2.2 : 1.6} /></span>
+                <small>{label}</small>
               </button>
             ))}
           </nav>

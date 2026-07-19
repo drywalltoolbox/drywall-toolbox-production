@@ -1,4 +1,5 @@
 const DOCUMENT_FADE_MS = 180;
+const CHECKOUT_HANDOFF_MS = 320;
 
 let navigationPending = false;
 
@@ -12,6 +13,7 @@ function resetDocumentTransition() {
   navigationPending = false;
   if (typeof document !== 'undefined') {
     document.documentElement.classList.remove('dtb-document-transition-active');
+    document.documentElement.classList.remove('dtb-checkout-handoff-active');
   }
 }
 
@@ -23,7 +25,7 @@ if (typeof window !== 'undefined') {
  * Navigates outside the React router after fading the current document.
  * Use only for intentional full-document transfers such as React -> WooCommerce.
  */
-export function navigateDocument(url, { replace = false } = {}) {
+export function navigateDocument(url, { replace = false, transition = 'fade' } = {}) {
   if (typeof window === 'undefined' || navigationPending) return;
 
   navigationPending = true;
@@ -41,6 +43,9 @@ export function navigateDocument(url, { replace = false } = {}) {
     return;
   }
 
-  document.documentElement.classList.add('dtb-document-transition-active');
-  window.setTimeout(commitNavigation, DOCUMENT_FADE_MS);
+  const isCheckoutHandoff = transition === 'checkout';
+  document.documentElement.classList.add(
+    isCheckoutHandoff ? 'dtb-checkout-handoff-active' : 'dtb-document-transition-active'
+  );
+  window.setTimeout(commitNavigation, isCheckoutHandoff ? CHECKOUT_HANDOFF_MS : DOCUMENT_FADE_MS);
 }

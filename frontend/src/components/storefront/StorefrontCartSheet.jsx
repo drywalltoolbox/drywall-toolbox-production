@@ -292,7 +292,26 @@ export default function StorefrontCartSheet({
   useEffect(() => {
     if (!isOpen) return undefined;
     const onKeyDown = (event) => {
-      if (event.key === 'Escape') handleClose();
+      if (event.key === 'Escape') {
+        handleClose();
+        return;
+      }
+      if (event.key !== 'Tab' || !overlayRef.current) return;
+
+      const focusable = Array.from(overlayRef.current.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )).filter((element) => element.getClientRects().length > 0);
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';

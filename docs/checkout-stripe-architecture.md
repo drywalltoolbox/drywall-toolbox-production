@@ -22,7 +22,7 @@ WooCommerce owns cart/session state, customer/address validation, shipping, tax,
 
 The official WooCommerce Stripe Payment Gateway owns embedded payment fields, supported Stripe payment methods, Link, eligible Apple Pay/Google Pay/other express methods, tokenization, 3DS/SCA, Stripe-side payment execution, and webhook-backed reconciliation into WooCommerce.
 
-DTB does not create Stripe PaymentIntents, Stripe Checkout Sessions, wallet tokens, payment-method payloads, or storefront orders. DTB owns routing integration, a minimal native checkout document adapter for the headless theme, conservative presentation CSS, readiness diagnostics, order metadata, captured-payment observation, eventing, queues, and downstream projections.
+DTB does not create Stripe PaymentIntents, Stripe Checkout Sessions, wallet tokens, payment-method payloads, or storefront orders. DTB owns routing integration, a minimal native checkout document adapter for the headless theme, responsive presentation, route-stable mobile step navigation, readiness diagnostics, order metadata, captured-payment observation, eventing, queues, and downstream projections.
 
 ## Headless-theme checkout exception
 
@@ -57,9 +57,14 @@ React owns cart interaction only.
 - The full cart may display the Store API merchandise subtotal and state that WooCommerce calculates remaining totals at checkout.
 - Checkout is a full-document navigation to the canonical WooCommerce checkout URL.
 - The drawer waits for debounced quantity changes and active Store API mutations to settle before navigation. If the cart cannot settle, checkout fails closed instead of transferring a stale cart.
+- The cart drawer, compatibility route, and native checkout document share one fail-open loading presentation so intermediate document rewrites do not expose blank or partially hydrated checkout frames.
 - The React `/checkout` route is compatibility-only. It performs a document handoff and has a one-shot direct WordPress fallback if a routing error serves the SPA at `/checkout/`.
 
-React product pages, product modals, full cart, and mini-cart do not mount Stripe/Woo payment iframes or fabricate express wallet buttons.
+React catalog browsing, product quick-view modals, full cart, and mini-cart do not mount Stripe/Woo payment iframes or fabricate express wallet buttons.
+
+Full `/products/{slug}/` and `/products/{slug}/variations/{variationId}/` purchasing routes are explicit native WooCommerce exceptions to the headless React theme. `DTB_WooNativeProductRuntime` preserves the native Woo product form and official Stripe extension assets, while `WooNativeProductPage.php` supplies branded document chrome without rendering or cloning payment controls.
+
+The React quick-view modal offers a neutral **View express payment options** handoff. It carries only the selected variation and quantity to the native product route; it does not mutate the cart or create a payment. WooCommerce validates the selection and owns the eventual cart mutation. The official Stripe extension renders eligible Apple Pay, Google Pay, Link, Amazon Pay, Klarna, or other enabled methods through its supported product-page Express Checkout Element.
 
 ## Official Stripe gateway identity
 
@@ -182,6 +187,7 @@ Configure the official extension through WooCommerce settings. Before live accep
 3. verify test/live mode explicitly;
 4. enable only intended payment methods;
 5. verify Stripe webhook status for both test and live modes as applicable;
+6. enable the Stripe express-checkout **Product page** location if product-page methods are desired;
 6. verify HTTPS across the entire site;
 7. verify payment-method domain registration and Apple Pay domain association when wallets are enabled;
 8. disable competing storefront card/wallet authorities;
@@ -192,11 +198,11 @@ The public read-only endpoint `GET /wp-json/dtb/v1/checkout/capabilities` expose
 
 ## Presentation policy
 
-Mechanical correctness precedes branding.
+`dtb-commerce/assets/woo-native-checkout.css` provides the branded responsive presentation around the supported WooCommerce Checkout Block surfaces. Desktop uses a two-pane layout with the checkout form on the left and order summary on the right. Mobile places the order summary first and uses a three-step Information, Delivery, and Payment workflow.
 
-`dtb-commerce/assets/woo-native-checkout.css` is intentionally a conservative compatibility baseline while checkout is being proven. It must not hide, re-parent, clone, or restyle provider-owned controls in ways that change eligibility or behavior.
+`dtb-commerce/assets/woo-native-checkout-steps.js` progressively adds mobile navigation by toggling existing Checkout Block section wrappers in place. It does not move, clone, submit, or render payment controls. Express Checkout belongs only to Information and is removed from layout on later steps. The inactive Payment section remains mounted with a measurable width so the official Stripe element can initialize normally; `inert` and `aria-hidden` remove it from interaction and accessibility navigation until active. WooCommerce and the official Stripe gateway retain final validation and submission authority.
 
-After the full mechanical test matrix passes, the UI may be designed around supported WooCommerce Checkout Block customization and outer styling without changing checkout/payment authority.
+The enhancement applies only below 768px, tears down when the viewport grows, and fails open to the normal single-page Checkout Block if JavaScript does not load. Express and payment-method containers may be dimensioned responsively, but provider logos, eligibility, fields, messages, and behavior remain provider-owned. Stripe Payment Element tabs and fields are styled only through the official `wc_stripe_upe_params` filter and Stripe Elements Appearance API; the cached appearance is invalidated once per DTB appearance version.
 
 ## Required verification matrix
 

@@ -91,6 +91,13 @@ if ( ! function_exists( 'dtb_tracking_links_frontend_base_from_referer' ) ) {
 
 if ( ! function_exists( 'dtb_tracking_links_frontend_base_for_order' ) ) {
 	function dtb_tracking_links_frontend_base_for_order( WC_Order $order ): string {
+		$storefront_base_path = function_exists( 'dtb_order_storefront_base_path' )
+			? (string) dtb_order_storefront_base_path( $order )
+			: '';
+		if ( preg_match( '#^/staging/\d+$#', $storefront_base_path ) ) {
+			return rtrim( home_url( $storefront_base_path . '/' ), '/' );
+		}
+
 		$stored = esc_url_raw( (string) $order->get_meta( '_dtb_frontend_tracking_base_url', true ) );
 		if ( '' !== $stored ) {
 			return rtrim( $stored, '/' );

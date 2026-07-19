@@ -37,11 +37,13 @@ The public browsing/account/cart experience is the React SPA in `frontend/`. Wor
 ### Storefront and checkout
 
 - catalog browsing, search, brand/category filtering, and product detail/variation selection;
+- React quick-view product discovery with full-product purchasing handed to native WooCommerce routes;
 - Store API-backed cart in the React storefront;
 - full-document checkout handoff from React cart/cart sidebar to `/checkout/`;
 - root `.htaccess` routes `/checkout/` to the WordPress/WooCommerce checkout instead of the React SPA shell;
 - WooCommerce renders the assigned Checkout page using the native Checkout Block;
 - the official WooCommerce Stripe Payment Gateway renders embedded payment fields, eligible express wallets, Link where enabled, saved-method UI, and payment errors inside Woo checkout;
+- on full native product pages, the official Stripe extension renders only the express methods eligible for that browser/customer when its Product page location is enabled;
 - WooCommerce creates the storefront order through Checkout Block/Store API;
 - the official Stripe gateway and its webhooks synchronize payment status back to WooCommerce;
 - DTB tags Woo checkout orders, observes verified paid official-Stripe orders, appends order events, and dispatches downstream jobs through `dtb-orders`;
