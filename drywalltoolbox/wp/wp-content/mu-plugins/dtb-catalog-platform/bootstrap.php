@@ -104,6 +104,7 @@ require_once $_dtb_cp . '/Rest/ProductPlaceholderImageFilter.php';
 // Admin / CLI tools.
 if ( is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 	require_once $_dtb_cp . '/Admin/CatalogAdminMenu.php';
+	require_once $_dtb_cp . '/Admin/ProductListTable.php';
 	require_once $_dtb_cp . '/Admin/CatalogToolsPage.php';
 	require_once $_dtb_cp . '/Admin/MetaBackfillTool.php';
 	require_once $_dtb_cp . '/Admin/CatalogHealthRenderer.php';
