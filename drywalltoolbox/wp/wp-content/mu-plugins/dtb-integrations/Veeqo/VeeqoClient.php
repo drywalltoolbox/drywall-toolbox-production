@@ -361,10 +361,10 @@ function dtb_veeqo_route_inventory( WP_REST_Request $request ): WP_REST_Response
 	$page     = max( 1, (int) ( $request->get_param( 'page' )     ?? 1 ) );
 	$per_page = min( 100, max( 1, (int) ( $request->get_param( 'per_page' ) ?? 100 ) ) );
 
-	// Veeqo pagination parameters are page_number (1-indexed) and page_size (max 100).
+	// Veeqo pagination parameters are page (1-indexed) and page_size (max 100).
 	$result = dtb_veeqo_request( 'GET', '/products', [
-		'page_number' => (string) $page,
-		'page_size'   => (string) $per_page,
+		'page'      => (string) $page,
+		'page_size' => (string) $per_page,
 	] );
 
 	if ( ! $result['ok'] ) {
@@ -1383,28 +1383,38 @@ function dtb_veeqo_get_inventory_summary(): array {
  * @return array|null Null on API error.
  */
 function dtb_veeqo_fetch_inventory_summary(): ?array {
-	$result = dtb_veeqo_request( 'GET', '/products', [ 'page_size' => 250 ] );
-
-	if ( ! $result['ok'] || ! is_array( $result['data'] ) ) {
-		return null;
-	}
-
 	$total     = 0;
 	$low_stock = 0;
 	$oos       = 0;
+	$page      = 1;
+	$per_page  = 100;
 
-	foreach ( (array) $result['data'] as $product ) {
-		$total++;
-		$qty = isset( $product['sellable_on_hand_count'] )
-			? (int) $product['sellable_on_hand_count']
-			: 0;
+	do {
+		$result = dtb_veeqo_request( 'GET', '/products', [
+			'page'      => (string) $page,
+			'page_size' => (string) $per_page,
+		] );
 
-		if ( 0 === $qty ) {
-			$oos++;
-		} elseif ( $qty <= 3 ) {
-			$low_stock++;
+		if ( ! $result['ok'] || ! is_array( $result['data'] ) ) {
+			return null;
 		}
-	}
+
+		$products = $result['data'];
+		foreach ( $products as $product ) {
+			$total++;
+			$qty = isset( $product['sellable_on_hand_count'] )
+				? (int) $product['sellable_on_hand_count']
+				: 0;
+
+			if ( 0 === $qty ) {
+				$oos++;
+			} elseif ( $qty <= 3 ) {
+				$low_stock++;
+			}
+		}
+
+		$page++;
+	} while ( count( $products ) === $per_page );
 
 	return [
 		'total_skus'    => $total,
@@ -1432,14 +1442,14 @@ function dtb_veeqo_log_sync_timestamp( string $type ): void {
 // Runs every 6 hours via WP-Cron.
 //
 // Flow:
-//   1. Fetch all products from Veeqo (paginated, up to 250 per run).
+//   1. Fetch all products from Veeqo in API-supported pages of up to 100.
 //   2. For each Veeqo sellable, extract available_stock (sum across warehouses).
 //   3. Find the matching WooCommerce product/variation by SKU.
 //   4. Update WC stock quantity to the Veeqo value when there is a discrepancy.
 //
-// Safety: we never increase WC stock above Veeqo's value; the pull is a
-// reconciliation write, not an authoritative inventory system replacement.
-// WooCommerce retains authority for stock reservation during checkout.
+// Veeqo is the inventory authority. WooCommerce stores the checkout-facing
+// projection and continues to perform its normal local reservation/reduction
+// behavior between authoritative Veeqo reconciliations.
 //
 // The pull can also be triggered on-demand by admins via:
 //   POST /dtb/v1/veeqo/inventory/pull
@@ -1472,18 +1482,36 @@ function dtb_veeqo_run_inventory_pull(): void {
 		return;
 	}
 
-	$updated = dtb_veeqo_pull_inventory_into_wc( 1, 250 );
+	$updated  = 0;
+	$page     = 1;
+	$per_page = 100;
+	$failed   = false;
+
+	do {
+		$products_seen = 0;
+		$page_updated  = dtb_veeqo_pull_inventory_into_wc( $page, $per_page, $products_seen );
+		if ( null === $page_updated ) {
+			$failed = true;
+			break;
+		}
+
+		$updated += $page_updated;
+		$page++;
+	} while ( $products_seen === $per_page );
 
 	dtb_veeqo_log(
-		null !== $updated ? 'info' : 'warn',
+		! $failed ? 'info' : 'warn',
 		'inventory_sync_cron',
-		null !== $updated
-			? sprintf( 'Scheduled inventory pull complete. %d WC product(s) updated.', $updated )
-			: 'Scheduled inventory pull failed — Veeqo API error.',
-		[ 'updated_skus' => $updated ?? 0 ]
+		! $failed
+			? sprintf( 'Scheduled inventory pull complete. %d WooCommerce product(s) updated across %d Veeqo page(s).', $updated, $page - 1 )
+			: sprintf( 'Scheduled inventory pull stopped after a Veeqo API error on page %d.', $page ),
+		[
+			'updated_skus'   => $updated,
+			'pages_completed' => $page - 1,
+		]
 	);
 
-	if ( null !== $updated ) {
+	if ( ! $failed ) {
 		dtb_veeqo_log_sync_timestamp( 'inventory_pull' );
 	}
 }
@@ -1492,18 +1520,19 @@ function dtb_veeqo_run_inventory_pull(): void {
  * Fetch one page of Veeqo products, compute available stock per SKU,
  * and write the values back to WooCommerce product/variation stock.
  *
- * @param int $page     Veeqo page number (1-indexed).
- * @param int $per_page Products per page (max 250 for scheduled runs).
+ * @param int      $page          Veeqo page number (1-indexed).
+ * @param int      $per_page      Products per page (Veeqo maximum: 100).
+ * @param int|null $products_seen Receives the number of Veeqo products returned on this page.
  * @return int|null  Number of WC products updated, or null on API error.
  */
-function dtb_veeqo_pull_inventory_into_wc( int $page = 1, int $per_page = 100 ): ?int {
+function dtb_veeqo_pull_inventory_into_wc( int $page = 1, int $per_page = 100, ?int &$products_seen = null ): ?int {
 	if ( ! function_exists( 'wc_get_product_id_by_sku' ) ) {
 		return null;
 	}
 
 	$result = dtb_veeqo_request( 'GET', '/products', [
-		'page_number' => (string) max( 1, $page ),
-		'page_size'   => (string) min( 250, max( 1, $per_page ) ),
+		'page'      => (string) max( 1, $page ),
+		'page_size' => (string) min( 100, max( 1, $per_page ) ),
 	] );
 
 	if ( ! $result['ok'] || ! is_array( $result['data'] ) ) {
@@ -1514,7 +1543,12 @@ function dtb_veeqo_pull_inventory_into_wc( int $page = 1, int $per_page = 100 ):
 		return null;
 	}
 
-	$updated = 0;
+	$products_seen = count( $result['data'] );
+	$updated       = 0;
+	$matched       = 0;
+	$enabled       = 0;
+	$unchanged     = 0;
+	$unmatched     = 0;
 
 	foreach ( (array) $result['data'] as $veeqo_product ) {
 		$sellables = (array) ( $veeqo_product['sellables'] ?? [] );
@@ -1534,28 +1568,67 @@ function dtb_veeqo_pull_inventory_into_wc( int $page = 1, int $per_page = 100 ):
 			// Find the WooCommerce product or variation with this SKU.
 			$wc_product_id = wc_get_product_id_by_sku( $sku );
 			if ( ! $wc_product_id ) {
+				$unmatched++;
 				continue;
 			}
 
 			$wc_product = wc_get_product( $wc_product_id );
-			if ( ! $wc_product || ! $wc_product->managing_stock() ) {
+			if (
+				! $wc_product
+				|| trim( (string) $wc_product->get_sku() ) !== $sku
+				|| ! in_array( $wc_product->get_type(), [ 'simple', 'variation' ], true )
+			) {
+				$unmatched++;
+				continue;
+			}
+			$matched++;
+
+			$sellable_id    = absint( $sellable['id'] ?? 0 );
+			$mapping_changed = $wc_product->get_meta( '_veeqo_mapped_sku' ) !== $sku
+				|| ( $sellable_id > 0 && (int) $wc_product->get_meta( '_veeqo_sellable_id' ) !== $sellable_id );
+			if ( $mapping_changed ) {
+				$wc_product->update_meta_data( '_veeqo_mapped_sku', $sku );
+				if ( $sellable_id > 0 ) {
+					$wc_product->update_meta_data( '_veeqo_sellable_id', $sellable_id );
+				}
+			}
+
+			$stock_status = $available > 0
+				? 'instock'
+				: ( $wc_product->backorders_allowed() ? 'onbackorder' : 'outofstock' );
+
+			// An exact Veeqo SKU match is sufficient authority to begin tracking the
+			// WooCommerce projection. Set the flag and quantity together so a product
+			// is never briefly managed with an invented/default stock value.
+			if ( ! $wc_product->managing_stock() ) {
+				$wc_product->set_manage_stock( true );
+				$wc_product->set_stock_quantity( $available );
+				$wc_product->set_stock_status( $stock_status );
+				$wc_product->save();
+				$enabled++;
+				$updated++;
+
+				dtb_veeqo_log( 'info', 'inventory_stock_management_enabled', 'WooCommerce stock management enabled from an exact Veeqo SKU match.', [
+					'sku'       => $sku,
+					'wc_id'     => $wc_product_id,
+					'veeqo'     => $available,
+				] );
 				continue;
 			}
 
 			$current_stock = (int) $wc_product->get_stock_quantity();
-			if ( $current_stock === $available ) {
+			if ( $current_stock === $available && $wc_product->get_stock_status() === $stock_status ) {
 				// Already in sync — no write needed.
+				if ( $mapping_changed ) {
+					$wc_product->save_meta_data();
+				}
+				$unchanged++;
 				continue;
 			}
 
-			// Only reconcile downward discrepancies larger than 1 unit to avoid
-			// thrashing during high-traffic order windows where WC reductions may
-			// not yet have synced back to Veeqo.
-			if ( abs( $current_stock - $available ) < 2 ) {
-				continue;
-			}
-
-			wc_update_product_stock( $wc_product, $available, 'set' );
+			$wc_product->set_stock_quantity( $available );
+			$wc_product->set_stock_status( $stock_status );
+			$wc_product->save();
 			$updated++;
 
 			dtb_veeqo_log( 'debug', 'inventory_stock_updated', 'WC product stock reconciled from Veeqo.', [
@@ -1566,6 +1639,16 @@ function dtb_veeqo_pull_inventory_into_wc( int $page = 1, int $per_page = 100 ):
 			] );
 		}
 	}
+
+	dtb_veeqo_log( 'info', 'inventory_pull_page_complete', 'Veeqo inventory page projected into WooCommerce.', [
+		'page'                   => $page,
+		'veeqo_products_seen'    => $products_seen,
+		'wc_skus_matched'        => $matched,
+		'stock_tracking_enabled' => $enabled,
+		'updated'                => $updated,
+		'unchanged'              => $unchanged,
+		'unmatched_sellables'    => $unmatched,
+	] );
 
 	return $updated;
 }

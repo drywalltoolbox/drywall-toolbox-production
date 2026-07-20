@@ -25,14 +25,41 @@ function dtb_get_wc_credentials(): array {
 	];
 }
 
+/** Validate a public headless storefront sub-path mount. */
+function dtb_sanitize_storefront_base_path( string $value ): string {
+	$value = trim( rawurldecode( $value ) );
+	if ( '' === $value || '/' === $value ) {
+		return '';
+	}
+
+	$value = '/' . trim( $value, '/' );
+	return preg_match( '#^/staging/[A-Za-z0-9_-]+$#', $value ) ? $value : '';
+}
+
 /** Detect the headless storefront sub-path mount (for example `/staging/2972`). */
 function dtb_detect_storefront_base_path(): string {
-	$staging_path_pattern = '#/staging/(\d+)(?:/|$|\?)#';
+	$staging_path_pattern = '#/staging/([A-Za-z0-9_-]+)(?:/|$|\?)#';
+
+	$query_base = isset( $_GET['dtb_storefront_base_path'] )
+		? dtb_sanitize_storefront_base_path( (string) wp_unslash( $_GET['dtb_storefront_base_path'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		: '';
+	if ( '' !== $query_base ) {
+		return $query_base;
+	}
 
 	$referer = isset( $_SERVER['HTTP_REFERER'] )
 		? (string) wp_unslash( $_SERVER['HTTP_REFERER'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		: '';
 	if ( '' !== $referer ) {
+		$referer_query = (string) wp_parse_url( $referer, PHP_URL_QUERY );
+		if ( '' !== $referer_query ) {
+			parse_str( $referer_query, $referer_args );
+			$referer_base = dtb_sanitize_storefront_base_path( (string) ( $referer_args['dtb_storefront_base_path'] ?? '' ) );
+			if ( '' !== $referer_base ) {
+				return $referer_base;
+			}
+		}
+
 		$referer_path = (string) wp_parse_url( $referer, PHP_URL_PATH );
 		if ( preg_match( $staging_path_pattern, $referer_path . '/', $matches ) ) {
 			return '/staging/' . $matches[1];
@@ -42,8 +69,9 @@ function dtb_detect_storefront_base_path(): string {
 	$declared_base = isset( $_SERVER['HTTP_X_DTB_STOREFRONT_BASE'] )
 		? (string) wp_unslash( $_SERVER['HTTP_X_DTB_STOREFRONT_BASE'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		: '';
-	if ( preg_match( $staging_path_pattern, $declared_base . '/', $matches ) ) {
-		return '/staging/' . $matches[1];
+	$declared_base = dtb_sanitize_storefront_base_path( $declared_base );
+	if ( '' !== $declared_base ) {
+		return $declared_base;
 	}
 
 	$request_uri = isset( $_SERVER['REQUEST_URI'] )
@@ -51,7 +79,7 @@ function dtb_detect_storefront_base_path(): string {
 		: '';
 	if ( '' !== $request_uri ) {
 		$path = (string) wp_parse_url( $request_uri, PHP_URL_PATH );
-		if ( preg_match( '#^/staging/(\d+)(?:/|$)#', $path, $matches ) ) {
+		if ( preg_match( '#^/staging/([A-Za-z0-9_-]+)(?:/|$)#', $path, $matches ) ) {
 			return '/staging/' . $matches[1];
 		}
 	}

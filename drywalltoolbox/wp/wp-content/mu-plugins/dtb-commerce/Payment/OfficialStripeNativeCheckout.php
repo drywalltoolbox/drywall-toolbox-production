@@ -19,7 +19,7 @@ final class DTB_OfficialStripeNativeCheckout {
 	public const CONTRACT_VERSION = 'woo-stripe-v1';
 
 	private const STRIPE_GATEWAY_ID = 'stripe';
-	private const ASSET_VERSION     = '2026.07.20.15';
+	private const ASSET_VERSION     = '2026.07.20.16';
 	private const STRIPE_APPEARANCE_VERSION = '2026.07.20.2';
 	private const STRIPE_APPEARANCE_OPTION  = 'dtb_stripe_appearance_version';
 
@@ -356,7 +356,10 @@ final class DTB_OfficialStripeNativeCheckout {
 		}
 		$order->update_meta_data( '_dtb_order_type', 'product' );
 		if ( function_exists( 'dtb_detect_storefront_base_path' ) ) {
-			$order->update_meta_data( '_dtb_storefront_base_path', dtb_detect_storefront_base_path() );
+			$storefront_base_path = dtb_detect_storefront_base_path();
+			if ( '' !== $storefront_base_path || '' === (string) $order->get_meta( '_dtb_storefront_base_path', true ) ) {
+				$order->update_meta_data( '_dtb_storefront_base_path', $storefront_base_path );
+			}
 		}
 	}
 

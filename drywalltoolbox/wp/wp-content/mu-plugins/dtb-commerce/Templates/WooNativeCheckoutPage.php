@@ -19,7 +19,7 @@ $storefront_base_path = function_exists( 'dtb_detect_storefront_base_path' )
 	? dtb_detect_storefront_base_path()
 	: '';
 $storefront_home_url  = home_url( $storefront_base_path . '/' );
-$checkout_refinement_version = '2026.07.20.1';
+$checkout_refinement_version = '2026.07.20.2';
 
 wp_enqueue_style(
 	'dtb-woo-native-checkout-profile-refinements',

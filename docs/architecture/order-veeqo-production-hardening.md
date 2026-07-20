@@ -157,6 +157,7 @@ X-DTB-External-Order-Secret: <secret>
 - Remove direct Veeqo status hooks from `VeeqoClient.php` after staging validation.
 - Move all Veeqo order writes into the DTB Action Scheduler queue.
 - Treat Veeqo inventory as upstream and WooCommerce stock as a projection.
+- On an exact Veeqo-to-WooCommerce SKU match, the inventory pull enables WooCommerce stock management and writes the authoritative Veeqo available quantity in the same product save. It never invents a quantity for an unmatched catalog product.
 - Keep bridge/API2Cart isolated from order creation.
 - Add a WP-admin integration health screen that shows:
   - external order-write blocking status

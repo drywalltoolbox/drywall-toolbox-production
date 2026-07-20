@@ -91,6 +91,12 @@ final class DTB_StorefrontReturnContext {
 		if ( function_exists( 'WC' ) && WC() && WC()->session ) {
 			$base_path = self::sanitize_storefront_base_path( (string) WC()->session->get( self::SESSION_KEY, '' ) );
 		}
+		if ( '' === $base_path ) {
+			$base_path = self::sanitize_storefront_base_path( (string) $order->get_meta( self::ORDER_META, true ) );
+		}
+		if ( '' === $base_path && function_exists( 'dtb_detect_storefront_base_path' ) ) {
+			$base_path = self::sanitize_storefront_base_path( dtb_detect_storefront_base_path() );
+		}
 
 		$order->update_meta_data( self::ORDER_META, $base_path );
 	}
@@ -99,6 +105,10 @@ final class DTB_StorefrontReturnContext {
 	 * Only production root or a tracked staging build path may be persisted.
 	 */
 	private static function sanitize_storefront_base_path( string $value ): string {
+		if ( function_exists( 'dtb_sanitize_storefront_base_path' ) ) {
+			return dtb_sanitize_storefront_base_path( $value );
+		}
+
 		$value = trim( rawurldecode( $value ) );
 		if ( '' === $value || '/' === $value ) {
 			return '';

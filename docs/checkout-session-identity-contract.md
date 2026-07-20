@@ -27,7 +27,7 @@ production storefront -> /checkout/ -> /order-tracking/{orderId}
 staging storefront    -> /checkout/ -> /staging/{id}/order-tracking/{orderId}
 ```
 
-The React checkout URL helper may append only the validated public routing hint `dtb_storefront_base_path=/staging/{id}`. `DTB_StorefrontReturnContext` captures that value into the existing Woo session, persists it as `_dtb_storefront_base_path` on the Woo order, and filters WooCommerce's successful gateway return URL to the matching React order-tracking route.
+The React checkout URL helper may append only the validated public routing hint `dtb_storefront_base_path=/staging/{id}`. `DTB_StorefrontReturnContext` captures that value into the existing Woo session, persists it as `_dtb_storefront_base_path` on the Woo order, and filters WooCommerce's successful gateway return URL to the matching React order-tracking route. Store API order processing also recovers the validated hint from the checkout request referrer and preserves an already-persisted order value, so a blank API request context cannot downgrade a staging order to the production storefront.
 
 The return context is not an authority input. It must never affect customer identity, cart contents, totals, order creation, Stripe state, payment verification, fulfillment, or accounting. Accepted values are production root (`''`) or `/staging/{id}` matching the strict staging-path allowlist; all other values collapse to production root.
 

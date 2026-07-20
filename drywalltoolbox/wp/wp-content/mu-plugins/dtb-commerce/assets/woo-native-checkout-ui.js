@@ -203,6 +203,33 @@
 		} );
 	}
 
+	function clearProgressiveCheckoutPresentation() {
+		document.body.classList.remove( 'dtb-checkout-enhanced', 'dtb-mobile-checkout-enhanced', ...stepBodyClasses );
+		progress?.remove();
+		progress = null;
+		actions?.remove();
+		actions = null;
+
+		document.querySelectorAll( '[data-dtb-checkout-step], [data-dtb-mobile-refinement-step]' ).forEach( ( node ) => {
+			node.classList.remove( inactiveStepClass );
+			node.removeAttribute( 'aria-hidden' );
+			delete node.dataset.dtbCheckoutStep;
+			delete node.dataset.dtbMobileRefinementStep;
+		} );
+		expressCheckoutElements().forEach( ( node ) => {
+			node.classList.remove( inactiveStepClass );
+			node.removeAttribute( 'aria-hidden' );
+		} );
+		paymentSheetElements().forEach( ( node ) => {
+			node.classList.remove( sheetOwnedClass, sheetClosedClass );
+			node.removeAttribute( 'aria-hidden' );
+			delete node.dataset.dtbPaymentSheetOwned;
+		} );
+		document.querySelectorAll( `.${ accountContactClass }` ).forEach( ( node ) => node.remove() );
+		document.querySelectorAll( '.has-dtb-account-contact' ).forEach( ( node ) => node.classList.remove( 'has-dtb-account-contact' ) );
+		clearSharedAddressPresentation();
+	}
+
 	function reconcileGuestContactDetails() {
 		if ( ! isGuestCheckout() ) {
 			clearSharedAddressPresentation();
@@ -515,6 +542,10 @@
 	function reconcileCheckoutPresentation() {
 		presentationReconcileQueued = false;
 		markDuplicateOrderSummaries();
+		if ( ! mobileViewport.matches ) {
+			clearProgressiveCheckoutPresentation();
+			return;
+		}
 		markSingleGatewayPresentation();
 		reconcileStepElementState();
 		reconcileRefinedSections();
@@ -903,14 +934,15 @@
 		if ( ! actions ) {
 			return;
 		}
-		if ( mobileViewport.matches ) {
-			root.insertAdjacentElement( 'afterend', actions );
-		} else {
-			checkoutMain()?.append( actions );
-		}
+		root.insertAdjacentElement( 'afterend', actions );
 	}
 
 	function mountCheckoutEnhancement() {
+		if ( ! mobileViewport.matches ) {
+			clearProgressiveCheckoutPresentation();
+			return true;
+		}
+
 		const root = checkoutRoot();
 		const paymentBlock = root?.querySelector( '.wp-block-woocommerce-checkout-payment-block, .wc-block-checkout__payment-method' );
 		const orderActions = root?.querySelector( '.wp-block-woocommerce-checkout-actions-block, .wc-block-checkout__actions' );
@@ -920,9 +952,7 @@
 		}
 
 		reconcileCheckoutPresentation();
-		if ( mobileViewport.matches ) {
-			ensurePaymentSheetChrome();
-		}
+		ensurePaymentSheetChrome();
 		markPaymentSheetElements();
 		if ( ! progress ) {
 			progress = createProgress();
@@ -938,7 +968,7 @@
 		}
 
 		document.body.classList.add( 'dtb-checkout-enhanced' );
-		document.body.classList.toggle( 'dtb-mobile-checkout-enhanced', mobileViewport.matches );
+		document.body.classList.add( 'dtb-mobile-checkout-enhanced' );
 		showStep( activeStep, false );
 		return true;
 	}
@@ -946,6 +976,7 @@
 	function handleViewportChange() {
 		closePaymentSheet( { immediate: true, restoreFocus: false } );
 		mountCheckoutEnhancement();
+		queueCheckoutPresentationReconcile();
 	}
 
 	function initialize() {

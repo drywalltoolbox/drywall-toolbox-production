@@ -1,6 +1,7 @@
 ( function () {
 	'use strict';
 
+	const mobileViewport = window.matchMedia( '(max-width: 767px)' );
 	const checkoutRootSelector = '.wc-block-checkout';
 	const inactiveStepClass = 'is-dtb-checkout-step-inactive';
 	const addressSectionAttribute = 'data-dtb-profile-address-section';
@@ -27,7 +28,21 @@
 	}
 
 	function isSignedInCheckout() {
-		return document.body.classList.contains( 'logged-in' ) && Boolean( checkoutRoot() );
+		return mobileViewport.matches && document.body.classList.contains( 'logged-in' ) && Boolean( checkoutRoot() );
+	}
+
+	function clearProfileRefinements() {
+		document.querySelectorAll( `[${ addressSectionAttribute }], [${ contactSectionAttribute }]` ).forEach( ( section ) => {
+			section.classList.remove( inactiveStepClass );
+			section.removeAttribute( 'aria-hidden' );
+			section.removeAttribute( addressSectionAttribute );
+			section.removeAttribute( contactSectionAttribute );
+			section.removeAttribute( editAttemptAttribute );
+		} );
+		document.querySelectorAll( `[${ contactFieldAttribute }], [${ shippingFieldAttribute }]` ).forEach( ( field ) => {
+			field.removeAttribute( contactFieldAttribute );
+			field.removeAttribute( shippingFieldAttribute );
+		} );
 	}
 
 	function activeStep() {
@@ -148,6 +163,10 @@
 
 	function reconcileSignedInProfileFields() {
 		reconcileQueued = false;
+		if ( ! mobileViewport.matches ) {
+			clearProfileRefinements();
+			return;
+		}
 		if ( ! isSignedInCheckout() ) {
 			return;
 		}
@@ -183,6 +202,7 @@
 	}
 
 	function initialize() {
+		mobileViewport.addEventListener( 'change', queueReconcile );
 		observeCheckout();
 		bodyObserver = new MutationObserver( () => {
 			observeCheckout();
