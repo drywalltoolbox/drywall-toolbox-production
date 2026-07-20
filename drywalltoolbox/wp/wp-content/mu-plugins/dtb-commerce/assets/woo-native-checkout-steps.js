@@ -6,9 +6,8 @@
 	 *
 	 * WooCommerce Checkout Block and the official WooCommerce Stripe gateway own
 	 * checkout sections, validation, navigation, payment controls, eligibility,
-	 * and submission. DTB must not hide/inert provider-owned sections, insert a
-	 * parallel step controller, or run a MutationObserver over checkout state while
-	 * the production payment path is being proven.
+	 * and submission. Presentation enhancements live in a separate UI asset so
+	 * this mechanical reveal path remains independently rollback-safe.
 	 */
 	function revealCheckout() {
 		window.requestAnimationFrame( () => {
