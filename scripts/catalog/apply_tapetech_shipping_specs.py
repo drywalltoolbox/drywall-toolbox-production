@@ -58,6 +58,19 @@ REQUIRED_SOURCE_FIELDS = {
 }
 REQUIRED_CATALOG_FIELDS = {"SKU", "Name", "Brands", *CATALOG_FIELD_MAP.values()}
 
+UPDATE_REPORT_FIELDS = {
+    "SKU",
+    "Description",
+    "AfterWeightLbs",
+    "AfterLengthIn",
+    "AfterWidthIn",
+    "AfterHeightIn",
+    "ShipBoxLengthCm",
+    "ShipBoxWidthCm",
+    "ShipBoxHeightCm",
+    "ShipPackageWeightKg",
+}
+
 
 def normalize_sku(value: object) -> str:
     text = str(value or "").strip().upper()
@@ -95,12 +108,42 @@ def require_fields(path: Path, actual: Iterable[str], required: set[str]) -> Non
         raise ValueError(f"{path}: missing required columns: {', '.join(missing)}")
 
 
+def normalize_source_schema(
+    path: Path,
+    headers: list[str],
+    rows: list[dict[str, str]],
+) -> tuple[list[str], list[dict[str, str]]]:
+    """Accept the official source schema or the reviewed launch update report."""
+    if REQUIRED_SOURCE_FIELDS.issubset(headers):
+        return headers, rows
+
+    require_fields(path, headers, UPDATE_REPORT_FIELDS)
+    normalized_rows: list[dict[str, str]] = []
+    for row in rows:
+        normalized_rows.append(
+            {
+                "Model": row.get("SKU", ""),
+                "Description": row.get("Description", ""),
+                "UPC Code": "",
+                "Ship Package Weight (lbs)": row.get("AfterWeightLbs", ""),
+                "Ship Box Length (in)": row.get("AfterLengthIn", ""),
+                "Ship Box Width (in)": row.get("AfterWidthIn", ""),
+                "Ship Box Height (in)": row.get("AfterHeightIn", ""),
+                "Ship Box Length (cm)": row.get("ShipBoxLengthCm", ""),
+                "Ship Box Width (cm)": row.get("ShipBoxWidthCm", ""),
+                "Ship Box Height (cm)": row.get("ShipBoxHeightCm", ""),
+                "Ship Package Weight (kg)": row.get("ShipPackageWeightKg", ""),
+            }
+        )
+    return sorted(REQUIRED_SOURCE_FIELDS), normalized_rows
+
+
 def atomic_write_csv(path: Path, headers: list[str], rows: list[dict[str, str]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
     try:
         with os.fdopen(fd, "w", encoding="utf-8", newline="") as handle:
-            writer = csv.DictWriter(handle, fieldnames=headers, extrasaction="ignore", lineterminator="\n")
+            writer = csv.DictWriter(handle, fieldnames=headers, extrasaction="ignore", lineterminator="\r\n")
             writer.writeheader()
             writer.writerows(rows)
             handle.flush()
@@ -163,17 +206,25 @@ def main() -> int:
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--audit", required=True, type=Path)
     parser.add_argument("--apply", action="store_true", help="Write the enriched catalog. Default is audit-only.")
+    parser.add_argument(
+        "--include-metadata",
+        action="store_true",
+        help="Also append metric and provenance metadata. Default writes native WooCommerce fields only.",
+    )
     args = parser.parse_args()
 
     catalog_headers, catalog_rows = read_csv(args.catalog)
     source_headers, source_rows = read_csv(args.source)
     require_fields(args.catalog, catalog_headers, REQUIRED_CATALOG_FIELDS)
+    source_headers, source_rows = normalize_source_schema(args.source, source_headers, source_rows)
     require_fields(args.source, source_headers, REQUIRED_SOURCE_FIELDS)
     assert_unique_source_models(source_rows)
 
-    output_headers = append_headers(
-        catalog_headers,
-        [*METRIC_META_FIELD_MAP.values(), *PROVENANCE_FIELDS.keys()],
+    metadata_fields = {*METRIC_META_FIELD_MAP.values(), *PROVENANCE_FIELDS.keys()}
+    output_headers = (
+        append_headers(catalog_headers, metadata_fields)
+        if args.include_metadata
+        else [field for field in catalog_headers if field not in metadata_fields]
     )
     catalog_index = build_catalog_index(catalog_rows)
 
@@ -223,30 +274,31 @@ def main() -> int:
                 row[catalog_field] = after
                 row_changed = True
 
-        for source_field, meta_field in METRIC_META_FIELD_MAP.items():
-            before = normalize_scalar(row.get(meta_field, ""))
-            after = normalize_scalar(source_row.get(source_field, ""))
-            audit[f"Existing {meta_field}"] = before
-            audit[f"Official {meta_field}"] = after
-            if not after:
-                continue
-            if before != after:
-                row[meta_field] = after
-                row_changed = True
+        if args.include_metadata:
+            for source_field, meta_field in METRIC_META_FIELD_MAP.items():
+                before = normalize_scalar(row.get(meta_field, ""))
+                after = normalize_scalar(source_row.get(source_field, ""))
+                audit[f"Existing {meta_field}"] = before
+                audit[f"Official {meta_field}"] = after
+                if not after:
+                    continue
+                if before != after:
+                    row[meta_field] = after
+                    row_changed = True
 
-        provenance_updates = {
-            "Meta: _dtb_shipping_spec_source": args.source.name,
-            "Meta: _dtb_shipping_spec_model": source_model,
-            "Meta: _dtb_shipping_spec_description": clean(source_row.get("Description", "")),
-            "Meta: _dtb_shipping_spec_verified": "yes",
-        }
-        for field, after in provenance_updates.items():
-            before = normalize_scalar(row.get(field, ""))
-            audit[f"Existing {field}"] = before
-            audit[f"Official {field}"] = after
-            if before != after:
-                row[field] = after
-                row_changed = True
+            provenance_updates = {
+                "Meta: _dtb_shipping_spec_source": args.source.name,
+                "Meta: _dtb_shipping_spec_model": source_model,
+                "Meta: _dtb_shipping_spec_description": clean(source_row.get("Description", "")),
+                "Meta: _dtb_shipping_spec_verified": "yes",
+            }
+            for field, after in provenance_updates.items():
+                before = normalize_scalar(row.get(field, ""))
+                audit[f"Existing {field}"] = before
+                audit[f"Official {field}"] = after
+                if before != after:
+                    row[field] = after
+                    row_changed = True
 
         if row_changed:
             changed += 1
