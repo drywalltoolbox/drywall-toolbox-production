@@ -804,10 +804,20 @@
 	function updateControls() {
 		progress?.querySelectorAll( '[data-step]' ).forEach( ( button ) => {
 			const index = Number( button.dataset.step );
-			button.classList.toggle( 'is-current', index === activeStep );
-			button.classList.toggle( 'is-complete', index < activeStep );
+			const isCurrent = index === activeStep;
+			const isComplete = index < activeStep;
+			const item = button.closest( '.dtb-mobile-checkout-progress__item' );
+			const number = button.querySelector( '.dtb-mobile-checkout-progress__number' );
+
+			button.classList.toggle( 'is-current', isCurrent );
+			button.classList.toggle( 'is-complete', isComplete );
+			item?.classList.toggle( 'is-current', isCurrent );
+			item?.classList.toggle( 'is-complete', isComplete );
+			if ( number ) {
+				number.textContent = isComplete ? '✓' : String( index + 1 );
+			}
 			button.disabled = index > highestVisitedStep || paymentSheetOpen;
-			if ( index === activeStep ) {
+			if ( isCurrent ) {
 				button.setAttribute( 'aria-current', 'step' );
 			} else {
 				button.removeAttribute( 'aria-current' );

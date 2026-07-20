@@ -19,7 +19,7 @@ final class DTB_OfficialStripeNativeCheckout {
 	public const CONTRACT_VERSION = 'woo-stripe-v1';
 
 	private const STRIPE_GATEWAY_ID = 'stripe';
-	private const ASSET_VERSION     = '2026.07.20.14';
+	private const ASSET_VERSION     = '2026.07.20.15';
 	private const STRIPE_APPEARANCE_VERSION = '2026.07.20.2';
 	private const STRIPE_APPEARANCE_OPTION  = 'dtb_stripe_appearance_version';
 
