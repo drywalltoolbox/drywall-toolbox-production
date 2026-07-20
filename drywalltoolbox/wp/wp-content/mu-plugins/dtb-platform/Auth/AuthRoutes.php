@@ -1146,9 +1146,16 @@ function dtb_auth_reset_password( WP_REST_Request $request ): WP_REST_Response {
  * @return WP_REST_Response
  */
 function dtb_auth_logout(): WP_REST_Response {
+	$cart_preserved = DTB_SessionService::rotate_woocommerce_session_to_guest();
 	dtb_clear_auth_cookie();
 
-	$response = new WP_REST_Response( [ 'success' => true ], 200 );
+	$response = new WP_REST_Response(
+		[
+			'success'        => true,
+			'cart_preserved' => $cart_preserved,
+		],
+		200
+	);
 	$response->header( 'Cache-Control', 'private, no-store' );
 	return $response;
 }

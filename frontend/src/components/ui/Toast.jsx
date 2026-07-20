@@ -8,7 +8,7 @@
  *   duration  number (ms, default 3000)
  */
 
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { X, CheckCircle, AlertCircle, Info, ShoppingCart, AlertTriangle } from 'lucide-react';
 import { createPortal } from 'react-dom';
@@ -90,8 +90,8 @@ function getCartToastPosition() {
 }
 
 export default function Toast({ message, type = 'success', onClose, duration = 3000 }) {
-  const [progress, setProgress] = useState(100);
   const [cartPosition, setCartPosition] = useState(() => (type === 'cart' ? getCartToastPosition() : null));
+  const positionFrameRef = useRef(0);
   const cfg = CONFIG[type] || CONFIG.info;
   const IconComponent = cfg.icon;
   const isCartToast = type === 'cart';
@@ -104,29 +104,22 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
   }, [duration, handleClose]);
 
   useEffect(() => {
-    const interval = 50;
-    const steps = duration / interval;
-    const decrement = 100 / steps;
-    let current = 100;
-    const id = setInterval(() => {
-      current -= decrement;
-      setProgress(Math.max(0, current));
-    }, interval);
-    return () => clearInterval(id);
-  }, [duration]);
-
-  useEffect(() => {
     if (!isCartToast) return undefined;
 
-    const update = () => setCartPosition(getCartToastPosition());
+    const update = () => {
+      if (positionFrameRef.current) return;
+      positionFrameRef.current = window.requestAnimationFrame(() => {
+        positionFrameRef.current = 0;
+        setCartPosition(getCartToastPosition());
+      });
+    };
     update();
-    const raf = window.requestAnimationFrame(update);
     window.addEventListener('resize', update);
     window.addEventListener('orientationchange', update);
     window.addEventListener('scroll', update, true);
 
     return () => {
-      window.cancelAnimationFrame(raf);
+      if (positionFrameRef.current) window.cancelAnimationFrame(positionFrameRef.current);
       window.removeEventListener('resize', update);
       window.removeEventListener('orientationchange', update);
       window.removeEventListener('scroll', update, true);
@@ -251,11 +244,10 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
 
       <div style={{ height: isCartToast ? '2px' : '3px', background: 'rgba(15,23,42,0.06)', borderRadius: '0 0 12px 12px', overflow: 'hidden' }}>
         <div
+          className="dtb-toast-progress"
           style={{
-            height: '100%',
-            width: `${progress}%`,
+            '--dtb-toast-duration': `${duration}ms`,
             background: cfg.accent,
-            transition: 'width 50ms linear',
             borderRadius: '0 0 12px 12px',
           }}
         />

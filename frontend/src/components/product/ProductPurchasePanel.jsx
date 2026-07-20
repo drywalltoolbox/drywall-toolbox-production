@@ -59,6 +59,7 @@ export default function ProductPurchasePanel({
           onClick={onAddToCart}
           disabled={!canAddToCart}
           className="dtb-pdp-add-to-cart"
+          data-dtb-cart-action="add"
         >
           <ShoppingCart size={16} />
           <span aria-live="polite">

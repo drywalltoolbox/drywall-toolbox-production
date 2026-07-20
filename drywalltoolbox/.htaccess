@@ -225,7 +225,9 @@ ErrorDocument 511 /errors/511.html
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set X-Frame-Options "SAMEORIGIN"
   Header always set X-Permitted-Cross-Domain-Policies "none"
-  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(self), usb=(), browsing-topics=()"
+  # Delegate Payment Request only to the official Stripe/Google Pay frame chain.
+  # Keep this synchronized with dtb_frontend_security_permissions_policy().
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(self \"https://js.stripe.com\" \"https://hooks.stripe.com\" \"https://b.stripecdn.com\" \"https://pay.google.com\"), usb=(), browsing-topics=()"
   Header always set Cross-Origin-Opener-Policy "same-origin-allow-popups"
 
   <FilesMatch "^index\.html$">
@@ -238,6 +240,12 @@ ErrorDocument 511 /errors/511.html
     Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"
     Header set Expires "0"
+  </FilesMatch>
+
+  # Stable public media and font assets are versioned operationally. Keep them
+  # browser-cacheable while allowing a bounded refresh window for logo updates.
+  <FilesMatch "\.(?:avif|webp|png|jpe?g|gif|svg|ico|woff2?|ttf|otf|eot)$">
+    Header set Cache-Control "public, max-age=2592000, stale-while-revalidate=86400"
   </FilesMatch>
 
   # Official Stripe/Apple Pay domain association should be revalidated during gateway/domain setup.

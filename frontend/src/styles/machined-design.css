@@ -1764,6 +1764,43 @@ button.header-mega-category-link {
     box-shadow: none;
 }
 
+.header-account-toggle__icon {
+    display: grid;
+    width: 20px;
+    height: 20px;
+    place-items: center;
+}
+
+.header-account-toggle.is-loading {
+    cursor: wait;
+    opacity: 1;
+}
+
+.header-mobile-account-toggle.is-loading {
+    cursor: wait;
+    opacity: 1;
+}
+
+.header-account-toggle.is-loading .header-account-toggle__icon,
+.header-mobile-account-toggle.is-loading .header-account-toggle__icon {
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.42);
+    animation: dtb-header-account-pulse 1.15s ease-in-out infinite alternate;
+}
+
+@keyframes dtb-header-account-pulse {
+    from { opacity: 0.48; }
+    to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .header-account-toggle.is-loading .header-account-toggle__icon,
+    .header-mobile-account-toggle.is-loading .header-account-toggle__icon {
+        animation: none;
+    }
+}
+
 .header-account-panel {
     position: absolute;
     top: calc(100% + 10px);

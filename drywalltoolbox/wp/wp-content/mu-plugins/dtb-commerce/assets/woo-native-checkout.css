@@ -152,15 +152,6 @@ body.dtb-official-stripe-checkout .entry-content {
   max-width: 700px;
   margin: 0 0 22px;
 }
-.dtb-checkout-intro__eyebrow {
-  margin: 0 0 7px;
-  color: var(--dtb-checkout-blue);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  line-height: 1.2;
-  text-transform: uppercase;
-}
 .dtb-checkout-intro h1 {
   margin: 0;
   color: var(--dtb-checkout-ink);
@@ -168,12 +159,6 @@ body.dtb-official-stripe-checkout .entry-content {
   font-weight: 740;
   letter-spacing: -0.03em;
   line-height: 1.15;
-}
-.dtb-checkout-intro > p:last-child {
-  margin: 6px 0 0;
-  color: var(--dtb-checkout-muted);
-  font-size: 14px;
-  line-height: 1.55;
 }
 body.dtb-official-stripe-checkout .wp-block-woocommerce-checkout,
 body.dtb-official-stripe-checkout .wc-block-checkout {
@@ -302,6 +287,143 @@ body.dtb-official-stripe-checkout .wc-block-components-address-card__edit {
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
+}
+
+/* Signed-in desktop contact context; Woo's native controls remain authoritative. */
+@media (min-width: 768px) {
+  body.dtb-official-stripe-checkout.logged-in .has-dtb-account-contact {
+    margin-bottom: 28px;
+    padding: 18px;
+    border: 1px solid var(--dtb-checkout-line);
+    border-radius: 14px;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fbff 100%);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.045);
+  }
+
+  body.dtb-official-stripe-checkout.logged-in .has-dtb-account-contact .wc-block-components-checkout-step__heading {
+    margin-bottom: 15px;
+  }
+
+  body.dtb-official-stripe-checkout.logged-in .has-dtb-account-contact .wc-block-components-checkout-step__container {
+    padding: 0;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-checkout-account-contact {
+    display: grid;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    grid-template-columns: 42px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #e7edf5;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-checkout-account-contact__icon {
+    display: inline-flex;
+    width: 42px;
+    height: 42px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d8e5fb;
+    border-radius: 12px;
+    background: var(--dtb-checkout-blue-soft);
+    color: var(--dtb-checkout-blue);
+  }
+
+  body.dtb-official-stripe-checkout .dtb-checkout-account-contact__icon svg {
+    width: 21px;
+    height: 21px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-checkout-account-contact__content {
+    min-width: 0;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-checkout-account-contact__heading {
+    display: flex;
+    min-width: 0;
+    margin-bottom: 2px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-checkout-account-contact__label {
+    color: var(--dtb-checkout-muted);
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-checkout-account-contact__status {
+    display: inline-flex;
+    min-height: 22px;
+    padding: 3px 8px;
+    align-items: center;
+    border: 1px solid #bbf7d0;
+    border-radius: 999px;
+    background: #f0fdf4;
+    color: #166534;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-checkout-account-contact__name {
+    display: block;
+    overflow: hidden;
+    color: var(--dtb-checkout-ink);
+    font-size: 16px;
+    font-weight: 720;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-checkout-account-contact__details {
+    display: flex;
+    min-width: 0;
+    margin-top: 4px;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    color: var(--dtb-checkout-muted);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-checkout-account-contact__details > span {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 6px;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-checkout-account-contact__details > span[hidden] {
+    display: none;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-checkout-account-contact__details svg {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  body.dtb-official-stripe-checkout.logged-in .has-dtb-account-contact .wc-block-components-text-input {
+    margin-top: 0;
+  }
 }
 body.dtb-official-stripe-checkout .wc-block-components-checkbox {
   margin-top: 15px;
@@ -1089,6 +1211,73 @@ body.dtb-official-stripe-checkout .woocommerce-message {
     transform: none;
   }
 }
+
+/*
+  ==========================================================================
+   GUEST CONTACT / SHIPPING FIELD SPLIT
+   The standard Woo address controls remain mounted and authoritative. Only
+   their presentation changes between the Contact and Shipping steps.
+   ==========================================================================
+ */
+@media (max-width: 767px) {
+  body.dtb-mobile-checkout-enhanced [data-dtb-shared-address-section].is-dtb-checkout-step-inactive,
+  body.dtb-checkout-step-payment [data-dtb-shared-address-section] {
+    display: none !important;
+  }
+
+  body.dtb-checkout-step-contact [data-dtb-shared-address-section],
+  body.dtb-checkout-step-shipping [data-dtb-shared-address-section] {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  body.dtb-checkout-step-contact [data-dtb-shared-address-section] {
+    margin: 0 0 22px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  body.dtb-checkout-step-contact [data-dtb-shared-address-section] .wc-block-components-checkout-step__heading,
+  body.dtb-checkout-step-contact [data-dtb-shared-address-section] .wc-block-components-checkout-step__description,
+  body.dtb-checkout-step-contact [data-dtb-shared-address-section] [data-dtb-shipping-address-field],
+  body.dtb-checkout-step-shipping [data-dtb-shared-address-section] [data-dtb-contact-detail-field] {
+    display: none !important;
+  }
+
+  body.dtb-checkout-step-contact [data-dtb-shared-address-section] [data-dtb-contact-detail-field],
+  body.dtb-checkout-step-shipping [data-dtb-shared-address-section] [data-dtb-shipping-address-field] {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  body.dtb-checkout-step-contact [data-dtb-shared-address-section] [data-dtb-contact-detail-field="first-name"],
+  body.dtb-checkout-step-contact [data-dtb-shared-address-section] [data-dtb-contact-detail-field="last-name"] {
+    display: block !important;
+    width: calc(50% - 6px) !important;
+    flex: 1 1 calc(50% - 6px) !important;
+  }
+
+  body.dtb-checkout-step-contact [data-dtb-shared-address-section] [data-dtb-contact-detail-field="phone"] {
+    display: block !important;
+    width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+}
+
+@media (max-width: 420px) {
+  body.dtb-checkout-step-contact [data-dtb-shared-address-section] [data-dtb-contact-detail-field="first-name"],
+  body.dtb-checkout-step-contact [data-dtb-shared-address-section] [data-dtb-contact-detail-field="last-name"] {
+    width: 100% !important;
+    flex-basis: 100% !important;
+  }
+}
 @media (max-width: 600px) {
   .dtb-native-woocommerce-main {
     padding: 28px 0 44px;
@@ -1319,6 +1508,332 @@ body.dtb-official-stripe-checkout .is-dtb-order-summary-duplicate {
 .dtb-mobile-checkout-actions {
   display: none;
 }
+
+/* Desktop uses the same checkout state machine without the mobile payment sheet. */
+@media (min-width: 768px) {
+  body.dtb-official-stripe-checkout .dtb-native-woocommerce-main {
+    width: min(1240px, calc(100% - 64px));
+    padding: 22px 0 48px;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-checkout-intro {
+    margin-bottom: 16px;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-checkout-intro h1 {
+    font-size: clamp(24px, 1.8vw, 28px);
+  }
+
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-progress {
+    display: block;
+    margin: 0 0 24px;
+    padding: 0 0 18px;
+    border-bottom: 1px solid var(--dtb-ui-border);
+  }
+
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-progress__track {
+    position: relative;
+    display: grid;
+    width: min(100%, 620px);
+    margin: 0;
+    padding: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    list-style: none;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-progress__track::before {
+    position: absolute;
+    top: 15px;
+    left: 16.66%;
+    right: 16.66%;
+    height: 2px;
+    background: var(--dtb-ui-border);
+    content: "";
+  }
+
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-progress__item {
+    position: relative;
+    z-index: 1;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-progress__button {
+    display: flex;
+    width: 100%;
+    padding: 0;
+    align-items: center;
+    flex-direction: column;
+    gap: 6px;
+    border: 0;
+    background: transparent;
+    color: var(--dtb-ui-muted);
+    font: 700 12px/1.25 var(--dtb-ui-font);
+  }
+
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-progress__number {
+    display: grid;
+    width: 31px;
+    height: 31px;
+    border: 2px solid var(--dtb-ui-border);
+    border-radius: 999px;
+    background: #fff;
+    color: #98a2b3;
+    font-size: 12px;
+    font-weight: 800;
+    place-items: center;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-progress__button.is-current,
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-progress__button.is-complete {
+    color: var(--dtb-ui-ink);
+  }
+
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-progress__button.is-current .dtb-mobile-checkout-progress__number {
+    border-color: var(--dtb-ui-blue);
+    background: var(--dtb-ui-blue);
+    color: #fff;
+    box-shadow: 0 5px 14px rgba(36, 87, 230, 0.2);
+  }
+
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-progress__button.is-complete .dtb-mobile-checkout-progress__number {
+    border-color: #b8c8ff;
+    background: var(--dtb-ui-soft-blue);
+    color: var(--dtb-ui-blue);
+  }
+
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-progress__button:disabled {
+    cursor: default;
+    opacity: 0.62;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-progress__button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  body.dtb-official-stripe-checkout.dtb-checkout-enhanced [data-dtb-checkout-step].is-dtb-checkout-step-inactive,
+  body.dtb-official-stripe-checkout.dtb-checkout-enhanced [data-dtb-mobile-refinement-step].is-dtb-checkout-step-inactive {
+    display: none !important;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-sidebar-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(330px, 360px);
+    gap: clamp(32px, 4vw, 52px);
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-main {
+    padding-right: 0 !important;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-sidebar {
+    top: 22px;
+    padding: 0 !important;
+    border-left: 0;
+    background: transparent;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-checkout__sidebar {
+    background: transparent;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-checkout-step,
+  body.dtb-official-stripe-checkout .wc-block-components-express-payment,
+  body.dtb-official-stripe-checkout .wc-block-checkout__payment-method {
+    margin-bottom: 20px;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-checkout-step__heading {
+    margin-bottom: 10px;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-checkout-step__container {
+    padding: 0 !important;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-text-input,
+  body.dtb-official-stripe-checkout .wc-block-components-combobox,
+  body.dtb-official-stripe-checkout .wc-block-components-form .wc-block-components-text-input {
+    margin-top: 8px;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-text-input input,
+  body.dtb-official-stripe-checkout .wc-block-components-combobox .components-combobox-control__input,
+  body.dtb-official-stripe-checkout .wc-block-components-textarea,
+  body.dtb-official-stripe-checkout input[type="text"],
+  body.dtb-official-stripe-checkout input[type="email"],
+  body.dtb-official-stripe-checkout input[type="tel"],
+  body.dtb-official-stripe-checkout select,
+  body.dtb-official-stripe-checkout textarea {
+    min-height: 48px;
+    border-radius: 9px;
+    font-size: 14px;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-address-card {
+    margin-bottom: 10px;
+    padding: 13px 15px;
+    border-radius: 11px;
+  }
+
+  body.dtb-official-stripe-checkout.logged-in .has-dtb-account-contact {
+    margin-bottom: 20px;
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-checkout-account-contact {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-express-payment__title-container {
+    margin-bottom: 10px;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-express-payment__content {
+    min-height: 66px;
+    padding: 10px;
+    border-radius: 11px !important;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-express-payment__event-buttons button,
+  body.dtb-official-stripe-checkout .wc-block-components-express-payment iframe {
+    min-height: 44px;
+    max-height: 44px;
+  }
+
+  body.dtb-official-stripe-checkout.dtb-checkout-step-shipping .wc-block-components-radio-control {
+    display: grid;
+    gap: 9px;
+  }
+
+  body.dtb-official-stripe-checkout.dtb-checkout-step-shipping .wc-block-components-radio-control__option {
+    min-height: 58px;
+    padding: 12px 14px 12px 46px;
+    border-radius: 10px;
+  }
+
+  body.dtb-official-stripe-checkout.dtb-checkout-step-shipping .wc-block-components-radio-control__input {
+    left: 14px;
+  }
+
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-actions {
+    display: flex;
+    margin-top: 20px;
+    padding-top: 18px;
+    justify-content: flex-end;
+    gap: 10px;
+    border-top: 1px solid var(--dtb-ui-border);
+  }
+
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-actions__back,
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-actions__next {
+    min-height: 48px;
+    padding: 0 20px;
+    border-radius: 10px;
+    font: 760 14px/1 var(--dtb-ui-font);
+  }
+
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-actions__back {
+    border: 1px solid var(--dtb-ui-border-strong);
+    background: #fff;
+    color: var(--dtb-ui-copy);
+  }
+
+  body.dtb-official-stripe-checkout .dtb-mobile-checkout-actions__next {
+    min-width: 210px;
+    border: 1px solid var(--dtb-ui-blue);
+    background: var(--dtb-ui-blue);
+    color: #fff;
+  }
+
+  body.dtb-official-stripe-checkout .wp-block-woocommerce-checkout-order-summary-block {
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(16, 24, 40, 0.05);
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-checkout-order-summary__title {
+    min-height: 52px;
+    padding: 13px 16px;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-checkout-order-summary__title .wc-block-components-checkout-order-summary__title-text,
+  body.dtb-official-stripe-checkout .wc-block-components-order-summary__button-text,
+  body.dtb-official-stripe-checkout .wc-block-components-sidebar .wc-block-components-title {
+    font-size: 18px;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-order-summary__content,
+  body.dtb-official-stripe-checkout .wc-block-components-sidebar .wc-block-components-panel,
+  body.dtb-official-stripe-checkout .wc-block-components-sidebar .wc-block-components-totals-wrapper {
+    padding-inline: 16px;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-order-summary-item {
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 12px 0;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-order-summary-item__image,
+  body.dtb-official-stripe-checkout .wc-block-components-order-summary-item__image img {
+    width: 52px;
+    height: 52px;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-product-name,
+  body.dtb-official-stripe-checkout .wc-block-components-product-price,
+  body.dtb-official-stripe-checkout .wc-block-components-order-summary-item__total-price {
+    font-size: 13px;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-totals-item {
+    min-height: 42px;
+    padding: 9px 0;
+    font-size: 13px;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-totals-footer-item {
+    min-height: 58px;
+  }
+
+  body.dtb-official-stripe-checkout .wc-block-components-totals-footer-item .wc-block-components-totals-item__label,
+  body.dtb-official-stripe-checkout .wc-block-components-totals-footer-item .wc-block-components-totals-item__value {
+    font-size: 18px;
+  }
+
+  body.dtb-official-stripe-checkout.dtb-checkout-step-contact [data-dtb-shared-address-section],
+  body.dtb-official-stripe-checkout.dtb-checkout-step-shipping [data-dtb-shared-address-section] {
+    display: flex !important;
+    width: 100% !important;
+    margin: 0 0 20px !important;
+    padding: 0 !important;
+    flex-wrap: wrap;
+    gap: 12px;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  body.dtb-official-stripe-checkout.dtb-checkout-step-payment [data-dtb-shared-address-section],
+  body.dtb-official-stripe-checkout.dtb-checkout-step-contact [data-dtb-shared-address-section] .wc-block-components-checkout-step__heading,
+  body.dtb-official-stripe-checkout.dtb-checkout-step-contact [data-dtb-shared-address-section] .wc-block-components-checkout-step__description,
+  body.dtb-official-stripe-checkout.dtb-checkout-step-contact [data-dtb-shared-address-section] [data-dtb-shipping-address-field],
+  body.dtb-official-stripe-checkout.dtb-checkout-step-shipping [data-dtb-shared-address-section] [data-dtb-contact-detail-field] {
+    display: none !important;
+  }
+
+  body.dtb-official-stripe-checkout.dtb-checkout-step-contact [data-dtb-shared-address-section] [data-dtb-contact-detail-field="first-name"],
+  body.dtb-official-stripe-checkout.dtb-checkout-step-contact [data-dtb-shared-address-section] [data-dtb-contact-detail-field="last-name"] {
+    display: block !important;
+    width: calc(50% - 6px) !important;
+    flex: 1 1 calc(50% - 6px) !important;
+  }
+
+  body.dtb-official-stripe-checkout.dtb-checkout-step-contact [data-dtb-shared-address-section] [data-dtb-contact-detail-field="phone"],
+  body.dtb-official-stripe-checkout.dtb-checkout-step-shipping [data-dtb-shared-address-section] [data-dtb-shipping-address-field] {
+    display: block !important;
+  }
+}
+
 @media (max-width: 767px) {
   body.dtb-official-stripe-checkout {
     background: #fff;
@@ -1350,25 +1865,11 @@ body.dtb-official-stripe-checkout .is-dtb-order-summary-duplicate {
     margin-bottom: 20px;
   }
 
-  body.dtb-official-stripe-checkout .dtb-checkout-intro__eyebrow {
-    margin-bottom: 6px;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-  }
-
   body.dtb-official-stripe-checkout .dtb-checkout-intro h1 {
-    font-size: clamp(27px, 8vw, 34px);
+    font-size: clamp(26px, 7vw, 32px);
     font-weight: 790;
     line-height: 1.05;
     letter-spacing: -0.045em;
-  }
-
-  body.dtb-official-stripe-checkout .dtb-checkout-intro > p:last-child {
-    max-width: 34rem;
-    margin-top: 9px;
-    font-size: 14px;
-    line-height: 1.55;
   }
 
   body.dtb-official-stripe-checkout .wc-block-components-sidebar-layout,
@@ -2040,7 +2541,11 @@ body.dtb-official-stripe-checkout .is-dtb-order-summary-duplicate {
 
   body.dtb-payment-sheet-open .wc-block-components-express-payment,
   body.dtb-payment-sheet-open .wp-block-woocommerce-checkout-express-payment-block {
+    display: block !important;
     margin-bottom: 22px;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
   }
 
   body.dtb-payment-sheet-open .wc-block-components-express-payment__content {

@@ -53,9 +53,13 @@ export default function TrendingProducts() {
     return () => window.removeEventListener('keydown', onKey);
   }, [closeModal]);
 
-  const handleAddToCart = useCallback((product, quantity = 1) => {
-    addToCart(product, quantity);
-    showToast(`${product.name} added to cart!`, 'cart');
+  const handleAddToCart = useCallback(async (product, quantity = 1) => {
+    try {
+      await addToCart(product, quantity);
+      showToast(`${product.name} added to cart!`, 'cart');
+    } catch (error) {
+      showToast(error?.message || 'Could not add item to cart. Please try again.', 'error');
+    }
   }, [addToCart]);
 
   useEffect(() => {

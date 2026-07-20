@@ -10,9 +10,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/logos/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="48x48" href="/logos/favicon-48x48.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/logos/apple-touch-icon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <link rel="preload" href="/logos/drywall-logo-white.webp" as="image" type="image/webp" fetchpriority="high">
     <style>
         :root {
             --gypsum-white: #f8fafc;
@@ -31,7 +29,7 @@
         body {
             background-color: var(--deep-slate);
             color: var(--gypsum-white);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             min-height: 100dvh;
             overflow-x: hidden;
             display: flex;
@@ -192,7 +190,19 @@
             background: rgba(37,99,235,0.12);
             border: 1px solid rgba(37,99,235,0.25);
             color: var(--brand-blue);
+            position: relative;
+        }
+
+        .sh-icon::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border: 2px solid rgba(37,99,235,0.38);
+            border-radius: inherit;
+            opacity: 0;
+            transform: scale(1);
             animation: sh-ring 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            will-change: transform, opacity;
         }
 
         .sh-text {
@@ -234,7 +244,7 @@
             display: block;
             margin-bottom: 0.45rem;
             color: rgba(203, 213, 225, 0.72);
-            font-family: 'JetBrains Mono', monospace;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             font-size: 0.66rem;
             font-weight: 600;
             letter-spacing: 0.14em;
@@ -249,7 +259,7 @@
             border-radius: 3px;
             padding: 0.875rem 1rem;
             color: white;
-            font-family: 'Inter', sans-serif;
+            font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: 0.9375rem;
             line-height: 1.3;
             outline: none;
@@ -287,7 +297,7 @@
             border-radius: 4px;
             padding: 0.875rem 3rem 0.875rem 1rem;
             color: rgba(248, 250, 252, 0.95);
-            font-family: 'Inter', sans-serif;
+            font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: 0.9375rem;
             line-height: 1.3;
             text-align: left;
@@ -473,9 +483,9 @@
 
         @keyframes reveal { to { opacity: 1; transform: translate(0); } }
         @keyframes sh-ring {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); }
-            45% { box-shadow: 0 0 0 5px rgba(37,99,235,0.18); }
-            70% { box-shadow: 0 0 0 9px rgba(37,99,235,0); }
+            0%, 35% { opacity: 0; transform: scale(1); }
+            45% { opacity: 0.55; }
+            75%, 100% { opacity: 0; transform: scale(1.55); }
         }
         @keyframes sh-underline { to { transform: scaleX(1); } }
         @keyframes bf1 { 0%,100%{transform:translate(-5vw,-3vh) rotate(-4deg)} 24%{transform:translate(5vw,5vh) rotate(1deg)} 52%{transform:translate(11vw,-2vh) rotate(3deg)} 78%{transform:translate(3vw,8vh) rotate(-1deg)} }
@@ -520,6 +530,21 @@
             #bf-durastilts { top: 22%; right: 0%; left: auto; width: 27vw; }
             #bf-surpro     { top: 33%; right: 1%; left: auto; width: 26vw; }
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            .content-block,
+            .signup-monolith,
+            .brand-float,
+            .sh-icon::after,
+            .sh-text em::after {
+                animation: none;
+            }
+            .content-block,
+            .signup-monolith {
+                opacity: 1;
+                transform: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -534,19 +559,19 @@
     <div class="ambient-glow" aria-hidden="true"></div>
     <canvas id="dust-canvas" aria-hidden="true"></canvas>
 
-    <div class="brand-float" id="bf-level5"><img src="https://drywalltoolbox.com/logos/Level5.svg" alt="" draggable="false" data-visual-search="false"></div>
-    <div class="brand-float" id="bf-tapetech"><img src="https://drywalltoolbox.com/logos/tapetech_logo.svg" alt="" draggable="false" data-visual-search="false"></div>
-    <div class="brand-float" id="bf-columbia"><img src="https://drywalltoolbox.com/logos/columbia_taping_tools_logo.svg" alt="" draggable="false" data-visual-search="false"></div>
-    <div class="brand-float" id="bf-graco"><img src="https://drywalltoolbox.com/logos/graco_logo.svg" alt="" draggable="false" data-visual-search="false"></div>
-    <div class="brand-float brand-float--white" id="bf-platinum"><img src="https://drywalltoolbox.com/logos/platinum_logo_white.svg" alt="" draggable="false" data-visual-search="false"></div>
-    <div class="brand-float" id="bf-surpro"><img src="https://drywalltoolbox.com/logos/surpro_logo.svg" alt="" draggable="false" data-visual-search="false"></div>
-    <div class="brand-float" id="bf-asgard"><img src="https://drywalltoolbox.com/logos/asgard_logo.svg" alt="" draggable="false" data-visual-search="false"></div>
-    <div class="brand-float brand-float--bkg" id="bf-durastilts"><img src="https://drywalltoolbox.com/logos/dura-stilts-logo.svg" alt="" draggable="false" data-visual-search="false"></div>
+    <div class="brand-float" id="bf-level5"><img src="/logos/Level5.svg" width="2048" height="470" alt="" draggable="false" data-visual-search="false"></div>
+    <div class="brand-float" id="bf-tapetech"><img src="/logos/tapetech_logo.svg" width="2048" height="611" alt="" draggable="false" data-visual-search="false"></div>
+    <div class="brand-float" id="bf-columbia"><img src="/logos/columbia_taping_tools_logo.svg" width="2048" height="2048" alt="" draggable="false" data-visual-search="false"></div>
+    <div class="brand-float" id="bf-graco"><img src="/logos/graco_logo.svg" width="2048" height="1152" alt="" draggable="false" data-visual-search="false"></div>
+    <div class="brand-float brand-float--white" id="bf-platinum"><img src="/logos/platinum_logo_white.svg" width="2048" height="613" alt="" draggable="false" data-visual-search="false"></div>
+    <div class="brand-float" id="bf-surpro"><img src="/logos/surpro_logo.svg" width="1800" height="900" alt="" draggable="false" data-visual-search="false"></div>
+    <div class="brand-float" id="bf-asgard"><img src="/logos/asgard_logo.svg" width="2048" height="580" alt="" draggable="false" data-visual-search="false"></div>
+    <div class="brand-float brand-float--bkg" id="bf-durastilts"><img src="/logos/dura-stilts-logo.svg" width="2048" height="414" alt="" draggable="false" data-visual-search="false"></div>
 
     <main>
         <div class="content-block">
             <div class="logo-container">
-                <img src="https://drywalltoolbox.com/logos/drywall-logo-white.png" alt="Drywall Toolbox" class="logo-img" draggable="false" data-visual-search="false">
+                <img src="/logos/drywall-logo-white.webp" width="340" height="104" fetchpriority="high" decoding="async" alt="Drywall Toolbox" class="logo-img" draggable="false" data-visual-search="false">
             </div>
             <h1>The New Standard<br>in Drywall.</h1>
             <p class="subtext">
@@ -621,11 +646,23 @@
     <script>
         const canvas = document.getElementById('dust-canvas');
         const ctx = canvas.getContext('2d');
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         let particles = [];
+        let dustFrame = 0;
+        let lastDustFrame = 0;
+        let resizeFrame = 0;
 
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+        }
+
+        function scheduleResize() {
+            if (resizeFrame) return;
+            resizeFrame = requestAnimationFrame(function() {
+                resizeFrame = 0;
+                resize();
+            });
         }
 
         class Particle {
@@ -657,17 +694,39 @@
         function initDust() {
             resize();
             particles = [];
-            for (let i = 0; i < 120; i++) particles.push(new Particle());
-            animateDust();
+            const particleCount = Math.max(24, Math.min(60, Math.round((canvas.width * canvas.height) / 28000)));
+            for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+            if (reduceMotion) {
+                drawDustFrame();
+                return;
+            }
+            dustFrame = requestAnimationFrame(animateDust);
         }
 
-        function animateDust() {
+        function drawDustFrame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateDust);
         }
 
-        window.addEventListener('resize', resize);
+        function animateDust(timestamp) {
+            if (timestamp - lastDustFrame >= 33) {
+                lastDustFrame = timestamp;
+                drawDustFrame();
+            }
+            dustFrame = requestAnimationFrame(animateDust);
+        }
+
+        document.addEventListener('visibilitychange', function() {
+            if (reduceMotion) return;
+            if (document.hidden) {
+                cancelAnimationFrame(dustFrame);
+                dustFrame = 0;
+            } else if (!dustFrame) {
+                lastDustFrame = 0;
+                dustFrame = requestAnimationFrame(animateDust);
+            }
+        });
+        window.addEventListener('resize', scheduleResize, { passive: true });
         initDust();
 
         var DTB_API = '/wp-json/dtb/v1';
@@ -807,12 +866,21 @@
 
         referral.addEventListener('change', syncReferralDetail);
 
-        (function(){
-            fetch(DTB_API + '/subscribe-nonce', { credentials: 'same-origin' })
+        var nonceRequest = null;
+        function ensureSubscribeNonce() {
+            if (nonceField.value) return Promise.resolve(nonceField.value);
+            if (nonceRequest) return nonceRequest;
+            nonceRequest = fetch(DTB_API + '/subscribe-nonce', { credentials: 'same-origin' })
                 .then(function(r){ return r.json(); })
-                .then(function(d){ if (d && d.nonce) nonceField.value = d.nonce; })
-                .catch(function(){});
-        })();
+                .then(function(d){
+                    if (d && d.nonce) nonceField.value = d.nonce;
+                    return nonceField.value;
+                })
+                .catch(function(){ return ''; });
+            return nonceRequest;
+        }
+        form.addEventListener('focusin', ensureSubscribeNonce, { once: true });
+        form.addEventListener('pointerdown', ensureSubscribeNonce, { once: true, passive: true });
 
         function setInvalid(el) {
             if (el === referral) {
@@ -909,13 +977,24 @@
             }
         });
 
-        if (window.matchMedia('(pointer: fine) and (hover: hover)').matches) {
-            document.addEventListener('mousemove', (e) => {
-                const x = (e.clientX / window.innerWidth - 0.5) * 12;
-                const y = (e.clientY / window.innerHeight - 0.5) * 12;
-                document.querySelector('.signup-monolith').style.transform = `perspective(1000px) rotateX(${-y/2}deg) rotateY(${x/2}deg)`;
-                document.querySelector('.content-block').style.transform = `translate3d(${x * -0.3}px, ${y * -0.3}px, 0)`;
-            });
+        if (!reduceMotion && window.matchMedia('(pointer: fine) and (hover: hover)').matches) {
+            const signupPanel = document.querySelector('.signup-monolith');
+            const contentBlock = document.querySelector('.content-block');
+            let pointerFrame = 0;
+            let pointerX = 0;
+            let pointerY = 0;
+            document.addEventListener('pointermove', function(e) {
+                pointerX = e.clientX;
+                pointerY = e.clientY;
+                if (pointerFrame) return;
+                pointerFrame = requestAnimationFrame(function() {
+                    pointerFrame = 0;
+                    const x = (pointerX / window.innerWidth - 0.5) * 12;
+                    const y = (pointerY / window.innerHeight - 0.5) * 12;
+                    signupPanel.style.transform = `perspective(1000px) rotateX(${-y/2}deg) rotateY(${x/2}deg)`;
+                    contentBlock.style.transform = `translate3d(${x * -0.3}px, ${y * -0.3}px, 0)`;
+                });
+            }, { passive: true });
         }
     </script>
 </body>

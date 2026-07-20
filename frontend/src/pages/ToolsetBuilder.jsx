@@ -855,6 +855,7 @@ function Stage3({ template, slotSelections, onRemove, onBack, onAddToCart, succe
             className="tsb-add-cart-btn"
             disabled={selectedItems.length === 0}
             onClick={onAddToCart}
+            data-dtb-cart-action="add"
           >
             <ShoppingCart size={16} /> Add Complete Kit to Cart
           </button>
@@ -901,11 +902,16 @@ export default function ToolsetBuilder() {
     setSlotSelections((prev) => { const n = { ...prev }; delete n[slotId]; return n; });
   }, []);
 
-  const handleAddToCart = useCallback(() => {
+  const handleAddToCart = useCallback(async () => {
     if (!template) return;
-    template.slots.map((s) => slotSelections[s.id]).filter(Boolean).forEach((p) => addToCart(p, 1));
-    setSuccess(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const products = template.slots.map((s) => slotSelections[s.id]).filter(Boolean);
+    try {
+      await Promise.all(products.map((product) => addToCart(product, 1, { announce: false })));
+      setSuccess(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch {
+      setSuccess(false);
+    }
   }, [template, slotSelections, addToCart]);
 
   const handleStartOver = useCallback(() => {

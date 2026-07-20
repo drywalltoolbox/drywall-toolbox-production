@@ -112,9 +112,10 @@ export default function SettingsTab({ user }) {
       setMessage({ type: 'success', text: data?.message || 'Password updated.' });
       setPasswords({ current: '', next: '', confirm: '' });
       if (data?.reauth_required) {
-        window.setTimeout(async () => {
-          await logout();
-          window.location.assign('/login');
+        window.setTimeout(() => {
+          void logout()
+            .then(() => window.location.assign('/login'))
+            .catch((error) => setMessage({ type: 'error', text: error?.message || 'Password updated, but secure sign out failed. Please sign out manually.' }));
         }, 1200);
       }
     } catch (error) {

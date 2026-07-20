@@ -9,6 +9,8 @@ import {
 } from '../api/cart.js';
 import { trackAddToCart, trackRemoveFromCart } from '../analytics/ecommerceEvents.js';
 import { decodeHtmlEntities } from '../utils/string.js';
+import Toast from '../components/ui/Toast.jsx';
+import CartInteractionFeedback from '../components/cart/CartInteractionFeedback.jsx';
 
 const CART_SNAPSHOT_KEY = 'drywall-cart-snapshot';
 const CartContext = createContext();
@@ -172,6 +174,76 @@ function buildStoreApiExtensions(product) {
   };
 }
 
+function getProductPrice(product) {
+  const price = product?.price;
+  const candidates = [
+    typeof price === 'object' ? price?.value : price,
+    product?.price_value,
+    product?.sale_price,
+    product?.regular_price,
+    product?.min_price,
+  ];
+
+  for (const candidate of candidates) {
+    const parsed = Number.parseFloat(String(candidate ?? ''));
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return 0;
+}
+
+function getProductImage(product) {
+  if (typeof product?.image === 'string') return product.image;
+  return product?.image?.src
+    || product?.image_thumbnail
+    || product?.images?.[0]?.thumbnail
+    || product?.images?.[0]?.src
+    || '';
+}
+
+function getProductIdentity(product) {
+  const attributes = normalizeVariationAttributes(product?.variation_attribute_values || product?.variation || []);
+  const variationKey = attributes
+    .map((attribute) => `${attribute.name}:${attribute.option}`.toLowerCase())
+    .sort()
+    .join('|');
+  return `${product?.id || ''}:${product?.variation_id || ''}:${variationKey}`;
+}
+
+function addOptimisticCartItem(items, product, quantity, mutationId) {
+  const safeQuantity = Math.max(1, Number.parseInt(quantity, 10) || 1);
+  const productIdentity = getProductIdentity(product);
+  const existingIndex = items.findIndex((item) => getProductIdentity(item) === productIdentity);
+
+  if (existingIndex >= 0) {
+    return items.map((item, index) => index === existingIndex
+      ? { ...item, quantity: Number(item.quantity || 0) + safeQuantity, isPending: true }
+      : item);
+  }
+
+  const attributes = normalizeVariationAttributes(product?.variation_attribute_values || product?.variation || []);
+  return [
+    ...items,
+    normalizeCartSnapshotItem({
+      ...product,
+      cartKey: `optimistic:${mutationId}`,
+      key: `optimistic:${mutationId}`,
+      image: getProductImage(product),
+      price: getProductPrice(product),
+      quantity: safeQuantity,
+      variation_attribute_values: attributes,
+      isPending: true,
+    }),
+  ];
+}
+
+function findMatchingServerItem(serverCart, target) {
+  const serverItems = normalizeStoreCart(serverCart);
+  const targetIdentity = getProductIdentity(target);
+  return serverItems.find((item) => getProductIdentity(item) === targetIdentity)
+    || serverItems.find((item) => String(item.id) === String(target?.id))
+    || null;
+}
+
 function readSnapshot() {
   try {
     const saved = localStorage.getItem(CART_SNAPSHOT_KEY);
@@ -196,9 +268,13 @@ export function CartProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isMutating, setIsMutating] = useState(false);
   const [error, setError] = useState(null);
+  const [optimisticNotice, setOptimisticNotice] = useState(null);
   const [lastSyncedAt, setLastSyncedAt] = useState(null);
   const cartItemsRef = useRef(cartItems);
+  const serverCartRef = useRef(null);
   const lastMutationIdRef = useRef(0);
+  const pendingMutationCountRef = useRef(0);
+  const mutationQueueRef = useRef(Promise.resolve());
 
   useEffect(() => {
     cartItemsRef.current = cartItems;
@@ -206,7 +282,22 @@ export function CartProvider({ children }) {
 
   const beginMutation = useCallback(() => {
     lastMutationIdRef.current += 1;
+    pendingMutationCountRef.current += 1;
+    setIsMutating(true);
     return lastMutationIdRef.current;
+  }, []);
+
+  const finishMutation = useCallback(() => {
+    pendingMutationCountRef.current = Math.max(0, pendingMutationCountRef.current - 1);
+    setIsMutating(pendingMutationCountRef.current > 0);
+  }, []);
+
+  const enqueueMutation = useCallback((task) => {
+    const queued = mutationQueueRef.current
+      .catch(() => undefined)
+      .then(task);
+    mutationQueueRef.current = queued.catch(() => undefined);
+    return queued;
   }, []);
 
   const isLatestMutation = useCallback(
@@ -216,10 +307,11 @@ export function CartProvider({ children }) {
 
   const applyServerCart = useCallback((nextCart, options = {}) => {
     const mutationId = options?.mutationId;
-    if (Number.isFinite(mutationId) && mutationId !== lastMutationIdRef.current) {
+    if (!Array.isArray(nextCart?.items)) {
       return null;
     }
-    if (!Array.isArray(nextCart?.items)) {
+    serverCartRef.current = nextCart;
+    if (Number.isFinite(mutationId) && mutationId !== lastMutationIdRef.current) {
       return null;
     }
     const normalizedItems = normalizeStoreCart(nextCart);
@@ -234,9 +326,21 @@ export function CartProvider({ children }) {
   const applyOrRefreshServerCart = useCallback(async (nextCart, mutationId) => {
     const appliedItems = applyServerCart(nextCart, { mutationId });
     if (appliedItems) return appliedItems;
+    if (Number.isFinite(mutationId) && mutationId !== lastMutationIdRef.current) {
+      return cartItemsRef.current;
+    }
 
     const refreshedCart = await getCart();
     return applyServerCart(refreshedCart, { mutationId }) || [];
+  }, [applyServerCart]);
+
+  const restoreAfterMutationFailure = useCallback((previousCart, previousItems, mutationId, mutationError = null) => {
+    const recoveredItems = applyServerCart(mutationError?.cart || serverCartRef.current, { mutationId });
+    if (recoveredItems) return;
+    setCart(previousCart);
+    setCartItems(previousItems);
+    cartItemsRef.current = previousItems;
+    writeSnapshot(previousItems);
   }, [applyServerCart]);
 
   const refreshCart = useCallback(async () => {
@@ -279,32 +383,43 @@ export function CartProvider({ children }) {
     return () => { mounted = false; };
   }, [applyServerCart]);
 
-  const addToCart = useCallback(async (product, quantity = 1) => {
+  const addToCart = useCallback(async (product, quantity = 1, options = {}) => {
     if (!product?.id) return null;
     const mutationId = beginMutation();
-    setIsMutating(true);
     setError(null);
     const previousItems = cartItemsRef.current;
+    const previousCart = cart;
+    const optimisticItems = addOptimisticCartItem(previousItems, product, quantity, mutationId);
+    setCart(null);
+    setCartItems(optimisticItems);
+    cartItemsRef.current = optimisticItems;
+    if (options.announce !== false) {
+      setOptimisticNotice({
+        id: mutationId,
+        message: `Adding ${decodeHtmlEntities(product.name || 'item')} to your cart…`,
+      });
+    }
     try {
       const variation = buildStoreApiVariation(product.variation_attribute_values);
       const extensions = buildStoreApiExtensions(product);
-      const nextCart = await storeAddToCart(product.id, quantity, variation, extensions);
+      const nextCart = await enqueueMutation(
+        () => storeAddToCart(product.id, quantity, variation, extensions)
+      );
       const normalizedItems = await applyOrRefreshServerCart(nextCart, mutationId);
       const addedItem = normalizedItems.find((item) => String(item.id) === String(product.id)) || normalizeCartSnapshotItem({ ...product, quantity });
       trackAddToCart({ ...addedItem, quantity });
       return nextCart;
     } catch (err) {
       if (isLatestMutation(mutationId)) {
-        setCartItems(previousItems);
-        cartItemsRef.current = previousItems;
-        writeSnapshot(previousItems);
+        restoreAfterMutationFailure(previousCart, previousItems, mutationId, err);
         setError(err?.message || 'Could not add item to cart.');
       }
       throw err;
     } finally {
-      if (isLatestMutation(mutationId)) setIsMutating(false);
+      setOptimisticNotice((current) => current?.id === mutationId ? null : current);
+      finishMutation();
     }
-  }, [applyOrRefreshServerCart, beginMutation, isLatestMutation]);
+  }, [applyOrRefreshServerCart, beginMutation, cart, enqueueMutation, finishMutation, isLatestMutation, restoreAfterMutationFailure]);
 
   const removeFromCart = useCallback(async (productIdOrKey) => {
     const key = String(productIdOrKey || '');
@@ -312,32 +427,40 @@ export function CartProvider({ children }) {
     const target = cartItemsRef.current.find((item) => String(item.cartKey || item.key || item.id) === key || String(item.id) === key);
     if (!target?.cartKey && !target?.key) return null;
     const mutationId = beginMutation();
-    setIsMutating(true);
     setError(null);
     const previousItems = cartItemsRef.current;
+    const previousCart = cart;
     const optimisticItems = previousItems.filter(
       (item) => String(item.cartKey || item.key || item.id) !== key && String(item.id) !== key
     );
     setCartItems(optimisticItems);
     cartItemsRef.current = optimisticItems;
+    setCart(null);
     writeSnapshot(optimisticItems);
     try {
-      const nextCart = await removeCartItem(target.cartKey || target.key);
+      const nextCart = await enqueueMutation(() => {
+        const serverTarget = String(target.cartKey || target.key).startsWith('optimistic:')
+          ? findMatchingServerItem(serverCartRef.current, target)
+          : target;
+        const serverKey = serverTarget?.cartKey || serverTarget?.key;
+        if (!serverKey || String(serverKey).startsWith('optimistic:')) {
+          throw new Error('This cart item is still syncing. Please try again.');
+        }
+        return removeCartItem(serverKey);
+      });
       await applyOrRefreshServerCart(nextCart, mutationId);
       trackRemoveFromCart(target);
       return nextCart;
     } catch (err) {
       if (isLatestMutation(mutationId)) {
-        setCartItems(previousItems);
-        cartItemsRef.current = previousItems;
-        writeSnapshot(previousItems);
+        restoreAfterMutationFailure(previousCart, previousItems, mutationId, err);
         setError(err?.message || 'Could not remove item from cart.');
       }
       throw err;
     } finally {
-      if (isLatestMutation(mutationId)) setIsMutating(false);
+      finishMutation();
     }
-  }, [applyOrRefreshServerCart, beginMutation, isLatestMutation]);
+  }, [applyOrRefreshServerCart, beginMutation, cart, enqueueMutation, finishMutation, isLatestMutation, restoreAfterMutationFailure]);
 
   const updateQuantity = useCallback(async (productIdOrKey, newQuantity) => {
     const normalizedQuantity = Number(newQuantity);
@@ -351,9 +474,9 @@ export function CartProvider({ children }) {
     if (!target?.cartKey && !target?.key) return null;
 
     const mutationId = beginMutation();
-    setIsMutating(true);
     setError(null);
     const previousItems = cartItemsRef.current;
+    const previousCart = cart;
     const optimisticItems = previousItems.map((item) => {
       const itemKey = String(item.cartKey || item.key || item.id);
       return itemKey === key || String(item.id) === key
@@ -362,9 +485,19 @@ export function CartProvider({ children }) {
     });
     setCartItems(optimisticItems);
     cartItemsRef.current = optimisticItems;
+    setCart(null);
     writeSnapshot(optimisticItems);
     try {
-      const nextCart = await updateCartItem(target.cartKey || target.key, normalizedQuantity);
+      const nextCart = await enqueueMutation(() => {
+        const serverTarget = String(target.cartKey || target.key).startsWith('optimistic:')
+          ? findMatchingServerItem(serverCartRef.current, target)
+          : target;
+        const serverKey = serverTarget?.cartKey || serverTarget?.key;
+        if (!serverKey || String(serverKey).startsWith('optimistic:')) {
+          throw new Error('This cart item is still syncing. Please try again.');
+        }
+        return updateCartItem(serverKey, normalizedQuantity);
+      });
       const normalizedItems = await applyOrRefreshServerCart(nextCart, mutationId);
       if (previousItems.length > 0 && normalizedItems.length === 0) {
         throw new Error('Cart sync returned an empty cart unexpectedly.');
@@ -372,41 +505,38 @@ export function CartProvider({ children }) {
       return nextCart;
     } catch (err) {
       if (isLatestMutation(mutationId)) {
-        setCartItems(previousItems);
-        cartItemsRef.current = previousItems;
-        writeSnapshot(previousItems);
+        restoreAfterMutationFailure(previousCart, previousItems, mutationId, err);
         setError(err?.message || 'Could not update cart quantity.');
       }
       throw err;
     } finally {
-      if (isLatestMutation(mutationId)) setIsMutating(false);
+      finishMutation();
     }
-  }, [applyOrRefreshServerCart, beginMutation, isLatestMutation, removeFromCart]);
+  }, [applyOrRefreshServerCart, beginMutation, cart, enqueueMutation, finishMutation, isLatestMutation, removeFromCart, restoreAfterMutationFailure]);
 
   const clearCart = useCallback(async () => {
     const mutationId = beginMutation();
-    setIsMutating(true);
     setError(null);
     const previousItems = cartItemsRef.current;
+    const previousCart = cart;
     setCartItems([]);
     cartItemsRef.current = [];
+    setCart(null);
     writeSnapshot([]);
     try {
-      const nextCart = await clearStoreCart();
+      const nextCart = await enqueueMutation(clearStoreCart);
       await applyOrRefreshServerCart(nextCart, mutationId);
       return nextCart;
     } catch (err) {
       if (isLatestMutation(mutationId)) {
-        setCartItems(previousItems);
-        cartItemsRef.current = previousItems;
-        writeSnapshot(previousItems);
+        restoreAfterMutationFailure(previousCart, previousItems, mutationId, err);
         setError(err?.message || 'Could not clear cart.');
       }
       throw err;
     } finally {
-      if (isLatestMutation(mutationId)) setIsMutating(false);
+      finishMutation();
     }
-  }, [applyOrRefreshServerCart, beginMutation, isLatestMutation]);
+  }, [applyOrRefreshServerCart, beginMutation, cart, enqueueMutation, finishMutation, isLatestMutation, restoreAfterMutationFailure]);
 
   const getCartTotal = useCallback(() => {
     const safeItems = asCartItems(cartItems);
@@ -450,5 +580,19 @@ export function CartProvider({ children }) {
     getCartCount,
   ]);
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+      <CartInteractionFeedback />
+      {optimisticNotice ? (
+        <Toast
+          key={optimisticNotice.id}
+          message={optimisticNotice.message}
+          type="cart"
+          duration={8000}
+          onClose={() => setOptimisticNotice(null)}
+        />
+      ) : null}
+    </CartContext.Provider>
+  );
 }

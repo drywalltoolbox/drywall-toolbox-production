@@ -123,21 +123,38 @@ export function useAuth() {
     let cancelled = false;
     const epoch = ++epochRef.current;
     setIsLoading(true);
-    validateSession({ retries: 1, epoch })
+    validateSession({ epoch })
       .catch(() => { if (!cancelled && epochRef.current === epoch) setUser(null); })
       .finally(() => { if (!cancelled && epochRef.current === epoch) setIsLoading(false); });
     return () => { cancelled = true; };
   }, [validateSession]);
 
-  const logout = useCallback(async ({ remote = true } = {}) => {
-    ++epochRef.current;
-    setUser(null);
+  const logout = useCallback(async ({ remote = true, publish = true } = {}) => {
+    const epoch = ++epochRef.current;
     setError(null);
-    setIsLoading(false);
-    emitAuthChanged('logout');
-    if (!remote) return;
-    try { await authJson('/logout', { method: 'DELETE' }); }
-    catch { /** best effort */ }
+    setIsLoading(remote);
+
+    try {
+      if (remote) {
+        const result = await authJson('/logout', { method: 'DELETE' });
+        if (result?.success !== true) {
+          throw new Error('The server did not confirm sign out. Please try again.');
+        }
+      }
+
+      if (epochRef.current === epoch) {
+        setUser(null);
+        if (publish) emitAuthChanged('logout');
+      }
+      return true;
+    } catch (logoutError) {
+      if (epochRef.current === epoch) {
+        setError(logoutError?.message || 'Unable to sign out securely. Please try again.');
+      }
+      throw logoutError;
+    } finally {
+      if (epochRef.current === epoch) setIsLoading(false);
+    }
   }, []);
 
   const updateUser = useCallback((nextUser) => {
@@ -145,7 +162,9 @@ export function useAuth() {
   }, []);
 
   useEffect(() => {
-    const handler = () => { void logout(); };
+    const handler = () => {
+      void logout().catch(() => logout({ remote: false }));
+    };
     window.addEventListener('auth:expired', handler);
     return () => window.removeEventListener('auth:expired', handler);
   }, [logout]);
@@ -155,7 +174,7 @@ export function useAuth() {
       if (event.key !== 'dtb:auth-sync' || !event.newValue) return;
       try {
         const payload = JSON.parse(event.newValue);
-        if (payload?.type === 'logout') void logout({ remote: false });
+        if (payload?.type === 'logout') void logout({ remote: false, publish: false });
         if (payload?.type === 'login') void validateSession({ retries: 2 });
       } catch { /** ignore */ }
     };

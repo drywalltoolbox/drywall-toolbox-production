@@ -85,8 +85,8 @@ function dtb_register_coming_soon_routes(): void {
 
 	// ── GET /wp-json/dtb/v1/subscribe-nonce ─────────────────────────────────
 	// Returns a short-lived WP nonce for the admin-post.php form fallback.
-	// The coming-soon.html JS fetches this on page-load and injects it into
-	// the hidden _dtb_nonce field so the no-JS POST path is also CSRF-safe.
+	// The coming-soon.html JS fetches this on first form interaction and injects
+	// it into the hidden _dtb_nonce field so the fallback POST remains CSRF-safe.
 	register_rest_route(
 		'dtb/v1',
 		'/subscribe-nonce',

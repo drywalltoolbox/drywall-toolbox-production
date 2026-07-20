@@ -60,7 +60,7 @@ function dtb_frontend_security_headers(): void {
 	header( 'X-Content-Type-Options: nosniff' );
 	header( 'Referrer-Policy: strict-origin-when-cross-origin' );
 	header( 'X-Frame-Options: SAMEORIGIN' );
-	header( 'Permissions-Policy: geolocation=(), microphone=(), camera=()' );
+	header( 'Permissions-Policy: ' . dtb_frontend_security_permissions_policy() );
 
 	// Content-Security-Policy: opt-in via DTB_ENABLE_CSP constant (default off).
 	if ( ! is_admin() && dtb_feature_enabled( 'DTB_ENABLE_CSP', false ) ) {
@@ -77,6 +77,16 @@ function dtb_frontend_security_headers(): void {
 	if ( 'staging' === $env || ( '' === $env && false !== strpos( (string) get_option( 'siteurl', '' ), '.staging.' ) ) ) {
 		header( 'X-Robots-Tag: noindex' );
 	}
+}
+
+/**
+ * Browser capabilities allowed to the storefront and its trusted payment UI.
+ *
+ * Payment remains denied to every origin except this site and the exact
+ * provider origins required by the official WooCommerce Stripe gateway.
+ */
+function dtb_frontend_security_permissions_policy(): string {
+	return 'geolocation=(), microphone=(), camera=(), payment=(self "https://js.stripe.com" "https://hooks.stripe.com" "https://b.stripecdn.com" "https://pay.google.com"), usb=(), browsing-topics=()';
 }
 
 function dtb_frontend_security_cleanup_head(): void {

@@ -36,7 +36,14 @@ Contact
 
 ### Contact
 
-Contains contact/account fields only. Payment controls are not presented as a general checkout surface in this step.
+The official WooCommerce Stripe Express Checkout block appears first when the
+provider reports an eligible wallet or accelerated method, followed by the
+contact/account fields. For guests, DTB presents WooCommerce's existing first
+name, last name, email, and optional phone controls in this step. The name and
+phone controls remain the standard Woo address inputs; DTB does not clone,
+reparent, or mirror their values. The remaining address controls are exposed in
+Shipping. Card and other standard payment fields are not exposed as general
+Contact-step controls.
 
 ### Shipping
 
@@ -44,7 +51,7 @@ Contains shipping address, billing relationship/address, delivery/shipping metho
 
 ### Payment
 
-The final page-level step is a review/payment-launch surface. The canonical WooCommerce sidebar Order Summary remains the only source for items, discounts, shipping, taxes, and final total. DTB must never copy or recompute those values.
+The final page-level step is a review/payment-launch surface. The canonical WooCommerce sidebar Order Summary remains visible on every mobile step and is the only source for items, discounts, shipping, taxes, and final total. DTB must never copy or recompute those values.
 
 The page-level `Continue to payment` CTA opens the payment sheet; it does not submit an order or charge the customer.
 
@@ -66,7 +73,7 @@ DTB must not reparent WooCommerce React-controlled nodes, clone Stripe iframes, 
 
 ## Stripe-safe mounting contract
 
-The official Stripe runtime may initialize before the customer opens the payment sheet. Therefore provider-owned payment and express blocks remain mounted at measurable mobile width while visually inactive.
+The official Stripe runtime may initialize before the customer opens the payment sheet. The existing Express Checkout block remains mounted and visible on Contact, is hidden during Shipping/Payment review, and is re-exposed when the Payment sheet opens. Provider-owned payment fields remain mounted at measurable mobile width while visually inactive.
 
 Do not use `display:none` for inactive Stripe/Woo payment surfaces. Do not mount Stripe only after opening the sheet.
 
@@ -128,9 +135,9 @@ WooCommerce remains final validation authority.
 
 ## Responsive behavior
 
-The enhanced Contact/Shipping/Payment + payment-sheet UX applies only at the mobile breakpoint.
+The Contact/Shipping/Payment state contract applies on mobile, tablet, and desktop. Desktop keeps the canonical order summary beside the active step and renders the official payment block in normal document flow on Payment.
 
-On desktop/tablet outside the mobile breakpoint, DTB removes the enhanced step/sheet classes and restores the normal WooCommerce Checkout Block document. The `Pay now` filter also returns Woo's default label outside the mobile breakpoint.
+The bottom payment sheet and the `Pay now` label apply only at the mobile breakpoint. Crossing the breakpoint preserves the active step and moves only DTB's action surface; WooCommerce and Stripe-owned controls are never cloned. If the enhancement fails to load, the normal WooCommerce Checkout Block remains the fail-open document.
 
 The presentation enhancement must fail open: if required Woo runtime selectors are not present after hydration, the native checkout remains usable rather than hiding controls.
 

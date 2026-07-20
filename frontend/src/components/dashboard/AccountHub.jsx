@@ -108,6 +108,8 @@ export default function AccountHub() {
   const [ recentRepairs,  setRecentRepairs  ] = useState( [] );
   const [ recentReturns,  setRecentReturns  ] = useState( [] );
   const [ recentSupportTickets, setRecentSupportTickets ] = useState( [] );
+  const [ isSigningOut, setIsSigningOut ] = useState( false );
+  const [ signOutError, setSignOutError ] = useState( '' );
   const [ ordersLoading,  setOrdersLoading  ] = useState( true );
   const activeTabId = TABS[ activeTab ]?.id ?? 'overview';
 
@@ -188,8 +190,17 @@ export default function AccountHub() {
   }
 
   async function handleLogout() {
-    await logout();
-    navigate( '/', { replace: true } );
+    if ( isSigningOut ) return;
+    setIsSigningOut( true );
+    setSignOutError( '' );
+    try {
+      await logout();
+      navigate( '/', { replace: true } );
+    } catch ( error ) {
+      setSignOutError( error?.message || 'Unable to sign out securely. Please try again.' );
+    } finally {
+      setIsSigningOut( false );
+    }
   }
 
   // Loading / auth guard
@@ -333,6 +344,7 @@ export default function AccountHub() {
         <button
           type="button"
           onClick={ handleLogout }
+          disabled={ isSigningOut }
           className="dash-logout-btn"
           style={ {
             display:        'flex',
@@ -353,8 +365,13 @@ export default function AccountHub() {
           onMouseEnter={ ( e ) => { e.currentTarget.style.background = '#fee2e2'; } }
           onMouseLeave={ ( e ) => { e.currentTarget.style.background = '#fef2f2'; } }
         >
-          <LogOut size={ 15 } /> Sign out
+          <LogOut size={ 15 } /> { isSigningOut ? 'Signing out…' : 'Sign out' }
         </button>
+        { signOutError && (
+          <p role="alert" style={ { margin: '9px 0 0', color: '#b91c1c', fontSize: '0.8rem', textAlign: 'center' } }>
+            { signOutError }
+          </p>
+        ) }
       </div>
 
       {/* ── Responsive CSS ── */}

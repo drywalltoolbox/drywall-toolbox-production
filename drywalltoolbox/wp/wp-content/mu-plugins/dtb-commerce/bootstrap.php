@@ -16,6 +16,7 @@ require_once __DIR__ . '/Orders/ToolsetOrderLineMeta.php';
 require_once __DIR__ . '/Services/OrderTypeService.php';
 require_once __DIR__ . '/Services/OrderAdminQueryService.php';
 require_once __DIR__ . '/Validation/CheckoutValidator.php';
+require_once __DIR__ . '/Validation/CheckoutFieldPolicy.php';
 require_once __DIR__ . '/Domain/PaymentState.php';
 require_once __DIR__ . '/Payment/WooNativeCheckoutRuntime.php';
 require_once __DIR__ . '/Payment/StorefrontReturnContext.php';
@@ -32,3 +33,4 @@ require_once __DIR__ . '/Rest/OrderRestController.php';
 
 DTB_ToolsetCartItemData::register();
 DTB_ToolsetOrderLineMeta::register();
+DTB_CheckoutFieldPolicy::register();

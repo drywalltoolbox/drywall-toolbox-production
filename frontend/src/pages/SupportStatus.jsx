@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { startTransition, useCallback, useMemo, useOptimistic, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead.jsx';
@@ -60,7 +60,52 @@ export default function SupportStatus() {
   const status = data?.status || 'open';
   const label = data?.label || SUPPORT_STATUS_LABELS[ status ] || 'Support Status';
   const displayId = formatSupportDisplayId( id );
-  const conversation = toConversation( data?.timeline, data );
+  const conversation = useMemo( () => toConversation( data?.timeline, data ), [ data ] );
+  const [ confirmedLocalReplies, setConfirmedLocalReplies ] = useState( [] );
+  const serverReplyBodies = useMemo(
+    () => new Set( conversation
+      .filter( ( event ) => event.type === 'ticket.reply_customer' )
+      .map( ( event ) => String( event.body || '' ).trim() ) ),
+    [ conversation ]
+  );
+  const conversationWithLocalReplies = useMemo(
+    () => [
+      ...conversation,
+      ...confirmedLocalReplies.filter( ( event ) => ! serverReplyBodies.has( String( event.body || '' ).trim() ) ),
+    ].sort( ( a, b ) => new Date( a.occurred_at ) - new Date( b.occurred_at ) ),
+    [ confirmedLocalReplies, conversation, serverReplyBodies ]
+  );
+  const [ visibleConversation, addOptimisticReply ] = useOptimistic(
+    conversationWithLocalReplies,
+    ( current, reply ) => [ ...current, reply ]
+  );
+
+  const handleReplySubmit = useCallback( ( message ) => new Promise( ( resolve, reject ) => {
+    const pendingReply = {
+      type: 'ticket.reply_customer',
+      actor_type: 'customer',
+      occurred_at: new Date().toISOString(),
+      body: message,
+      label: 'Sending reply…',
+      optimistic: true,
+    };
+
+    startTransition( async () => {
+      addOptimisticReply( pendingReply );
+
+      try {
+        await submitSupportReply( id, token, message );
+        setConfirmedLocalReplies( ( current ) => [
+          ...current,
+          { ...pendingReply, label: 'Customer reply sent', optimistic: false },
+        ] );
+        await refresh();
+        resolve();
+      } catch ( err ) {
+        reject( err );
+      }
+    } );
+  } ), [ addOptimisticReply, id, refresh, token ] );
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -98,11 +143,11 @@ export default function SupportStatus() {
         ) : (
           <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
             <div className="space-y-5">
-              <SupportState status={ status } label={ label } events={ conversation } />
-              <Conversation events={ conversation } customerName={ data?.customer_name } />
+              <SupportState status={ status } label={ label } events={ visibleConversation } />
+              <Conversation events={ visibleConversation } customerName={ data?.customer_name } />
             </div>
             <aside className="space-y-5">
-              <ReplyBox ticketId={ id } token={ token } disabled={ SUPPORT_TERMINAL_STATUSES.includes( status ) } status={ status } onSent={ refresh } />
+              <ReplyBox disabled={ SUPPORT_TERMINAL_STATUSES.includes( status ) } status={ status } onSubmitReply={ handleReplySubmit } />
               <TicketFacts data={ data } displayId={ displayId } />
             </aside>
           </div>
@@ -194,13 +239,14 @@ function Conversation( { events, customerName } ) {
           const author = isCustomer ? 'You' : 'Drywall Toolbox Support';
           const message = event.body || event.label;
           return (
-            <article key={ `${ event.type }-${ event.occurred_at }-${ index }` } className={ `flex ${ isCustomer ? 'justify-end' : 'justify-start' }` }>
-              <div className={ `max-w-[92%] rounded-2xl border px-4 py-3 shadow-sm ${ isCustomer ? 'border-blue-100 bg-blue-50 text-slate-800' : 'border-slate-200 bg-white text-slate-800' }` }>
+            <article key={ `${ event.type }-${ event.occurred_at }-${ index }` } className={ `flex ${ isCustomer ? 'justify-end' : 'justify-start' }` } aria-busy={ event.optimistic ? 'true' : undefined }>
+              <div className={ `max-w-[92%] rounded-2xl border px-4 py-3 shadow-sm ${ isCustomer ? 'border-blue-100 bg-blue-50 text-slate-800' : 'border-slate-200 bg-white text-slate-800' } ${ event.optimistic ? 'opacity-70' : '' }` }>
                 <div className="mb-2 grid gap-0.5 sm:flex sm:items-center sm:justify-between sm:gap-3">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{ author }</p>
                   <time className="text-[11px] text-slate-400">{ formatDate( event.occurred_at ) }</time>
                 </div>
                 <MessageBody text={ message } fallback={ isCustomer ? customerName || 'Customer message' : 'Support update' } />
+                { event.optimistic ? <p className="mt-2 text-[11px] font-semibold text-blue-600">Sending…</p> : null }
               </div>
             </article>
           );
@@ -229,7 +275,7 @@ function MessageBody( { text, fallback } ) {
   );
 }
 
-function ReplyBox( { ticketId, token, disabled, status, onSent } ) {
+function ReplyBox( { disabled, status, onSubmitReply } ) {
   const [ message, setMessage ] = useState( '' );
   const [ sending, setSending ] = useState( false );
   const [ error, setError ] = useState( '' );
@@ -245,10 +291,9 @@ function ReplyBox( { ticketId, token, disabled, status, onSent } ) {
     setSent( false );
     setSending( true );
     try {
-      await submitSupportReply( ticketId, token, message.trim() );
+      await onSubmitReply( message.trim() );
       setMessage( '' );
       setSent( true );
-      onSent?.();
     } catch ( err ) {
       setError( err?.message || 'Unable to send reply.' );
     } finally {

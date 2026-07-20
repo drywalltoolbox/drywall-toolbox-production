@@ -73,7 +73,7 @@ export default function usePublicStatus( id, token, fetcher, terminalStatuses = 
   }, [ clearTimer, fetchStatus ] );
 
   const refresh = useCallback( () => {
-    fetchStatus( true );
+    return fetchStatus( true );
   }, [ fetchStatus ] );
 
   return {

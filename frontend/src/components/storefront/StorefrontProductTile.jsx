@@ -334,6 +334,7 @@ export default function StorefrontProductTile({
               disabled={outOfStock}
               className={`dtb-product-card__action${isMobile ? ' dtb-product-card__action--hidden-mobile' : ''}`}
               data-dtb-card-action="add"
+              data-dtb-cart-action="add"
               aria-label={`Add ${name} to cart`}
             >
               <ShoppingCart size={14} />

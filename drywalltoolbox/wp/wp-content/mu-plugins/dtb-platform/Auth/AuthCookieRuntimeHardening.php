@@ -49,10 +49,6 @@ function dtb_auth_harden_rest_response( $response, $server, $request ) { // phpc
 		dtb_auth_signal_session_mutation();
 	}
 
-	if ( '/dtb/v1/auth/logout' === $route ) {
-		dtb_auth_signal_session_mutation();
-	}
-
 	return $response;
 }
 

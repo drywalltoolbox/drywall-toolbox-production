@@ -112,11 +112,16 @@ async function storeFetch( path, options = {}, isRetry = false ) {
 	}
 	if ( !response.ok ) {
 		let message = `Store API error ${ response.status }: ${ url }`;
+		let body = null;
 		try {
-			const body = await response.json();
+			body = await response.json();
 			if ( body?.message ) message = body.message;
 		} catch { /* Response may not contain JSON. */ }
-		throw new Error( message );
+		const error = new Error( message );
+		error.status = response.status;
+		error.code = body?.code || '';
+		error.cart = body?.data?.cart || null;
+		throw error;
 	}
 	if ( response.status === 204 ) return null;
 	return response.json();
@@ -158,35 +163,20 @@ export async function addToCart( productId, qty = 1, variation = [], extensions 
 }
 
 export async function updateCartItem( key, qty ) {
-	const encodedKey = encodeURIComponent( key );
 	const quantity = Math.max( 1, Math.floor( Number( qty ) || 1 ) );
-	try {
-		const payload = await storeFetch( '/cart/update-item', {
-			method: 'POST',
-			body: JSON.stringify( { key, quantity } ),
-		} );
-		return payload?.items ? payload : getCart();
-	} catch {
-		const payload = await storeFetch( `/cart/items/${ encodedKey }`, {
-			method: 'PUT',
-			body: JSON.stringify( { quantity } ),
-		} );
-		return payload?.items ? payload : getCart();
-	}
+	const payload = await storeFetch( '/cart/update-item', {
+		method: 'POST',
+		body: JSON.stringify( { key, quantity } ),
+	} );
+	return payload?.items ? payload : getCart();
 }
 
 export async function removeCartItem( key ) {
-	const encodedKey = encodeURIComponent( key );
-	try {
-		const payload = await storeFetch( `/cart/items/${ encodedKey }`, { method: 'DELETE' } );
-		return payload?.items ? payload : getCart();
-	} catch {
-		const payload = await storeFetch( '/cart/remove-item', {
-			method: 'POST',
-			body: JSON.stringify( { key } ),
-		} );
-		return payload?.items ? payload : getCart();
-	}
+	const payload = await storeFetch( '/cart/remove-item', {
+		method: 'POST',
+		body: JSON.stringify( { key } ),
+	} );
+	return payload?.items ? payload : getCart();
 }
 
 export async function applyCoupon( code ) {
@@ -215,8 +205,6 @@ export async function selectShippingRate( rateId, packageId = 0 ) {
 }
 
 export async function clearStoreCart() {
-	const cart = await getCart();
-	if ( !cart?.items?.length ) return cart;
-	for ( const item of cart.items ) await removeCartItem( item.key );
+	await storeFetch( '/cart/items/', { method: 'DELETE' } );
 	return getCart();
 }

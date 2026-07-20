@@ -19,8 +19,8 @@ final class DTB_OfficialStripeNativeCheckout {
 	public const CONTRACT_VERSION = 'woo-stripe-v1';
 
 	private const STRIPE_GATEWAY_ID = 'stripe';
-	private const ASSET_VERSION     = '2026.07.20.8';
-	private const STRIPE_APPEARANCE_VERSION = '2026.07.20.1';
+	private const ASSET_VERSION     = '2026.07.20.14';
+	private const STRIPE_APPEARANCE_VERSION = '2026.07.20.2';
 	private const STRIPE_APPEARANCE_OPTION  = 'dtb_stripe_appearance_version';
 
 	public static function register(): void {
@@ -28,7 +28,7 @@ final class DTB_OfficialStripeNativeCheckout {
 		add_action( 'wp_enqueue_scripts', [ __CLASS__, 'enqueue_checkout_assets' ], 20 );
 		add_action( 'init', [ __CLASS__, 'maybe_refresh_stripe_appearance_cache' ], 20 );
 		add_filter( 'body_class', [ __CLASS__, 'body_class' ] );
-		add_filter( 'wc_stripe_upe_params', [ __CLASS__, 'stripe_upe_params' ], 20 );
+		add_filter( 'wc_stripe_upe_params', [ __CLASS__, 'stripe_upe_params' ], 100 );
 		add_action( 'woocommerce_checkout_create_order', [ __CLASS__, 'tag_checkout_order' ], 20, 2 );
 		add_action( 'woocommerce_store_api_checkout_order_processed', [ __CLASS__, 'tag_store_api_order' ], 20 );
 		add_action( 'woocommerce_payment_complete', [ __CLASS__, 'mirror_verified_stripe_payment' ], 9 );
@@ -50,6 +50,7 @@ final class DTB_OfficialStripeNativeCheckout {
 	}
 
 	public static function checkout_capabilities(): WP_REST_Response {
+		$main_gateway = self::payment_gateways()[ self::STRIPE_GATEWAY_ID ] ?? null;
 		$gateways = [];
 		foreach ( self::payment_gateways() as $gateway ) {
 			if ( ! self::is_official_stripe_gateway_instance( $gateway ) ) {
@@ -75,7 +76,11 @@ final class DTB_OfficialStripeNativeCheckout {
 				'gateways' => $gateways,
 				'readiness' => [
 					'stripe_extension_active' => self::is_official_stripe_extension_active(),
+					'stripe_extension_version' => defined( 'WC_STRIPE_VERSION' ) ? sanitize_text_field( (string) WC_STRIPE_VERSION ) : '',
 					'stripe_gateway_enabled'  => self::is_official_stripe_gateway_enabled(),
+					'optimized_checkout_enabled' => self::gateway_option_enabled( $main_gateway, 'optimized_checkout_element' ),
+					'adaptive_pricing_configured' => self::gateway_option_enabled( $main_gateway, 'adaptive_pricing' ),
+					'adaptive_pricing_runtime_enabled' => self::adaptive_pricing_runtime_enabled(),
 					'checkout_block'          => self::checkout_page_has_supported_content(),
 					'https'                   => is_ssl(),
 					'competing_woopayments'   => self::is_gateway_enabled( 'woocommerce_payments' ),
@@ -137,7 +142,7 @@ final class DTB_OfficialStripeNativeCheckout {
 		$existing_rules      = isset( $existing['rules'] ) ? (array) $existing['rules'] : [];
 		$appearance_variables = [
 			'colorPrimary'          => '#2457e6',
-			'colorBackground'       => 'transparent',
+			'colorBackground'       => '#ffffff',
 			'colorText'             => '#101828',
 			'colorTextSecondary'    => '#667085',
 			'colorDanger'           => '#b91c1c',
@@ -205,6 +210,18 @@ final class DTB_OfficialStripeNativeCheckout {
 				'rules'     => (object) array_merge( $existing_rules, $appearance_rules ),
 			]
 		);
+
+		/*
+		 * Adaptive Pricing uses the gateway's eager Checkout Sessions bootstrap.
+		 * Keep the normal deferred-intent path as the production-safe default so
+		 * a failed session bootstrap cannot pass an undefined client secret into
+		 * Stripe.js and make every card/express surface unavailable. This does not
+		 * disable Optimized Checkout or Express Checkout. Re-enable only after the
+		 * live Stripe account/session path has been verified end to end.
+		 */
+		if ( ! self::adaptive_pricing_runtime_enabled() ) {
+			$stripe_params['isAdaptivePricingEnabled'] = false;
+		}
 
 		return $stripe_params;
 	}
@@ -277,6 +294,13 @@ final class DTB_OfficialStripeNativeCheckout {
 		if ( self::is_gateway_enabled( 'woocommerce_payments' ) ) {
 			echo '<div class="notice notice-warning"><p>'
 				. esc_html__( 'Drywall Toolbox checkout should have one active storefront card/wallet authority. Disable WooPayments when the official WooCommerce Stripe gateway is active.', 'drywall-toolbox' )
+				. '</p></div>';
+		}
+
+		$main_gateway = self::payment_gateways()[ self::STRIPE_GATEWAY_ID ] ?? null;
+		if ( self::gateway_option_enabled( $main_gateway, 'adaptive_pricing' ) && ! self::adaptive_pricing_runtime_enabled() ) {
+			echo '<div class="notice notice-info"><p>'
+				. esc_html__( 'Stripe Adaptive Pricing is configured but held behind the DTB runtime guard. Optimized Checkout, Express Checkout, and normal Stripe payments remain enabled. Define DTB_ENABLE_STRIPE_ADAPTIVE_PRICING as true only after the live Checkout Sessions bootstrap has been verified.', 'drywall-toolbox' )
 				. '</p></div>';
 		}
 
@@ -380,6 +404,19 @@ final class DTB_OfficialStripeNativeCheckout {
 		$gateways = self::payment_gateways();
 		$gateway  = $gateways[ sanitize_key( $gateway_id ) ] ?? null;
 		return is_object( $gateway ) && isset( $gateway->enabled ) && 'yes' === (string) $gateway->enabled;
+	}
+
+	private static function gateway_option_enabled( $gateway, string $option ): bool {
+		if ( ! is_object( $gateway ) || ! method_exists( $gateway, 'get_option' ) ) {
+			return false;
+		}
+
+		return 'yes' === (string) $gateway->get_option( sanitize_key( $option ), 'no' );
+	}
+
+	private static function adaptive_pricing_runtime_enabled(): bool {
+		return defined( 'DTB_ENABLE_STRIPE_ADAPTIVE_PRICING' )
+			&& true === constant( 'DTB_ENABLE_STRIPE_ADAPTIVE_PRICING' );
 	}
 
 	private static function is_official_stripe_gateway_instance( $gateway ): bool {

@@ -164,6 +164,8 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout, onUnr
   const [accountSections, setAccountSections] = useState({ services: false, support: false });
   const [readNotificationKeys, setReadNotificationKeys] = useState([]);
   const [notificationReadUserId, setNotificationReadUserId] = useState('');
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState('');
 
   const showOrdersTab = useCallback((filter = 'product') => {
     setHistoryFilter(filter);
@@ -176,6 +178,20 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout, onUnr
     setAccountSections({ services: false, support: false });
     onClose?.();
   }, [onClose]);
+
+  const handleSignOut = useCallback(async () => {
+    if (isSigningOut) return;
+    setIsSigningOut(true);
+    setSignOutError('');
+    try {
+      await onLogout?.();
+      closeSheet();
+    } catch (error) {
+      setSignOutError(error?.message || 'Unable to sign out securely. Please try again.');
+    } finally {
+      setIsSigningOut(false);
+    }
+  }, [closeSheet, isSigningOut, onLogout]);
 
   const applyHistoryResults = useCallback(([ordersResult, repairsResult, returnsResult, supportResult]) => {
     setOrders(ordersResult.status === 'fulfilled' ? normalizeOrders(ordersResult.value) : []);
@@ -540,7 +556,10 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout, onUnr
                 />
               </div>
               <section className="account-hub__list-section">
-                <button type="button" className="account-hub__signout-btn" onClick={async () => { closeSheet(); await onLogout?.(); }}>Sign out</button>
+                <button type="button" className="account-hub__signout-btn" onClick={handleSignOut} disabled={isSigningOut}>
+                  {isSigningOut ? 'Signing out…' : 'Sign out'}
+                </button>
+                {signOutError ? <p className="account-hub__signout-error" role="alert">{signOutError}</p> : null}
               </section>
             </div>
           )}

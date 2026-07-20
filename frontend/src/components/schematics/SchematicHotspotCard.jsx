@@ -406,6 +406,7 @@ export default function SchematicHotspotCard({
                       className="schematic-hotspot-card__cta"
                       disabled={!canAdd || isAdding}
                       onClick={handleAdd}
+                      data-dtb-cart-action="add"
                     >
                       {ctaLabel}
                     </button>

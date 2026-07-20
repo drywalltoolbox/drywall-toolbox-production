@@ -53,6 +53,20 @@ Native WordPress cookie authentication always wins when present. The bridge does
 
 Guests remain WordPress user `0` with WooCommerce's normal guest session identity. The native checkout bridge does nothing when `dtb_auth` is absent or invalid.
 
+## Logout transition
+
+`DELETE /dtb/v1/auth/logout` is the single storefront logout boundary. A successful response means both identity layers have transitioned:
+
+1. the customer-owned WooCommerce session is destroyed;
+2. only its cart payload is copied into a newly generated guest session;
+3. customer, contact, address, coupon, shipping, payment, and pending-checkout state are not copied;
+4. the `dtb_auth` cookie is expired; and
+5. the response is private and non-cacheable.
+
+The React auth provider must not publish logged-out state, close the account surface, or redirect until the server confirms success. Logout failures remain visible and retryable. Cross-tab logout propagation updates browser state without issuing duplicate logout requests.
+
+Browser-managed address autofill is independent of DTB and Woo session state. Standard checkout `autocomplete` metadata remains enabled for usability; server-rendered guest values must nevertheless be empty after the logout transition.
+
 ## Cart-Token policy
 
 Same-origin production/staging React uses WooCommerce's cookie-backed session plus Store API Nonce semantics. `Cart-Token` remains compatibility-only for genuinely cross-origin clients.
@@ -86,5 +100,8 @@ For an authenticated staging customer:
 9. Repeat from production root and verify the return URL is `/order-tracking/{orderId}?order_key=...&checkout_complete=1` with no staging prefix.
 10. Guest checkout must continue to work without a DTB auth cookie.
 11. Invalid/expired/tampered `dtb_auth` must not authenticate the request or expose another customer's cart.
+12. Sign out with a populated account cart, then open checkout as a guest in the same browser. The cart must remain, while server-rendered email, phone, name, address, coupons, chosen shipping, payment, and pending-order state from the account must not remain.
+13. Force the logout endpoint to fail. The storefront must retain authenticated UI state, keep the account surface open, and present a retryable error instead of claiming logout succeeded.
+14. Complete logout in one tab. Other tabs must clear their local authenticated state without generating a logout-request loop.
 
 Only after this identity/session/return-context contract passes should Stripe card, 3DS/SCA, Link, wallet, webhook, order-pay, refund, Veeqo, and QuickBooks acceptance tests be considered meaningful.

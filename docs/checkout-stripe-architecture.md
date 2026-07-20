@@ -195,13 +195,33 @@ Configure the official extension through WooCommerce settings. Before live accep
 
 The public read-only endpoint `GET /wp-json/dtb/v1/checkout/capabilities` exposes non-secret contract/readiness metadata only. It must never expose Stripe keys, webhook secrets, client secrets, tokens, or raw payment data.
 
+The readiness response also reports the official Stripe extension version and
+the non-secret Optimized Checkout/Adaptive Pricing state. DTB keeps Adaptive
+Pricing behind `DTB_ENABLE_STRIPE_ADAPTIVE_PRICING` (default off) so a failed
+Checkout Sessions bootstrap cannot prevent the provider's deferred-intent card
+and express surfaces from loading. This guard does not disable Optimized
+Checkout or Express Checkout. Enable it only after the live account connection,
+session creation, webhooks, totals, and payment completion have passed an
+authenticated end-to-end checkout test.
+
+The storefront Permissions Policy denies sensitive capabilities by default and
+delegates `payment` only to the site itself and the exact Stripe/Google Pay
+origins used by the official gateway iframe chain. The PHP security header and
+deployment `.htaccess` policy must remain synchronized.
+
+The responsive guest Contact step presents the standard WooCommerce first name,
+last name, email, and optional phone controls. DTB changes only which existing
+address-field wrappers are visible between Contact and Shipping; it never
+duplicates or reparents Woo-controlled inputs. WooCommerce remains responsible
+for field state, Store API validation, customer data, and order persistence.
+
 ## Presentation policy
 
-`dtb-commerce/assets/woo-native-checkout.css` provides the branded responsive presentation around the supported WooCommerce Checkout Block surfaces. Desktop uses a two-pane layout with the checkout form on the left and order summary on the right. Mobile places the order summary first and uses a three-step Information, Delivery, and Payment workflow.
+`dtb-commerce/assets/woo-native-checkout.css` provides the branded responsive presentation around the supported WooCommerce Checkout Block surfaces. Desktop uses a compact two-pane layout with the active checkout step on the left and the canonical order summary on the right. Mobile places the order summary first. Both viewports use the same Contact, Shipping, and Payment presentation-state contract.
 
-`dtb-commerce/assets/woo-native-checkout-steps.js` owns only the independently rollback-safe checkout-loader reveal. `dtb-commerce/assets/woo-native-checkout-ui.js` owns the mobile Contact, Shipping, and Payment presentation state, supported Checkout Block label filter, responsive wrapper classification, and payment-sheet interaction. It toggles existing Checkout Block section wrappers in place and does not move, clone, submit, or render payment controls. The inactive Payment section remains mounted with a measurable width so the official Stripe element can initialize normally; `inert` and `aria-hidden` remove it from interaction and accessibility navigation until active. WooCommerce and the official Stripe gateway retain final validation and submission authority.
+`dtb-commerce/assets/woo-native-checkout-steps.js` owns only the independently rollback-safe checkout-loader reveal. `dtb-commerce/assets/woo-native-checkout-ui.js` owns the responsive Contact, Shipping, and Payment presentation state, supported Checkout Block label filter, wrapper classification, and mobile payment-sheet interaction. It toggles existing Checkout Block section wrappers in place and does not clone, submit, or render payment controls. On mobile, the inactive Payment section remains mounted at measurable width so the official Stripe element can initialize normally; `inert` and `aria-hidden` remove it from interaction and accessibility navigation until active. On desktop, Payment remains in normal document flow only while its step is active. WooCommerce and the official Stripe gateway retain final validation and submission authority.
 
-The enhancement applies only below 768px, tears down when the viewport grows, and fails open to the normal single-page Checkout Block if JavaScript does not load. Express and payment-method containers may be dimensioned responsively, but provider logos, eligibility, fields, messages, and behavior remain provider-owned. Stripe Payment Element tabs and fields are styled only through the official `wc_stripe_upe_params` filter and Stripe Elements Appearance API; the cached appearance is invalidated once per DTB appearance version.
+The step enhancement applies at every checkout viewport and reflows without duplicating controls when the breakpoint changes. The bottom payment sheet and `Pay now` label remain mobile-only; desktop exposes the provider-owned Payment block in the third step and retains Woo's native submit label. The enhancement fails open to the normal Checkout Block if JavaScript does not load. Express and payment-method containers may be dimensioned responsively, but provider logos, eligibility, fields, messages, and behavior remain provider-owned. Stripe Payment Element tabs and fields are styled only through the official `wc_stripe_upe_params` filter and Stripe Elements Appearance API; the cached appearance is invalidated once per DTB appearance version.
 
 ## Required verification matrix
 

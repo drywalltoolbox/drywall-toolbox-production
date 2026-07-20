@@ -52,7 +52,7 @@ export default function ToolsetBuilderPlatform() {
     }
 
     for (const line of cartLines) {
-      await addToCart(line, line.quantity || 1);
+      await addToCart(line, line.quantity || 1, { announce: false });
     }
 
     setToast({ type: 'cart', message: 'Configured toolset added to cart.' });
@@ -173,6 +173,7 @@ export default function ToolsetBuilderPlatform() {
               onClick={handleAddConfiguredKit}
               disabled={validating || missingRequired.length > 0}
               className="px-4 py-2 rounded-md bg-primary-600 text-white disabled:opacity-50"
+              data-dtb-cart-action="add"
             >
               {validating ? 'Validating…' : 'Validate and add configured kit'}
             </button>

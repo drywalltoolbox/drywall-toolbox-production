@@ -6,6 +6,11 @@
 	const inactiveStepClass = 'is-dtb-checkout-step-inactive';
 	const sheetOwnedClass = 'is-dtb-payment-sheet-owned';
 	const sheetClosedClass = 'is-dtb-payment-sheet-closed';
+	const sharedAddressAttribute = 'data-dtb-shared-address-section';
+	const contactDetailAttribute = 'data-dtb-contact-detail-field';
+	const shippingAddressAttribute = 'data-dtb-shipping-address-field';
+	const accountContactTemplateId = 'dtb-checkout-account-contact-template';
+	const accountContactClass = 'dtb-checkout-account-contact';
 	const stepBodyClasses = [ 'dtb-checkout-step-contact', 'dtb-checkout-step-shipping', 'dtb-checkout-step-payment' ];
 	const sheetCloseDuration = 240;
 	const checkoutFilters = window.wc?.blocksCheckout;
@@ -21,6 +26,8 @@
 			id: 'contact',
 			label: 'Contact',
 			selectors: [
+				'.wp-block-woocommerce-checkout-express-payment-block',
+				'.wc-block-components-express-payment',
 				'.wp-block-woocommerce-checkout-contact-information-block',
 				'.wc-block-checkout__contact-fields',
 				'.wp-block-woocommerce-checkout-create-account-block',
@@ -45,8 +52,12 @@
 			id: 'payment',
 			label: 'Payment',
 			selectors: [
-				'.wc-block-components-sidebar',
-				'.wc-block-checkout__sidebar',
+				'.wp-block-woocommerce-checkout-payment-block',
+				'.wc-block-checkout__payment-method',
+				'.wp-block-woocommerce-checkout-order-note-block',
+				'.wc-block-checkout__order-notes',
+				'.wp-block-woocommerce-checkout-actions-block',
+				'.wc-block-checkout__actions',
 				'.wp-block-woocommerce-checkout-terms-block',
 				'.wc-block-checkout__terms',
 			],
@@ -54,8 +65,6 @@
 	];
 
 	const paymentSheetSelectors = [
-		'.wp-block-woocommerce-checkout-express-payment-block',
-		'.wc-block-components-express-payment',
 		'.wp-block-woocommerce-checkout-payment-block',
 		'.wc-block-checkout__payment-method',
 		'.wp-block-woocommerce-checkout-order-note-block',
@@ -122,6 +131,7 @@
 	let checkoutPresentationObserver = null;
 	let presentationReconcileQueued = false;
 	let initializationTimer = 0;
+	const accountContactState = {};
 
 	function uniqueElements( elements ) {
 		return Array.from( new Set( elements.filter( Boolean ) ) );
@@ -137,6 +147,172 @@
 
 	function checkoutMain() {
 		return checkoutRoot()?.querySelector( '.wc-block-components-main, .wc-block-checkout__main' ) || null;
+	}
+
+	function isGuestCheckout() {
+		return ! document.body.classList.contains( 'logged-in' );
+	}
+
+	function isShippingAddressSection( node ) {
+		return node instanceof Element && (
+			node.matches( refinedSectionDefinitions.shippingAddress.selectors.join( ',' ) )
+			|| Boolean( node.querySelector( refinedSectionDefinitions.shippingAddress.selectors.join( ',' ) ) )
+		);
+	}
+
+	function addressControlKind( control ) {
+		if ( ! ( control instanceof HTMLInputElement ) ) {
+			return '';
+		}
+
+		const descriptor = [ control.id, control.name, control.autocomplete ]
+			.filter( Boolean )
+			.join( ' ' )
+			.toLowerCase();
+		if ( /(?:first[_-]?name|given-name)/.test( descriptor ) ) {
+			return 'first-name';
+		}
+		if ( /(?:last[_-]?name|family-name)/.test( descriptor ) ) {
+			return 'last-name';
+		}
+		if ( control.type === 'tel' || /(?:phone|\btel\b)/.test( descriptor ) ) {
+			return 'phone';
+		}
+		return '';
+	}
+
+	function addressFieldWrapper( control, section ) {
+		const wrapper = control.closest( [
+			'.wc-block-components-text-input',
+			'.wc-block-components-combobox',
+			'.wc-block-components-address-form__field',
+			'.components-base-control',
+		].join( ',' ) );
+		return wrapper && section.contains( wrapper ) ? wrapper : control.parentElement;
+	}
+
+	function clearSharedAddressPresentation() {
+		document.querySelectorAll( `[${ sharedAddressAttribute }]` ).forEach( ( section ) => {
+			section.classList.remove( inactiveStepClass );
+			section.removeAttribute( 'aria-hidden' );
+			section.removeAttribute( sharedAddressAttribute );
+		} );
+		document.querySelectorAll( `[${ contactDetailAttribute }], [${ shippingAddressAttribute }]` ).forEach( ( field ) => {
+			field.removeAttribute( contactDetailAttribute );
+			field.removeAttribute( shippingAddressAttribute );
+		} );
+	}
+
+	function reconcileGuestContactDetails() {
+		if ( ! isGuestCheckout() ) {
+			clearSharedAddressPresentation();
+			return;
+		}
+
+		const activeStepId = steps[ activeStep ]?.id || 'contact';
+		refinedSectionRoots( refinedSectionDefinitions.shippingAddress ).forEach( ( section ) => {
+			section.setAttribute( sharedAddressAttribute, '1' );
+			const hidden = activeStepId === 'payment';
+			section.classList.toggle( inactiveStepClass, hidden );
+			section.setAttribute( 'aria-hidden', hidden ? 'true' : 'false' );
+
+			section.querySelectorAll( 'input:not([type="hidden"]), select' ).forEach( ( control ) => {
+				const wrapper = addressFieldWrapper( control, section );
+				if ( ! ( wrapper instanceof Element ) ) {
+					return;
+				}
+
+				const kind = addressControlKind( control );
+				wrapper.removeAttribute( contactDetailAttribute );
+				wrapper.removeAttribute( shippingAddressAttribute );
+				if ( kind ) {
+					wrapper.setAttribute( contactDetailAttribute, kind );
+				} else {
+					wrapper.setAttribute( shippingAddressAttribute, '1' );
+				}
+			} );
+		} );
+	}
+
+	function contactValueControl( kind ) {
+		const root = checkoutRoot();
+		if ( ! root ) {
+			return null;
+		}
+
+		if ( kind === 'email' ) {
+			const contactSection = topLevelElements( refinedSectionRoots( refinedSectionDefinitions.contact ) )[ 0 ] || root;
+			return contactSection.querySelector( 'input[type="email"], input[autocomplete="email"]' );
+		}
+
+		return Array.from( root.querySelectorAll( 'input:not([type="hidden"])' ) ).find( ( control ) =>
+			addressControlKind( control ) === kind
+		) || null;
+	}
+
+	function setContactSummaryValue( summary, selector, value ) {
+		const target = summary.querySelector( selector );
+		if ( target && typeof value === 'string' && target.textContent !== value ) {
+			target.textContent = value;
+		}
+	}
+
+	function reconcileLoggedInContactSummary() {
+		const existingSummaries = Array.from( document.querySelectorAll( `.${ accountContactClass }` ) );
+		if ( isGuestCheckout() || mobileViewport.matches ) {
+			existingSummaries.forEach( ( summary ) => summary.remove() );
+			document.querySelectorAll( '.has-dtb-account-contact' ).forEach( ( section ) => {
+				section.classList.remove( 'has-dtb-account-contact' );
+			} );
+			return;
+		}
+
+		const template = document.getElementById( accountContactTemplateId );
+		const contactSection = topLevelElements( refinedSectionRoots( refinedSectionDefinitions.contact ) )[ 0 ];
+		if ( ! ( template instanceof HTMLTemplateElement ) || ! contactSection ) {
+			return;
+		}
+
+		let summary = contactSection.querySelector( `.${ accountContactClass }` );
+		if ( ! summary ) {
+			existingSummaries.forEach( ( candidate ) => candidate.remove() );
+			summary = template.content.firstElementChild?.cloneNode( true ) || null;
+			const container = contactSection.querySelector( '.wc-block-components-checkout-step__container' ) || contactSection;
+			if ( ! summary || ! container ) {
+				return;
+			}
+			container.prepend( summary );
+		}
+
+		contactSection.classList.add( 'has-dtb-account-contact' );
+		const firstNameControl = contactValueControl( 'first-name' );
+		const lastNameControl = contactValueControl( 'last-name' );
+		const emailControl = contactValueControl( 'email' );
+		const phoneControl = contactValueControl( 'phone' );
+		if ( firstNameControl || lastNameControl ) {
+			accountContactState.name = `${ firstNameControl?.value.trim() || '' } ${ lastNameControl?.value.trim() || '' }`.trim();
+		} else if ( typeof accountContactState.name !== 'string' ) {
+			accountContactState.name = summary.querySelector( '[data-dtb-account-contact-name]' )?.textContent.trim() || '';
+		}
+		if ( emailControl ) {
+			accountContactState.email = emailControl.value.trim();
+		} else if ( typeof accountContactState.email !== 'string' ) {
+			accountContactState.email = summary.querySelector( '[data-dtb-account-contact-email]' )?.textContent.trim() || '';
+		}
+		if ( phoneControl ) {
+			accountContactState.phone = phoneControl.value.trim();
+		} else if ( typeof accountContactState.phone !== 'string' ) {
+			accountContactState.phone = summary.querySelector( '[data-dtb-account-contact-phone]' )?.textContent.trim() || '';
+		}
+
+		setContactSummaryValue( summary, '[data-dtb-account-contact-name]', accountContactState.name );
+		setContactSummaryValue( summary, '[data-dtb-account-contact-email]', accountContactState.email );
+		setContactSummaryValue( summary, '[data-dtb-account-contact-phone]', accountContactState.phone );
+
+		const phoneWrapper = summary.querySelector( '[data-dtb-account-contact-phone-wrap]' );
+		if ( phoneWrapper ) {
+			phoneWrapper.hidden = accountContactState.phone === '';
+		}
 	}
 
 	function safeSectionRoot( node ) {
@@ -182,27 +358,22 @@
 	}
 
 	function reconcileRefinedSections() {
-		if ( ! mobileViewport.matches ) {
-			document.querySelectorAll( '[data-dtb-mobile-refinement-step]' ).forEach( ( node ) => {
-				node.classList.remove( inactiveStepClass );
-				node.removeAttribute( 'aria-hidden' );
-				delete node.dataset.dtbMobileRefinementStep;
-			} );
-			return;
-		}
-
 		const activeStepId = steps[ activeStep ]?.id || 'contact';
 		refinedSectionRoots( refinedSectionDefinitions.contact ).forEach( ( node ) => {
 			setRefinedSectionState( node, refinedSectionDefinitions.contact.marker, activeStepId === 'contact' );
 		} );
 
 		const shippingVisible = activeStepId === 'shipping';
-		[ 'shippingAddress', 'billingAddress', 'shippingMethod' ].forEach( ( definitionKey ) => {
+		const shippingDefinitions = isGuestCheckout()
+			? [ 'billingAddress', 'shippingMethod' ]
+			: [ 'shippingAddress', 'billingAddress', 'shippingMethod' ];
+		shippingDefinitions.forEach( ( definitionKey ) => {
 			const definition = refinedSectionDefinitions[ definitionKey ];
 			refinedSectionRoots( definition ).forEach( ( node ) => {
 				setRefinedSectionState( node, definition.marker, shippingVisible );
 			} );
 		} );
+		reconcileGuestContactDetails();
 	}
 
 	function stepElements( stepIndex ) {
@@ -220,14 +391,39 @@
 
 	function stepElementMap() {
 		const map = new Map();
+		const mobilePaymentElements = mobileViewport.matches ? new Set( paymentSheetElements() ) : null;
 		steps.forEach( ( step, index ) => {
 			stepElements( index ).forEach( ( node ) => {
+				if ( step.id === 'payment' && mobilePaymentElements?.has( node ) ) {
+					return;
+				}
+				if ( isGuestCheckout() && step.id === 'shipping' && isShippingAddressSection( node ) ) {
+					return;
+				}
 				if ( ! map.has( node ) ) {
 					map.set( node, index );
 				}
 			} );
 		} );
 		return map;
+	}
+
+	function reconcileStepElementState() {
+		if ( ! document.body.classList.contains( 'dtb-checkout-enhanced' ) ) {
+			return;
+		}
+
+		document.querySelectorAll( '[data-dtb-checkout-step]' ).forEach( ( node ) => {
+			node.classList.remove( inactiveStepClass );
+			node.removeAttribute( 'aria-hidden' );
+			delete node.dataset.dtbCheckoutStep;
+		} );
+		stepElementMap().forEach( ( owningStep, node ) => {
+			const inactive = owningStep !== activeStep;
+			node.dataset.dtbCheckoutStep = steps[ owningStep ].id;
+			node.classList.toggle( inactiveStepClass, inactive );
+			node.setAttribute( 'aria-hidden', inactive ? 'true' : 'false' );
+		} );
 	}
 
 	function paymentSheetElements() {
@@ -260,6 +456,26 @@
 			if ( node !== canonical ) {
 				node.classList.add( 'is-dtb-order-summary-duplicate' );
 			}
+		} );
+	}
+
+	function expressCheckoutElements() {
+		const root = checkoutRoot();
+		if ( ! root ) {
+			return [];
+		}
+
+		return topLevelElements( uniqueElements( [
+			...root.querySelectorAll( '.wp-block-woocommerce-checkout-express-payment-block' ),
+			...root.querySelectorAll( '.wc-block-components-express-payment' ),
+		] ) );
+	}
+
+	function reconcileExpressCheckoutVisibility() {
+		const visible = activeStep === 0 || ( mobileViewport.matches && paymentSheetOpen );
+		expressCheckoutElements().forEach( ( node ) => {
+			node.classList.toggle( inactiveStepClass, ! visible );
+			node.setAttribute( 'aria-hidden', visible ? 'false' : 'true' );
 		} );
 	}
 
@@ -300,7 +516,11 @@
 		presentationReconcileQueued = false;
 		markDuplicateOrderSummaries();
 		markSingleGatewayPresentation();
+		reconcileStepElementState();
 		reconcileRefinedSections();
+		markPaymentSheetElements();
+		reconcileExpressCheckoutVisibility();
+		reconcileLoggedInContactSummary();
 	}
 
 	function queueCheckoutPresentationReconcile() {
@@ -322,6 +542,11 @@
 
 	function markPaymentSheetElements() {
 		paymentSheetElements().forEach( ( node ) => {
+			if ( ! mobileViewport.matches ) {
+				node.classList.remove( sheetOwnedClass, sheetClosedClass );
+				delete node.dataset.dtbPaymentSheetOwned;
+				return;
+			}
 			node.classList.add( sheetOwnedClass );
 			node.dataset.dtbPaymentSheetOwned = '1';
 			node.classList.toggle( sheetClosedClass, ! paymentSheetOpen );
@@ -386,16 +611,62 @@
 		next.className = 'dtb-mobile-checkout-actions__next';
 		next.addEventListener( 'click', () => {
 			if ( activeStep < steps.length - 1 ) {
+				if ( activeStep === 0 && ! validateGuestContactDetails() ) {
+					return;
+				}
 				const nextStep = activeStep + 1;
 				highestVisitedStep = Math.max( highestVisitedStep, nextStep );
 				showStep( nextStep, true );
 				return;
 			}
-			openPaymentSheet( next );
+			if ( mobileViewport.matches ) {
+				openPaymentSheet( next );
+			}
 		} );
 
 		wrapper.append( back, next );
 		return wrapper;
+	}
+
+	function contactControl( kind ) {
+		return document.querySelector( `[${ contactDetailAttribute }="${ kind }"] input` );
+	}
+
+	function validateGuestContactDetails() {
+		if ( ! isGuestCheckout() ) {
+			return true;
+		}
+
+		const contactSection = refinedSectionRoots( refinedSectionDefinitions.contact )[ 0 ] || checkoutRoot();
+		const fields = [
+			{ control: contactControl( 'first-name' ), message: 'Enter your first name.' },
+			{ control: contactControl( 'last-name' ), message: 'Enter your last name.' },
+			{
+				control: contactSection?.querySelector( 'input[type="email"], input[autocomplete="email"]' ),
+				message: 'Enter a valid email address.',
+			},
+		];
+
+		for ( const field of fields ) {
+			const control = field.control;
+			if ( ! ( control instanceof HTMLInputElement ) ) {
+				continue;
+			}
+
+			control.required = true;
+			control.setCustomValidity( '' );
+			if ( control.value.trim() === '' ) {
+				control.setCustomValidity( field.message );
+			}
+			if ( ! control.checkValidity() ) {
+				control.reportValidity();
+				control.focus( { preventScroll: true } );
+				control.scrollIntoView( { behavior: 'smooth', block: 'center' } );
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	function ensurePaymentSheetChrome() {
@@ -463,6 +734,7 @@
 		paymentSheetClosing = false;
 		document.body.classList.remove( 'dtb-payment-sheet-open', 'dtb-payment-sheet-closing' );
 		markPaymentSheetElements();
+		reconcileExpressCheckoutVisibility();
 		setSheetBackgroundInert( false );
 		document.body.style.overflow = previousBodyOverflow;
 
@@ -516,6 +788,7 @@
 		document.body.classList.add( 'dtb-payment-sheet-open' );
 		document.body.style.overflow = 'hidden';
 		markPaymentSheetElements();
+		reconcileExpressCheckoutVisibility();
 		setSheetBackgroundInert( true );
 
 		main.setAttribute( 'role', 'dialog' );
@@ -545,6 +818,7 @@
 			const back = actions.querySelector( '.dtb-mobile-checkout-actions__back' );
 			const next = actions.querySelector( '.dtb-mobile-checkout-actions__next' );
 			back.hidden = activeStep === 0;
+			next.hidden = ! mobileViewport.matches && activeStep === steps.length - 1;
 			next.textContent = activeStep === 0
 				? 'Continue to shipping'
 				: activeStep === 1
@@ -555,21 +829,13 @@
 	}
 
 	function showStep( requestedStep, shouldScroll = false ) {
-		if ( ! mobileViewport.matches ) {
-			return;
-		}
-
 		if ( paymentSheetOpen || paymentSheetClosing ) {
 			closePaymentSheet( { immediate: true, restoreFocus: false } );
 		}
 
 		activeStep = Math.max( 0, Math.min( requestedStep, steps.length - 1 ) );
-		stepElementMap().forEach( ( owningStep, node ) => {
-			const inactive = owningStep !== activeStep;
-			node.dataset.dtbCheckoutStep = steps[ owningStep ].id;
-			node.classList.toggle( inactiveStepClass, inactive );
-			node.setAttribute( 'aria-hidden', inactive ? 'true' : 'false' );
-		} );
+		reconcileStepElementState();
+		reconcileExpressCheckoutVisibility();
 
 		markPaymentSheetElements();
 		document.body.classList.remove( ...stepBodyClasses );
@@ -587,7 +853,7 @@
 	}
 
 	function handleCheckoutFocus( event ) {
-		if ( ! mobileViewport.matches || ! ( event.target instanceof Element ) ) {
+		if ( ! ( event.target instanceof Element ) ) {
 			return;
 		}
 
@@ -623,36 +889,18 @@
 		}
 	}
 
-	function teardownMobileEnhancement() {
-		closePaymentSheet( { immediate: true, restoreFocus: false } );
-		document.body.classList.remove( 'dtb-mobile-checkout-enhanced', ...stepBodyClasses );
-		document.querySelectorAll( '[data-dtb-checkout-step]' ).forEach( ( node ) => {
-			node.classList.remove( inactiveStepClass );
-			node.removeAttribute( 'aria-hidden' );
-			delete node.dataset.dtbCheckoutStep;
-		} );
-		document.querySelectorAll( '[data-dtb-mobile-refinement-step]' ).forEach( ( node ) => {
-			node.classList.remove( inactiveStepClass );
-			node.removeAttribute( 'aria-hidden' );
-			delete node.dataset.dtbMobileRefinementStep;
-		} );
-		document.querySelectorAll( '[data-dtb-payment-sheet-owned]' ).forEach( ( node ) => {
-			node.classList.remove( sheetOwnedClass, sheetClosedClass );
-			node.removeAttribute( 'aria-hidden' );
-			delete node.dataset.dtbPaymentSheetOwned;
-		} );
-		progress?.remove();
-		actions?.remove();
-		paymentSheetBackdrop?.remove();
-		paymentSheetHeader?.remove();
-		progress = null;
-		actions = null;
-		paymentSheetBackdrop = null;
-		paymentSheetHeader = null;
-		paymentSheetCloseButton = null;
+	function placeActions( root ) {
+		if ( ! actions ) {
+			return;
+		}
+		if ( mobileViewport.matches ) {
+			root.insertAdjacentElement( 'afterend', actions );
+		} else {
+			checkoutMain()?.append( actions );
+		}
 	}
 
-	function mountMobileEnhancement() {
+	function mountCheckoutEnhancement() {
 		const root = checkoutRoot();
 		const paymentBlock = root?.querySelector( '.wp-block-woocommerce-checkout-payment-block, .wc-block-checkout__payment-method' );
 		const orderActions = root?.querySelector( '.wp-block-woocommerce-checkout-actions-block, .wc-block-checkout__actions' );
@@ -662,12 +910,9 @@
 		}
 
 		reconcileCheckoutPresentation();
-		if ( ! mobileViewport.matches ) {
-			teardownMobileEnhancement();
-			return true;
+		if ( mobileViewport.matches ) {
+			ensurePaymentSheetChrome();
 		}
-
-		ensurePaymentSheetChrome();
 		markPaymentSheetElements();
 		if ( ! progress ) {
 			progress = createProgress();
@@ -675,40 +920,39 @@
 		}
 		if ( ! actions ) {
 			actions = createActions();
-			root.insertAdjacentElement( 'afterend', actions );
 		}
+		placeActions( root );
 		if ( root.dataset.dtbStepperFocusBound !== '1' ) {
 			root.dataset.dtbStepperFocusBound = '1';
 			root.addEventListener( 'focusin', handleCheckoutFocus );
 		}
 
-		document.body.classList.add( 'dtb-mobile-checkout-enhanced' );
+		document.body.classList.add( 'dtb-checkout-enhanced' );
+		document.body.classList.toggle( 'dtb-mobile-checkout-enhanced', mobileViewport.matches );
 		showStep( activeStep, false );
 		return true;
 	}
 
 	function handleViewportChange() {
-		if ( mobileViewport.matches ) {
-			mountMobileEnhancement();
-		} else {
-			teardownMobileEnhancement();
-			reconcileCheckoutPresentation();
-		}
+		closePaymentSheet( { immediate: true, restoreFocus: false } );
+		mountCheckoutEnhancement();
 	}
 
 	function initialize() {
 		mobileViewport.addEventListener( 'change', handleViewportChange );
 		document.addEventListener( 'keydown', handleGlobalKeydown );
+		document.addEventListener( 'input', queueCheckoutPresentationReconcile );
+		document.addEventListener( 'change', queueCheckoutPresentationReconcile );
 		observeCheckoutPresentation();
 		reconcileCheckoutPresentation();
-		if ( mountMobileEnhancement() ) {
+		if ( mountCheckoutEnhancement() ) {
 			window.setTimeout( queueCheckoutPresentationReconcile, 500 );
 			window.setTimeout( queueCheckoutPresentationReconcile, 1500 );
 			return;
 		}
 
 		initialObserver = new MutationObserver( () => {
-			if ( mountMobileEnhancement() ) {
+			if ( mountCheckoutEnhancement() ) {
 				initialObserver?.disconnect();
 				initialObserver = null;
 				window.clearTimeout( initializationTimer );
@@ -722,7 +966,7 @@
 			initialObserver?.disconnect();
 			initialObserver = null;
 			queueCheckoutPresentationReconcile();
-			mountMobileEnhancement();
+			mountCheckoutEnhancement();
 		}, 5000 );
 	}
 
