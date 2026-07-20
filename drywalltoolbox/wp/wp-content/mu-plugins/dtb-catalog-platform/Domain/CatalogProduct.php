@@ -1,6 +1,15 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
+/** True when a product title identifies a tube tool rather than an accessory. */
+function dtb_catalog_product_name_is_compound_tube_tool( string $name ): bool {
+	return 1 === preg_match(
+		'/\b(?:compound|mud)[\s_-]*tubes?\b|\bcam[\s_-]*lock[\s_-]*tubes?\b/i',
+		$name
+	)
+		&& 1 !== preg_match( '/\b(?:adapter|adaptor|filler|sleeve|spring|cap|pin|body|repair|replacement)\b/i', $name );
+}
+
 /**
  * True when a product is a compound/mud/cam-lock tube tool, regardless of an
  * older imported display-category value.
@@ -10,10 +19,18 @@ function dtb_catalog_product_is_compound_tube( array $dto ): bool {
 		return false;
 	}
 
+	$name = (string) ( $dto['name'] ?? '' );
+	if (
+		1 === preg_match( '/\b(?:compound|mud)[\s_-]*tubes?\b|\bcam[\s_-]*lock[\s_-]*tubes?\b/i', $name )
+		&& ! dtb_catalog_product_name_is_compound_tube_tool( $name )
+	) {
+		return false;
+	}
+
 	$haystack = strtolower( implode( ' ', array_filter( [
 		(string) ( $dto['sku'] ?? '' ),
 		(string) ( $dto['mpn'] ?? '' ),
-		(string) ( $dto['name'] ?? '' ),
+		$name,
 		(string) ( $dto['slug'] ?? '' ),
 		(string) ( $dto['displayCategory']['key'] ?? '' ),
 		(string) ( $dto['displayCategory']['label'] ?? '' ),

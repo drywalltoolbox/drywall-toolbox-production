@@ -22,6 +22,9 @@ if ( class_exists( 'DTB_CatalogProductRepository' ) ) {
  */
 final class DTB_CatalogProductRepository {
 
+	/** SKU/name/meta pattern for compound, mud, and cam-lock tube tools. */
+	const COMPOUND_TUBE_PATTERN = '(compound[[:space:]_-]*tube|mud[[:space:]_-]*tube|cam[[:space:]_-]*lock[[:space:]_-]*tube|(^|[^A-Z0-9])((CMT|CLT|CT)[0-9]{2,3}(TT)?|CLTBF)([^A-Z0-9]|$))';
+
 	/**
 	 * Return a paginated set of product IDs and totals for the current filter set.
 	 *
@@ -157,11 +160,34 @@ final class DTB_CatalogProductRepository {
 					[ $display_category_key, $display_category_slug, $hyphen_form, $space_form, $title_form ]
 				) ) ) );
 
-				$meta_query[] = [
-					'key'     => DTB_ProductMeta::DISPLAY_CATEGORY_KEY,
-					'value'   => $all_forms,
-					'compare' => 'IN',
-				];
+				$is_compound_selection = 'compound_tubes' === $canonical;
+				$is_legacy_tube_category = in_array(
+					$canonical,
+					[ 'automatic_tapers', 'semi_automatic_tapers', 'corner_tools', 'predator_family' ],
+					true
+				);
+				$compound_ids = ( $is_compound_selection || $is_legacy_tube_category )
+					? self::compound_tube_product_ids()
+					: [];
+
+				if ( $is_compound_selection ) {
+					self::intersect_post_ids( $args, $compound_ids );
+				} else {
+					$meta_query[] = [
+						'key'     => DTB_ProductMeta::DISPLAY_CATEGORY_KEY,
+						'value'   => $all_forms,
+						'compare' => 'IN',
+					];
+
+					// A tube imported under a legacy display category must not leak
+					// into that category while its response DTO says Compound Tubes.
+					if ( ! empty( $compound_ids ) ) {
+						$args['post__not_in'] = array_values( array_unique( array_merge(
+							array_map( 'absint', $args['post__not_in'] ?? [] ),
+							$compound_ids
+						) ) );
+					}
+				}
 
 				// Tool/category filters must not leak schematic replacement parts.
 				if ( ! array_key_exists( 'is_parts', $filters ) || null === $filters['is_parts'] ) {
@@ -269,6 +295,87 @@ final class DTB_CatalogProductRepository {
 	 */
 	private static function is_parts_display_category( string $display_category ): bool {
 		return in_array( sanitize_title( $display_category ), [ 'parts', 'repair-parts', 'replacement-parts' ], true );
+	}
+
+	/** Return product IDs that resolve to the Compound Tubes display category. */
+	private static function compound_tube_product_ids(): array {
+		static $resolved_ids = null;
+		if ( null !== $resolved_ids ) {
+			return $resolved_ids;
+		}
+
+		$ids       = [];
+		$raw_forms = DTB_CategoryNormalizer::display_category_raw_forms( 'compound_tubes' );
+		$base_args = [
+			'post_type'              => 'product',
+			'post_status'            => 'publish',
+			'fields'                 => 'ids',
+			'posts_per_page'         => -1,
+			'no_found_rows'          => true,
+			'ignore_sticky_posts'    => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+		];
+
+		self::merge_query_ids( $ids, array_merge( $base_args, [
+			'meta_query' => [
+				'relation' => 'OR',
+				[
+					'key'     => DTB_ProductMeta::DISPLAY_CATEGORY_KEY,
+					'value'   => $raw_forms,
+					'compare' => 'IN',
+				],
+				[
+					'key'     => '_sku',
+					'value'   => self::COMPOUND_TUBE_PATTERN,
+					'compare' => 'REGEXP',
+				],
+				[
+					'key'     => DTB_ProductMeta::MPN,
+					'value'   => self::COMPOUND_TUBE_PATTERN,
+					'compare' => 'REGEXP',
+				],
+				[
+					'key'     => DTB_ProductMeta::MANUFACTURER_SKU,
+					'value'   => self::COMPOUND_TUBE_PATTERN,
+					'compare' => 'REGEXP',
+				],
+			],
+		] ) );
+
+		$title_ids = [];
+		foreach ( [ 'compound tube', 'mud tube', 'cam lock tube', 'camlock tube' ] as $term ) {
+			self::merge_query_ids( $title_ids, array_merge( $base_args, [ 's' => $term ] ) );
+		}
+		foreach ( array_unique( array_map( 'absint', $title_ids ) ) as $product_id ) {
+			if ( dtb_catalog_product_name_is_compound_tube_tool( get_the_title( $product_id ) ) ) {
+				$ids[] = $product_id;
+			}
+		}
+
+		$resolved_ids = array_values( array_unique( array_map( 'absint', $ids ) ) );
+
+		return $resolved_ids;
+	}
+
+	/** Merge WP_Query ID results into an existing ID accumulator. */
+	private static function merge_query_ids( array &$ids, array $args ): void {
+		$query = new WP_Query( $args );
+		$ids   = array_merge( $ids, array_map( 'absint', $query->posts ?? [] ) );
+	}
+
+	/** Intersect a new ID constraint with any search-derived post__in constraint. */
+	private static function intersect_post_ids( array &$args, array $ids ): void {
+		$ids = array_values( array_unique( array_map( 'absint', $ids ) ) );
+
+		if ( isset( $args['post__in'] ) ) {
+			$ids = array_values( array_intersect(
+				array_map( 'absint', (array) $args['post__in'] ),
+				$ids
+			) );
+		}
+
+		$args['post__in'] = ! empty( $ids ) ? $ids : [ 0 ];
 	}
 
 	/**
