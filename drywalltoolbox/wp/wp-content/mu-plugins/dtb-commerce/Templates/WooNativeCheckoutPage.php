@@ -11,7 +11,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$dtb_checkout_ui_version = '2026.07.20.2';
+$dtb_checkout_ui_version = '2026.07.20.3';
 wp_enqueue_style(
 	'dtb-woo-native-checkout-ui',
 	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-ui.css' ),
@@ -24,10 +24,35 @@ wp_enqueue_style(
 	[ 'dtb-woo-native-checkout-ui' ],
 	$dtb_checkout_ui_version
 );
+wp_enqueue_style(
+	'dtb-woo-native-checkout-payment-flow',
+	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-payment-flow.css' ),
+	[ 'dtb-woo-native-checkout-mobile-fixes' ],
+	$dtb_checkout_ui_version
+);
+wp_enqueue_style(
+	'dtb-woo-native-checkout-payment-sheet',
+	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-payment-sheet.css' ),
+	[ 'dtb-woo-native-checkout-payment-flow' ],
+	$dtb_checkout_ui_version
+);
+wp_enqueue_style(
+	'dtb-woo-native-checkout-payment-sheet-content',
+	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-payment-sheet-content.css' ),
+	[ 'dtb-woo-native-checkout-payment-sheet' ],
+	$dtb_checkout_ui_version
+);
+wp_enqueue_script(
+	'dtb-woo-native-checkout-block-filters',
+	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-block-filters.js' ),
+	[ 'wc-blocks-checkout' ],
+	$dtb_checkout_ui_version,
+	true
+);
 wp_enqueue_script(
 	'dtb-woo-native-checkout-ui',
 	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-ui.js' ),
-	[ 'dtb-woo-native-checkout-steps' ],
+	[ 'dtb-woo-native-checkout-steps', 'dtb-woo-native-checkout-block-filters' ],
 	$dtb_checkout_ui_version,
 	true
 );
