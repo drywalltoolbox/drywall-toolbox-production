@@ -97,35 +97,23 @@ Verify:
 
 ```text
 dtb-commerce/assets/woo-native-checkout.css
-  -> compatibility/base checkout layout
+  -> sole authoritative checkout stylesheet; ordered sections own the base
+     layout, design tokens, component surfaces, responsive step workflow,
+     shipping choices, payment-sheet shell/content, and structural guards
 
 dtb-commerce/assets/woo-native-checkout-steps.js
   -> mechanical boot/reveal only
 
-dtb-commerce/assets/woo-native-checkout-ui.css
-  -> existing checkout typography, fields, express-button radius,
-     and canonical Order Summary styling
-
-dtb-commerce/assets/woo-native-checkout-block-filters.js
-  -> supported Woo Checkout Block presentation filters only;
-     mobile authoritative Place Order label becomes "Pay now"
-
 dtb-commerce/assets/woo-native-checkout-ui.js
   -> Contact/Shipping/Payment presentation state, duplicate visual summary
-     suppression, and payment-sheet open/close/focus/scroll state
-
-dtb-commerce/assets/woo-native-checkout-mobile-fixes.css
-  -> provider-safe mobile overflow/touch compatibility only
-
-dtb-commerce/assets/woo-native-checkout-payment-flow.css
-  -> sequential mobile footer and final Payment summary layout
-
-dtb-commerce/assets/woo-native-checkout-payment-sheet.css
-  -> same-page bottom-sheet shell, backdrop, motion, and fixed Woo main surface
-
-dtb-commerce/assets/woo-native-checkout-payment-sheet-content.css
-  -> provider-owned express/payment content spacing and authoritative submit CTA
+     suppression, responsive wrapper classification, provider-safe step
+     visibility, payment-sheet open/close/focus/scroll state, and the supported
+     Woo Checkout Block filter that labels the mobile submit action "Pay now"
 ```
+
+Checkout CSS must remain unified in `woo-native-checkout.css`. Do not add a
+downstream checkout override stylesheet: place new rules in the matching ordered
+section and preserve the WooCommerce/official-Stripe ownership boundaries above.
 
 ## Validation/error behavior
 

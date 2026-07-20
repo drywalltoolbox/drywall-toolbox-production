@@ -5,84 +5,26 @@
  * This template intentionally delegates checkout rendering to the page content
  * and WooCommerce. It does not manually instantiate Checkout Block, payment
  * methods, Stripe fields, order creation, or endpoint handlers.
+ * DTB_OfficialStripeNativeCheckout owns all checkout asset registration,
+ * dependencies, loading strategy, and cache versions; this file renders only
+ * the document shell and assigned Checkout page content.
  *
  * @package drywall-toolbox
  */
 
 defined( 'ABSPATH' ) || exit;
 
-$dtb_checkout_ui_version = '2026.07.20.4';
-wp_enqueue_style(
-	'dtb-woo-native-checkout-ui',
-	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-ui.css' ),
-	[ 'dtb-woo-native-checkout' ],
-	$dtb_checkout_ui_version
-);
-wp_enqueue_style(
-	'dtb-woo-native-checkout-mobile-fixes',
-	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-mobile-fixes.css' ),
-	[ 'dtb-woo-native-checkout-ui' ],
-	$dtb_checkout_ui_version
-);
-wp_enqueue_style(
-	'dtb-woo-native-checkout-payment-flow',
-	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-payment-flow.css' ),
-	[ 'dtb-woo-native-checkout-mobile-fixes' ],
-	$dtb_checkout_ui_version
-);
-wp_enqueue_style(
-	'dtb-woo-native-checkout-payment-sheet',
-	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-payment-sheet.css' ),
-	[ 'dtb-woo-native-checkout-payment-flow' ],
-	$dtb_checkout_ui_version
-);
-wp_enqueue_style(
-	'dtb-woo-native-checkout-payment-sheet-content',
-	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-payment-sheet-content.css' ),
-	[ 'dtb-woo-native-checkout-payment-sheet' ],
-	$dtb_checkout_ui_version
-);
-wp_enqueue_style(
-	'dtb-woo-native-checkout-mobile-refinements',
-	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-mobile-refinements.css' ),
-	[ 'dtb-woo-native-checkout-payment-sheet-content' ],
-	$dtb_checkout_ui_version
-);
-wp_enqueue_style(
-	'dtb-woo-native-checkout-mobile-layout-guard',
-	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-mobile-layout-guard.css' ),
-	[ 'dtb-woo-native-checkout-mobile-refinements' ],
-	$dtb_checkout_ui_version
-);
-wp_enqueue_script(
-	'dtb-woo-native-checkout-block-filters',
-	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-block-filters.js' ),
-	[ 'wc-blocks-checkout' ],
-	$dtb_checkout_ui_version,
-	true
-);
-wp_enqueue_script(
-	'dtb-woo-native-checkout-ui',
-	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-ui.js' ),
-	[ 'dtb-woo-native-checkout-steps', 'dtb-woo-native-checkout-block-filters' ],
-	$dtb_checkout_ui_version,
-	true
-);
-wp_enqueue_script(
-	'dtb-woo-native-checkout-mobile-refinements',
-	content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-mobile-refinements.js' ),
-	[ 'dtb-woo-native-checkout-ui' ],
-	$dtb_checkout_ui_version,
-	true
-);
-wp_script_add_data( 'dtb-woo-native-checkout-ui', 'strategy', 'defer' );
-wp_script_add_data( 'dtb-woo-native-checkout-mobile-polish', 'strategy', 'defer' );
+$storefront_base_path = function_exists( 'dtb_detect_storefront_base_path' )
+	? dtb_detect_storefront_base_path()
+	: '';
+$storefront_home_url  = home_url( $storefront_base_path . '/' );
 ?><!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 	<meta name="robots" content="noindex,nofollow">
+	<!-- Critical boot guard must run before deferred checkout assets and fail open after eight seconds. -->
 	<script>document.documentElement.classList.add('dtb-native-checkout-booting');window.setTimeout(function(){document.documentElement.classList.remove('dtb-native-checkout-booting');},8000);</script>
 	<style>
 		.dtb-native-checkout-loader{position:fixed;z-index:2147483000;inset:0;display:none;min-height:100vh;background:#f8fafc;color:#0f172a;align-items:center;justify-content:center;opacity:1;transition:opacity 260ms cubic-bezier(.4,0,.2,1)}
@@ -107,45 +49,39 @@ wp_script_add_data( 'dtb-woo-native-checkout-mobile-polish', 'strategy', 'defer'
 			<p><?php esc_html_e( 'Preparing your secure checkout…', 'drywall-toolbox' ); ?></p>
 		</div>
 	</div>
-	<?php
-	$storefront_base_path = function_exists( 'dtb_detect_storefront_base_path' )
-		? dtb_detect_storefront_base_path()
-		: '';
-	$storefront_home_url  = home_url( $storefront_base_path . '/' );
-	?>
 	<header class="dtb-checkout-header">
 		<div class="dtb-checkout-header__inner">
 			<a class="dtb-checkout-header__brand" href="<?php echo esc_url( $storefront_home_url ); ?>" aria-label="<?php esc_attr_e( 'Return to Drywall Toolbox', 'drywall-toolbox' ); ?>">
-				<img src="<?php echo esc_url( home_url( '/logos/drywall-logo-black.png' ) ); ?>" alt="<?php esc_attr_e( 'Drywall Toolbox', 'drywall-toolbox' ); ?>">
+				<img src="https://drywalltoolbox.com/logos/logo-white.svg" alt="<?php esc_attr_e( 'Drywall Toolbox', 'drywall-toolbox' ); ?>" width="3000" height="917">
 			</a>
-			<div class="dtb-checkout-header__secure" aria-label="<?php esc_attr_e( 'Secure checkout', 'drywall-toolbox' ); ?>">
+			<div class="dtb-checkout-header__secure" aria-label="<?php esc_attr_e( 'Secure checkout powered by Stripe', 'drywall-toolbox' ); ?>">
 				<svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
 					<path d="M7.5 10V7.5a4.5 4.5 0 0 1 9 0V10m-10 0h11a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 17.5 20h-11A1.5 1.5 0 0 1 5 18.5v-7A1.5 1.5 0 0 1 6.5 10Z" />
 				</svg>
-				<span><?php esc_html_e( 'Secure checkout', 'drywall-toolbox' ); ?></span>
+				<img class="dtb-checkout-header__stripe" src="https://drywalltoolbox.com/logos/powered_by_stripe.svg" alt="" aria-hidden="true" width="2340" height="540">
 			</div>
 		</div>
 	</header>
-<main id="primary" class="dtb-native-woocommerce-main" role="main">
-	<div class="dtb-checkout-intro">
-		<p class="dtb-checkout-intro__eyebrow"><?php esc_html_e( 'Checkout', 'drywall-toolbox' ); ?></p>
-		<h1><?php esc_html_e( 'Complete your order', 'drywall-toolbox' ); ?></h1>
-		<p><?php esc_html_e( 'Review your delivery and payment details before placing your order.', 'drywall-toolbox' ); ?></p>
-	</div>
-	<?php
-	if ( have_posts() ) {
-		while ( have_posts() ) {
-			the_post();
-			the_content();
+	<main id="primary" class="dtb-native-woocommerce-main" role="main">
+		<div class="dtb-checkout-intro">
+			<p class="dtb-checkout-intro__eyebrow"><?php esc_html_e( 'Checkout', 'drywall-toolbox' ); ?></p>
+			<h1><?php esc_html_e( 'Complete your order', 'drywall-toolbox' ); ?></h1>
+			<p><?php esc_html_e( 'Review your delivery and payment details before placing your order.', 'drywall-toolbox' ); ?></p>
+		</div>
+		<?php
+		if ( have_posts() ) {
+			while ( have_posts() ) {
+				the_post();
+				the_content();
+			}
+		} else {
+			status_header( 404 );
+			echo '<div class="woocommerce-error" role="alert">'
+				. esc_html__( 'Checkout is temporarily unavailable. Please return to your cart and try again.', 'drywall-toolbox' )
+				. '</div>';
 		}
-	} else {
-		status_header( 404 );
-		echo '<div class="woocommerce-error" role="alert">'
-			. esc_html__( 'Checkout is temporarily unavailable. Please return to your cart and try again.', 'drywall-toolbox' )
-			. '</div>';
-	}
-	?>
-</main>
+		?>
+	</main>
 <?php wp_footer(); ?>
 </body>
 </html>

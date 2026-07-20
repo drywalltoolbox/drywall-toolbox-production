@@ -8,6 +8,13 @@
 	const sheetClosedClass = 'is-dtb-payment-sheet-closed';
 	const stepBodyClasses = [ 'dtb-checkout-step-contact', 'dtb-checkout-step-shipping', 'dtb-checkout-step-payment' ];
 	const sheetCloseDuration = 240;
+	const checkoutFilters = window.wc?.blocksCheckout;
+
+	if ( checkoutFilters?.registerCheckoutFilters ) {
+		checkoutFilters.registerCheckoutFilters( 'dtb-native-mobile-checkout', {
+			placeOrderButtonLabel: ( defaultValue ) => mobileViewport.matches ? 'Pay now' : defaultValue,
+		} );
+	}
 
 	const steps = [
 		{
@@ -57,6 +64,48 @@
 		'.wc-block-checkout__actions',
 	];
 
+	const refinedSectionDefinitions = {
+		contact: {
+			marker: 'contact',
+			selectors: [
+				'.wp-block-woocommerce-checkout-contact-information-block',
+				'.wc-block-checkout__contact-fields',
+				'[data-block-name="woocommerce/checkout-contact-information-block"]',
+			],
+			fallbackSelectors: [ 'input[type="email"]' ],
+		},
+		shippingAddress: {
+			marker: 'shipping-address',
+			selectors: [
+				'.wp-block-woocommerce-checkout-shipping-address-block',
+				'.wc-block-checkout__shipping-fields',
+				'[data-block-name="woocommerce/checkout-shipping-address-block"]',
+			],
+			fallbackSelectors: [ '#shipping', '[id="shipping"]' ],
+		},
+		billingAddress: {
+			marker: 'billing-address',
+			selectors: [
+				'.wp-block-woocommerce-checkout-billing-address-block',
+				'.wc-block-checkout__billing-fields',
+				'[data-block-name="woocommerce/checkout-billing-address-block"]',
+			],
+			fallbackSelectors: [ '#billing', '[id="billing"]' ],
+		},
+		shippingMethod: {
+			marker: 'shipping-method',
+			selectors: [
+				'.wp-block-woocommerce-checkout-shipping-method-block',
+				'.wp-block-woocommerce-checkout-shipping-methods-block',
+				'.wc-block-checkout__shipping-option',
+				'.wc-block-checkout__shipping-method',
+				'.wp-block-woocommerce-checkout-pickup-options-block',
+				'[data-block-name="woocommerce/checkout-shipping-method-block"]',
+			],
+			fallbackSelectors: [],
+		},
+	};
+
 	let activeStep = 0;
 	let highestVisitedStep = 0;
 	let progress = null;
@@ -70,6 +119,8 @@
 	let paymentSheetReturnFocus = null;
 	let previousBodyOverflow = '';
 	let initialObserver = null;
+	let checkoutPresentationObserver = null;
+	let presentationReconcileQueued = false;
 	let initializationTimer = 0;
 
 	function uniqueElements( elements ) {
@@ -86,6 +137,72 @@
 
 	function checkoutMain() {
 		return checkoutRoot()?.querySelector( '.wc-block-components-main, .wc-block-checkout__main' ) || null;
+	}
+
+	function safeSectionRoot( node ) {
+		if ( ! ( node instanceof Element ) ) {
+			return null;
+		}
+
+		return node.closest( [
+			'.wp-block-woocommerce-checkout-contact-information-block',
+			'.wp-block-woocommerce-checkout-shipping-address-block',
+			'.wp-block-woocommerce-checkout-billing-address-block',
+			'.wp-block-woocommerce-checkout-shipping-method-block',
+			'.wp-block-woocommerce-checkout-shipping-methods-block',
+			'.wc-block-checkout__contact-fields',
+			'.wc-block-checkout__shipping-fields',
+			'.wc-block-checkout__billing-fields',
+			'.wc-block-checkout__shipping-option',
+			'.wc-block-checkout__shipping-method',
+			'.wc-block-components-checkout-step',
+		].join( ',' ) );
+	}
+
+	function refinedSectionRoots( definition ) {
+		const root = checkoutRoot();
+		if ( ! root ) {
+			return [];
+		}
+
+		const direct = definition.selectors.flatMap( ( selector ) => Array.from( root.querySelectorAll( selector ) ) );
+		const fallback = definition.fallbackSelectors.flatMap( ( selector ) =>
+			Array.from( root.querySelectorAll( selector ) ).map( safeSectionRoot )
+		);
+
+		return uniqueElements( [ ...direct, ...fallback ] ).filter( ( node ) =>
+			node instanceof Element && ! node.closest( '[data-dtb-payment-sheet-owned]' )
+		);
+	}
+
+	function setRefinedSectionState( node, marker, visible ) {
+		node.dataset.dtbMobileRefinementStep = marker;
+		node.classList.toggle( inactiveStepClass, ! visible );
+		node.setAttribute( 'aria-hidden', visible ? 'false' : 'true' );
+	}
+
+	function reconcileRefinedSections() {
+		if ( ! mobileViewport.matches ) {
+			document.querySelectorAll( '[data-dtb-mobile-refinement-step]' ).forEach( ( node ) => {
+				node.classList.remove( inactiveStepClass );
+				node.removeAttribute( 'aria-hidden' );
+				delete node.dataset.dtbMobileRefinementStep;
+			} );
+			return;
+		}
+
+		const activeStepId = steps[ activeStep ]?.id || 'contact';
+		refinedSectionRoots( refinedSectionDefinitions.contact ).forEach( ( node ) => {
+			setRefinedSectionState( node, refinedSectionDefinitions.contact.marker, activeStepId === 'contact' );
+		} );
+
+		const shippingVisible = activeStepId === 'shipping';
+		[ 'shippingAddress', 'billingAddress', 'shippingMethod' ].forEach( ( definitionKey ) => {
+			const definition = refinedSectionDefinitions[ definitionKey ];
+			refinedSectionRoots( definition ).forEach( ( node ) => {
+				setRefinedSectionState( node, definition.marker, shippingVisible );
+			} );
+		} );
 	}
 
 	function stepElements( stepIndex ) {
@@ -144,6 +261,63 @@
 				node.classList.add( 'is-dtb-order-summary-duplicate' );
 			}
 		} );
+	}
+
+	function gatewayOptions( radioControl ) {
+		const directOptions = Array.from( radioControl.children ).filter( ( node ) =>
+			node.matches( '.wc-block-components-radio-control__option, .wc-block-components-radio-control-accordion-option' )
+		);
+		if ( directOptions.length > 0 ) {
+			return directOptions;
+		}
+
+		return uniqueElements(
+			Array.from( radioControl.querySelectorAll( 'input[type="radio"]' ) )
+				.map( ( input ) => input.closest( '.wc-block-components-radio-control__option, .wc-block-components-radio-control-accordion-option' ) )
+		).filter( ( node ) => node && node.closest( '.wc-block-components-radio-control' ) === radioControl );
+	}
+
+	function markSingleGatewayPresentation() {
+		const root = checkoutRoot();
+		if ( ! root ) {
+			return;
+		}
+
+		root.querySelectorAll( '.wc-block-components-payment-methods.is-dtb-single-gateway-set' ).forEach( ( methods ) => {
+			methods.classList.remove( 'is-dtb-single-gateway-set' );
+		} );
+
+		root.querySelectorAll( '.wc-block-checkout__payment-method .wc-block-components-radio-control' ).forEach( ( radioControl ) => {
+			const isSingleGateway = gatewayOptions( radioControl ).length === 1;
+			radioControl.classList.toggle( 'is-dtb-single-gateway', isSingleGateway );
+			if ( isSingleGateway ) {
+				radioControl.closest( '.wc-block-components-payment-methods' )?.classList.add( 'is-dtb-single-gateway-set' );
+			}
+		} );
+	}
+
+	function reconcileCheckoutPresentation() {
+		presentationReconcileQueued = false;
+		markDuplicateOrderSummaries();
+		markSingleGatewayPresentation();
+		reconcileRefinedSections();
+	}
+
+	function queueCheckoutPresentationReconcile() {
+		if ( presentationReconcileQueued ) {
+			return;
+		}
+		presentationReconcileQueued = true;
+		window.requestAnimationFrame( reconcileCheckoutPresentation );
+	}
+
+	function observeCheckoutPresentation() {
+		if ( checkoutPresentationObserver ) {
+			return;
+		}
+
+		checkoutPresentationObserver = new MutationObserver( queueCheckoutPresentationReconcile );
+		checkoutPresentationObserver.observe( document.body, { childList: true, subtree: true } );
 	}
 
 	function markPaymentSheetElements() {
@@ -400,6 +574,7 @@
 		markPaymentSheetElements();
 		document.body.classList.remove( ...stepBodyClasses );
 		document.body.classList.add( `dtb-checkout-step-${ steps[ activeStep ].id }` );
+		reconcileRefinedSections();
 		markDuplicateOrderSummaries();
 		updateControls();
 
@@ -456,6 +631,11 @@
 			node.removeAttribute( 'aria-hidden' );
 			delete node.dataset.dtbCheckoutStep;
 		} );
+		document.querySelectorAll( '[data-dtb-mobile-refinement-step]' ).forEach( ( node ) => {
+			node.classList.remove( inactiveStepClass );
+			node.removeAttribute( 'aria-hidden' );
+			delete node.dataset.dtbMobileRefinementStep;
+		} );
 		document.querySelectorAll( '[data-dtb-payment-sheet-owned]' ).forEach( ( node ) => {
 			node.classList.remove( sheetOwnedClass, sheetClosedClass );
 			node.removeAttribute( 'aria-hidden' );
@@ -481,7 +661,7 @@
 			return false;
 		}
 
-		markDuplicateOrderSummaries();
+		reconcileCheckoutPresentation();
 		if ( ! mobileViewport.matches ) {
 			teardownMobileEnhancement();
 			return true;
@@ -512,17 +692,18 @@
 			mountMobileEnhancement();
 		} else {
 			teardownMobileEnhancement();
-			markDuplicateOrderSummaries();
+			reconcileCheckoutPresentation();
 		}
 	}
 
 	function initialize() {
 		mobileViewport.addEventListener( 'change', handleViewportChange );
 		document.addEventListener( 'keydown', handleGlobalKeydown );
-		markDuplicateOrderSummaries();
+		observeCheckoutPresentation();
+		reconcileCheckoutPresentation();
 		if ( mountMobileEnhancement() ) {
-			window.setTimeout( markDuplicateOrderSummaries, 500 );
-			window.setTimeout( markDuplicateOrderSummaries, 1500 );
+			window.setTimeout( queueCheckoutPresentationReconcile, 500 );
+			window.setTimeout( queueCheckoutPresentationReconcile, 1500 );
 			return;
 		}
 
@@ -531,8 +712,8 @@
 				initialObserver?.disconnect();
 				initialObserver = null;
 				window.clearTimeout( initializationTimer );
-				window.setTimeout( markDuplicateOrderSummaries, 500 );
-				window.setTimeout( markDuplicateOrderSummaries, 1500 );
+				window.setTimeout( queueCheckoutPresentationReconcile, 500 );
+				window.setTimeout( queueCheckoutPresentationReconcile, 1500 );
 			}
 		} );
 		initialObserver.observe( document.body, { childList: true, subtree: true } );
@@ -540,7 +721,7 @@
 		initializationTimer = window.setTimeout( () => {
 			initialObserver?.disconnect();
 			initialObserver = null;
-			markDuplicateOrderSummaries();
+			queueCheckoutPresentationReconcile();
 			mountMobileEnhancement();
 		}, 5000 );
 	}

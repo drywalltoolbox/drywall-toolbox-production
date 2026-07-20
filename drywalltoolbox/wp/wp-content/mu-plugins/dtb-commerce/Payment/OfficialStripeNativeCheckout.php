@@ -19,8 +19,8 @@ final class DTB_OfficialStripeNativeCheckout {
 	public const CONTRACT_VERSION = 'woo-stripe-v1';
 
 	private const STRIPE_GATEWAY_ID = 'stripe';
-	private const ASSET_VERSION     = '2026.07.19.6';
-	private const STRIPE_APPEARANCE_VERSION = '2026.07.19.1';
+	private const ASSET_VERSION     = '2026.07.20.8';
+	private const STRIPE_APPEARANCE_VERSION = '2026.07.20.1';
 	private const STRIPE_APPEARANCE_OPTION  = 'dtb_stripe_appearance_version';
 
 	public static function register(): void {
@@ -103,7 +103,15 @@ final class DTB_OfficialStripeNativeCheckout {
 			self::ASSET_VERSION,
 			true
 		);
+		wp_enqueue_script(
+			'dtb-woo-native-checkout-ui',
+			content_url( 'mu-plugins/dtb-commerce/assets/woo-native-checkout-ui.js' ),
+			[ 'dtb-woo-native-checkout-steps', 'wc-blocks-checkout' ],
+			self::ASSET_VERSION,
+			true
+		);
 		wp_script_add_data( 'dtb-woo-native-checkout-steps', 'strategy', 'defer' );
+		wp_script_add_data( 'dtb-woo-native-checkout-ui', 'strategy', 'defer' );
 	}
 
 	public static function body_class( array $classes ): array {
@@ -128,19 +136,19 @@ final class DTB_OfficialStripeNativeCheckout {
 		$existing_variables  = isset( $existing['variables'] ) ? (array) $existing['variables'] : [];
 		$existing_rules      = isset( $existing['rules'] ) ? (array) $existing['rules'] : [];
 		$appearance_variables = [
-			'colorPrimary'          => '#1d4ed8',
-			'colorBackground'       => '#ffffff',
-			'colorText'             => '#0f172a',
-			'colorTextSecondary'    => '#475569',
+			'colorPrimary'          => '#2457e6',
+			'colorBackground'       => 'transparent',
+			'colorText'             => '#101828',
+			'colorTextSecondary'    => '#667085',
 			'colorDanger'           => '#b91c1c',
-			'fontFamily'            => 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-			'borderRadius'          => '6px',
+			'fontFamily'            => 'ui-rounded, "SF Pro Rounded", "Avenir Next", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif',
+			'borderRadius'          => '10px',
 			'gridColumnSpacing'     => '10px',
-			'gridRowSpacing'        => '10px',
+			'gridRowSpacing'        => '0px',
 			'tabSpacing'            => '8px',
 			'tabIconColor'          => '#334155',
-			'tabIconHoverColor'     => '#1d4ed8',
-			'tabIconSelectedColor'  => '#1d4ed8',
+			'tabIconHoverColor'     => '#2457e6',
+			'tabIconSelectedColor'  => '#2457e6',
 			'tabLogoColor'          => 'dark',
 			'tabLogoSelectedColor'  => 'dark',
 		];
@@ -162,7 +170,7 @@ final class DTB_OfficialStripeNativeCheckout {
 			],
 			'.Tab--selected' => (object) [
 				'backgroundColor' => '#eff6ff',
-				'border'          => '1px solid #2563eb',
+				'border'          => '1px solid #2457e6',
 				'boxShadow'       => 'none',
 			],
 			'.TabLabel' => (object) [
@@ -172,13 +180,18 @@ final class DTB_OfficialStripeNativeCheckout {
 				'paddingBottom' => '4px',
 			],
 			'.Input' => (object) [
-				'border'    => '1px solid #cbd5e1',
-				'boxShadow' => 'none',
-				'padding'   => '13px 14px',
+				'backgroundColor' => 'transparent',
+				'border'          => 'none',
+				'boxShadow'       => 'inset 0 -1px 0 #d0d5dd',
+				'padding'         => '12px 0',
 			],
 			'.Input:focus' => (object) [
-				'border'    => '1px solid #2563eb',
-				'boxShadow' => '0 0 0 3px rgba(37, 99, 235, 0.12)',
+				'border'    => 'none',
+				'boxShadow' => 'inset 0 -2px 0 #2457e6',
+			],
+			'.Input--invalid' => (object) [
+				'border'    => 'none',
+				'boxShadow' => 'inset 0 -2px 0 #b91c1c',
 			],
 		];
 
@@ -186,6 +199,7 @@ final class DTB_OfficialStripeNativeCheckout {
 			$existing,
 			[
 				'theme'     => 'flat',
+				'inputs'    => 'condensed',
 				'labels'    => 'floating',
 				'variables' => (object) array_merge( $existing_variables, $appearance_variables ),
 				'rules'     => (object) array_merge( $existing_rules, $appearance_rules ),
