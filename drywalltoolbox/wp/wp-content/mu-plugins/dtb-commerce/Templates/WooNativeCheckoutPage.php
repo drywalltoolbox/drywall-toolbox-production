@@ -57,11 +57,12 @@ wp_enqueue_script(
 	true
 );
 wp_script_add_data( 'dtb-woo-native-checkout-ui', 'strategy', 'defer' );
+wp_script_add_data( 'dtb-woo-native-checkout-mobile-polish', 'strategy', 'defer' );
 ?><!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
-	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 	<meta name="robots" content="noindex,nofollow">
 	<script>document.documentElement.classList.add('dtb-native-checkout-booting');window.setTimeout(function(){document.documentElement.classList.remove('dtb-native-checkout-booting');},8000);</script>
 	<style>
