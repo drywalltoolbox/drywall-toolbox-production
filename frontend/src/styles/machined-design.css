@@ -42,8 +42,8 @@
     --header-height: calc(clamp(56px, 8vw, 100px) + 7px + env(safe-area-inset-top, 0px));
 }
 
-:root:has(.site-top-ticker) {
-    --header-height: calc(38px + clamp(56px, 8vw, 100px) + 7px + env(safe-area-inset-top, 0px));
+:root:has(.storefront-header-stack--with-banner) {
+    --header-height: calc(30px + clamp(56px, 8vw, 100px) + 7px + env(safe-area-inset-top, 0px));
 }
 
 * {
@@ -1065,16 +1065,6 @@ aside input[type="range"],
     .site-header {
         min-height: 100px;
         padding: 1.5rem 0;
-    }
-}
-
-.site-header.site-header--with-top-ticker {
-    top: 28px;
-}
-
-@media (min-width: 1025px) {
-    .site-header.site-header--with-top-ticker {
-        top: 22px;
     }
 }
 
@@ -3409,6 +3399,9 @@ a.header-contact-icon {
    ─────────────────────────────────────────────────────── */
 @media (min-width: 1025px) {
     :root { --header-height: calc(120px + env(safe-area-inset-top, 0px)); } /* taller nav bar */
+    :root:has(.storefront-header-stack--with-banner) {
+        --header-height: calc(150px + env(safe-area-inset-top, 0px));
+    }
 
     .site-header {
         position: fixed;

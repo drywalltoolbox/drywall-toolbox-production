@@ -1,6 +1,22 @@
+.storefront-header-stack {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 9999;
+  width: 100%;
+}
+
+/* The utility bar and global header are one viewport-fixed stack. Keeping the
+   header in this stack prevents the banner from entering page flow below it
+   or scrolling away independently. */
+.storefront-header-stack .site-header {
+  position: relative;
+  top: auto;
+  z-index: auto;
+}
+
 .storefront-top-banner {
   position: relative;
-  z-index: 1100;
+  z-index: 1;
   width: 100%;
   min-height: 30px;
   /* Exact static chrome/silver palette used by the homepage "The New Standard in Drywall" title. */

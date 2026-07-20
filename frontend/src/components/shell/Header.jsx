@@ -12,7 +12,7 @@ export default function Header(props) {
   const hasTopTicker = Boolean(props.hasTopTicker || showHomeUtilityBar);
 
   return (
-    <>
+    <div className={`storefront-header-stack${showHomeUtilityBar ? ' storefront-header-stack--with-banner' : ''}`}>
       {showHomeUtilityBar ? (
         <div className="storefront-top-banner" role="region" aria-label="Store information">
           <div className="storefront-top-banner__inner">
@@ -26,6 +26,6 @@ export default function Header(props) {
         </div>
       ) : null}
       <StorefrontHeader {...props} hasTopTicker={hasTopTicker} />
-    </>
+    </div>
   );
 }

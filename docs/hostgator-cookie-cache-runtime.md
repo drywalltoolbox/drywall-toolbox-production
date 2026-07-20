@@ -1,12 +1,12 @@
 # HostGator Cookie and Cache Runtime Contract
 
-Last verified against source: 2026-07-14.
+Last verified against source: 2026-07-20.
 
 ## Purpose
 
 Drywall Toolbox runs with the public document root at `/public_html/drywalltoolbox/` while WordPress core lives under `/public_html/drywalltoolbox/wp/`. Root URLs such as `/wp-admin/`, `/wp-login.php`, `/wp-json/*`, `/dtb/*`, and `/checkout/order-pay/*` are intentionally routed into the WordPress subdirectory before the React SPA fallback.
 
-`/wp-admin/admin-ajax.php` is a deliberate exception to the general `/wp-admin/*` redirect: it is internally rewritten to `/wp/wp-admin/admin-ajax.php`. This preserves POST bodies for WooCommerce batch jobs such as the product CSV importer; a browser-followed 302 would replay the request as GET and discard the AJAX action, nonce, file mapping, and batch position.
+The root `/wp-admin/*` and `/wp-login.php` aliases are internal rewrites to the WordPress files under `/wp`; the physical `/wp` path must not be exposed through a browser redirect. This preserves login credentials and admin POST bodies. A browser-followed `302` would replay a typical POST as GET and discard the login fields, AJAX action, nonce, file mapping, and batch position.
 
 Because WordPress is mounted under `/wp` but exposed through root aliases, cookie path scope and cache bypass rules must be explicit. Otherwise mobile browsers and host-level cache can load the wp-admin login page while WordPress rejects the login test cookie.
 

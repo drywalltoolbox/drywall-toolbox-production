@@ -174,14 +174,10 @@ ErrorDocument 511 /errors/511.html
 
   RewriteRule ^favicon\.ico$ logos/favicon.ico [L]
 
-  # WordPress admin/login aliases.
-  # admin-ajax must be internally rewritten before the general wp-admin 302.
-  # Redirecting WooCommerce importer batches changes POST to GET in browsers,
-  # dropping the action, nonce, mapping, file, and current import position.
+  # WordPress admin/login aliases. These must remain internal rewrites: a
+  # browser-followed 302 changes login/admin POST requests to GET and drops the
+  # submitted credentials, action, nonce, file mapping, and batch position.
   RewriteRule ^wp-admin/admin-ajax\.php$ wp/wp-admin/admin-ajax.php [L,QSA]
-  RewriteRule ^wp-admin/?$ /wp/wp-admin/ [R=302,L,QSA]
-  RewriteRule ^wp-admin/(.*)$ /wp/wp-admin/$1 [R=302,L,QSA]
-  RewriteRule ^wp-login\.php$ /wp/wp-login.php [R=302,L,QSA]
   RewriteRule ^wp-admin/?$ wp/wp-admin/ [L,QSA]
   RewriteRule ^wp-admin/(.*)$ wp/wp-admin/$1 [L,QSA]
   RewriteRule ^wp-login\.php$ wp/wp-login.php [L,QSA]
