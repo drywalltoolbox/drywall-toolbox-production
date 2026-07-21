@@ -1,6 +1,6 @@
 # Drywall Toolbox Intelligence and Engineering Authority
 
-Last verified against active source: 2026-07-20 (current `main` head observed at `763a58779b75951ae96fd5c65c65b3e965af06f8`).
+Last verified against active source: 2026-07-21.
 
 ## 1. Mission and accountability
 
@@ -145,7 +145,7 @@ Do not cite smoke scripts from historical instructions unless they exist in acti
 
 ### Deployment mirror
 
-`drywalltoolbox/` is the tracked HostGator deployment mirror, not a second independent application. There is no canonical root-level `wp/` source tree.
+`drywalltoolbox/` is the tracked SiteGround deployment source mirror, not a second independent application. `launch/live/` is an assembled overlay and never a second source tree. There is no canonical root-level `wp/` source tree.
 
 Do not package or overwrite runtime-owned `wp-config.php`, WordPress core, uploads, cache, upgrade state, secrets, or uncontrolled database dumps.
 
@@ -517,12 +517,7 @@ npm run lint
 npm run build
 ```
 
-Current CI also runs these checkout static contracts:
-
-```powershell
-./scripts/smoke-dtb-mobile-payment-sheet.ps1
-./scripts/smoke-dtb-checkout-performance.ps1
-```
+Current CI also validates all custom MU-plugin/theme PHP syntax, rejects legacy production origins in active runtime source, assembles the bounded deployment payload, and rejects runtime-owned or secret paths.
 
 Targeted checkout/backend validation should include changed PHP syntax plus the relevant source/runtime contracts, including:
 
@@ -541,13 +536,7 @@ Targeted checkout/backend validation should include changed PHP syntax plus the 
 - partial/multiple refunds keyed by `refund_id`;
 - Veeqo and QuickBooks side effects exactly once.
 
-Optional checkout performance shell baseline:
-
-```powershell
-./scripts/audit-dtb-checkout-pagespeed.ps1 -Url "https://drywalltoolbox.com/checkout/"
-```
-
-A public PageSpeed result is only a shell baseline; it cannot reproduce a shopper-specific Woo cookie/cart session. Session-preserving staging validation is still required for release acceptance.
+The previously referenced checkout smoke/PageSpeed scripts are absent from current source. A public shell/PageSpeed result would not reproduce a shopper-specific Woo cookie/cart session; session-preserving staging validation remains required for release acceptance.
 
 Do not claim any test, smoke script, runtime payment, webhook, integration, or deployment passed unless it actually ran and produced usable evidence.
 
@@ -555,13 +544,13 @@ If a historically referenced validation script is absent from current source, st
 
 ## 15. CI/CD and deployment safety
 
-`.github/workflows/ci-build.yml` currently runs on pull requests to `main`, pushes to `main`, and manual dispatch. It installs dependencies, lints, builds, runs the two checkout smoke contracts, assembles `deploy-root`, and rejects forbidden runtime payloads such as `wp-config.php`, uploads, and cache.
+`.github/workflows/ci-build.yml` currently runs on pull requests to `main`, pushes to `main`, and manual dispatch. It installs dependencies, lints, builds, validates custom PHP syntax and active origin wiring, assembles `deploy-root`, and rejects forbidden runtime payloads such as `wp-config.php`, uploads, and cache.
 
 Merge is not deployment.
 
 The intended production deployment contract is controlled/manual release with explicit confirmation, protected approval, backup, validation, rollback, and restore capability.
 
-**Current-source caveat:** at this verification point, active `.github/workflows/deploy.yml` defines deploy/restore inputs and begins build/package plus a protected pre-deploy backup job, but the checked-in file ends after a placeholder `Continuing existing controlled deployment workflow...` step. Do not claim that upload, smoke, rollback, or restore automation is currently complete until active source contains and validates those executable steps.
+Active `.github/workflows/deploy.yml` builds an immutable bounded payload, requires exact confirmation and protected `siteground-production` approval, backs up only the DTB-managed remote surface, deploys over SFTP, runs root/health/checkout HTTP smoke checks, automatically restores managed files on release failure, and supports explicit artifact-based restore. Database backup/restore and external payment/integration acceptance remain operator-owned and must not be inferred from a successful file release.
 
 Never package or deploy:
 

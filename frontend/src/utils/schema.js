@@ -5,7 +5,7 @@
  * No side effects — every function receives data and returns a plain object.
  */
 
-const SITE_URL  = 'https://drywalltoolbox.com';
+const SITE_URL  = 'https://elliottm4.sg-host.com';
 const SITE_NAME = 'Drywall Toolbox';
 
 /** Remove HTML tags and decode common entities for clean schema descriptions. */

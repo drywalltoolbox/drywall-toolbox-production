@@ -19,7 +19,7 @@
 import { Helmet } from 'react-helmet-async';
 
 const SITE_NAME      = 'Drywall Toolbox';
-const SITE_URL       = 'https://drywalltoolbox.com';
+const SITE_URL       = 'https://elliottm4.sg-host.com';
 const DEFAULT_OG_IMG = `${SITE_URL}/logo-black.svg`;
 const MAX_DESC_LEN   = 160;
 const SEARCH_INDEXING_ENABLED =

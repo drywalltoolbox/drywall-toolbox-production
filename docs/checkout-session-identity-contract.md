@@ -9,7 +9,7 @@ Drywall Toolbox uses one WooCommerce cart/session across the React storefront an
 ```text
 React Store API cart
   -> same-origin Woo cookie-backed session
-  -> full-document https://drywalltoolbox.com/checkout/
+  -> full-document https://elliottm4.sg-host.com/checkout/
   -> WordPress resolves the same authenticated customer
   -> WooCommerce loads the same session/cart
   -> Checkout Block

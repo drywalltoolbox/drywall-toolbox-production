@@ -95,12 +95,7 @@ Before payment acceptance, validate the checkout as a separate native performanc
 11. Payment failure recovery never creates a second PaymentIntent, Payment Element, Checkout Session, wallet button, or independent payment submit path.
 12. `private/no-store` remains enforced for checkout/session/payment routes despite any asset prewarming.
 
-Run the static and performance tools:
-
-```powershell
-./scripts/smoke-dtb-checkout-performance.ps1
-./scripts/audit-dtb-checkout-pagespeed.ps1 -Url "https://drywalltoolbox.com/checkout/" -OutputPath "artifacts/checkout-pagespeed-mobile.json"
-```
+The historical standalone checkout-performance/PageSpeed scripts are absent from active source. Run current CI validation, then capture session-preserving mobile Lighthouse/WebPageTest evidence with a real cart at `https://elliottm4.sg-host.com/checkout/`.
 
 A public PageSpeed audit is a shell baseline only because it does not reproduce a shopper-specific WooCommerce cookie/cart session. Also run a session-preserving mobile Lighthouse/WebPageTest flow in staging with a real cart and record the release-candidate evidence.
 
@@ -111,10 +106,10 @@ Review at minimum LCP, CLS, total blocking time/long tasks, server response time
 Confirm these are WordPress/WooCommerce-owned and private/no-store:
 
 ```text
-https://drywalltoolbox.com/checkout/
-https://drywalltoolbox.com/checkout/order-pay/{order_id}/?key=wc_order_...
-https://drywalltoolbox.com/checkout/order-received/{order_id}/?key=wc_order_...
-https://drywalltoolbox.com/?wc-api=wc_stripe
+https://elliottm4.sg-host.com/checkout/
+https://elliottm4.sg-host.com/checkout/order-pay/{order_id}/?key=wc_order_...
+https://elliottm4.sg-host.com/checkout/order-received/{order_id}/?key=wc_order_...
+https://elliottm4.sg-host.com/?wc-api=wc_stripe
 ```
 
 Confirm staging checkout routes also enter WordPress rather than `/staging/2972/index.html`.
@@ -124,7 +119,7 @@ Confirm `.htaccess` cache-bypass behavior does not replace or corrupt WordPress/
 Confirm the Apple Pay association URL returns the intended non-empty verification file when Apple Pay is enabled:
 
 ```text
-https://drywalltoolbox.com/.well-known/apple-developer-merchantid-domain-association
+https://elliottm4.sg-host.com/.well-known/apple-developer-merchantid-domain-association
 ```
 
 ## React cart/session continuity
@@ -236,8 +231,6 @@ php -l drywalltoolbox/wp/wp-content/mu-plugins/dtb-order-platform/Payment/Checko
 php -l drywalltoolbox/wp/wp-content/mu-plugins/dtb-order-platform/Payment/RefundLifecycle.php
 php -l drywalltoolbox/wp/wp-content/mu-plugins/dtb-integrations/OperationalPipeline/QuickBooksAccountingPipeline.php
 php -l drywalltoolbox/wp/wp-content/mu-plugins/dtb-integrations/OperationalPipeline/QuickBooksJobOverride.php
-./scripts/smoke-dtb-mobile-payment-sheet.ps1
-./scripts/smoke-dtb-checkout-performance.ps1
 git diff --check
 ```
 

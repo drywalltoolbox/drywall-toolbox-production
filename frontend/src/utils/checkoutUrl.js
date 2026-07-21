@@ -14,7 +14,7 @@ function storefrontBasePath() {
   if (!configured || configured === '/') return '';
 
   try {
-    const pathname = new URL(configured, typeof window !== 'undefined' ? window.location.origin : 'https://drywalltoolbox.com').pathname.replace(/\/+$/, '');
+    const pathname = new URL(configured, typeof window !== 'undefined' ? window.location.origin : 'https://elliottm4.sg-host.com').pathname.replace(/\/+$/, '');
     return /^\/staging\/[A-Za-z0-9_-]+$/.test(pathname) ? pathname : '';
   } catch {
     return /^\/staging\/[A-Za-z0-9_-]+$/.test(configured) ? configured : '';
@@ -23,7 +23,7 @@ function storefrontBasePath() {
 
 function buildCheckoutUrl(path) {
   const origin = backendOrigin();
-  const base = origin ? new URL(path, origin) : new URL(path, 'https://drywalltoolbox.com');
+  const base = origin ? new URL(path, origin) : new URL(path, 'https://elliottm4.sg-host.com');
   const storefrontPath = storefrontBasePath();
 
   if (storefrontPath) {

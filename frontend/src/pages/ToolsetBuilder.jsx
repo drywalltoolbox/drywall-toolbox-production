@@ -47,10 +47,10 @@ import {
   BUILDER_BRANDS, getSlotProducts,
 } from '../data/toolsetTemplates';
 
-const tapeTechLogo  = 'https://drywalltoolbox.com/logos/tapetech_logo.svg';
-const columbiaLogo  = 'https://drywalltoolbox.com/logos/columbia_taping_tools_logo.svg';
-const level5Logo    = 'https://drywalltoolbox.com/logos/Level5.svg';
-const asgardLogo    = 'https://drywalltoolbox.com/logos/asgard_logo.svg';
+const tapeTechLogo  = 'https://elliottm4.sg-host.com/logos/tapetech_logo.svg';
+const columbiaLogo  = 'https://elliottm4.sg-host.com/logos/columbia_taping_tools_logo.svg';
+const level5Logo    = 'https://elliottm4.sg-host.com/logos/Level5.svg';
+const asgardLogo    = 'https://elliottm4.sg-host.com/logos/asgard_logo.svg';
 
 import '../styles/toolset-builder.css';
 
@@ -333,12 +333,12 @@ function Stage1({ allProducts, loading, onConfigure }) {
                 {brandTemplates.map((template, index) => {
                   // Use a representative image for each kit type
                   const kitImage = template.scope === 'full' 
-                    ? 'https://drywalltoolbox.com/products/automatic-taping-tools-placeholder.jpg'
+                    ? 'https://elliottm4.sg-host.com/products/automatic-taping-tools-placeholder.jpg'
                     : template.scope === 'finishing'
-                    ? 'https://drywalltoolbox.com/products/finishing-boxes-placeholder.jpg'
+                    ? 'https://elliottm4.sg-host.com/products/finishing-boxes-placeholder.jpg'
                     : template.scope === 'taping'
-                    ? 'https://drywalltoolbox.com/products/taper-placeholder.jpg'
-                    : 'https://drywalltoolbox.com/products/flat-box-placeholder.jpg';
+                    ? 'https://elliottm4.sg-host.com/products/taper-placeholder.jpg'
+                    : 'https://elliottm4.sg-host.com/products/flat-box-placeholder.jpg';
                   
                   return (
                     <button
@@ -929,7 +929,7 @@ export default function ToolsetBuilder() {
       <SEOHead
         title="Kit Builder — Build Your Custom Drywall Toolset | Drywall Toolbox"
         description="Build your perfect drywall toolset step by step. Choose your workflow, configure every tool slot with real photos and prices, compare options side-by-side, and add your complete kit to cart."
-        canonical="https://drywalltoolbox.com/toolset-builder"
+        canonical="https://elliottm4.sg-host.com/toolset-builder"
       />
 
       <div className="tsb-page">

@@ -1,10 +1,10 @@
 # Product
 
-Last verified against active source: 2026-07-20 (current `main` head observed at `763a58779b75951ae96fd5c65c65b3e965af06f8`).
+Last verified against active source: 2026-07-21.
 
 ## Product definition
 
-Drywall Toolbox (`drywalltoolbox.com`) is a contractor-focused headless commerce and service-operations platform for professional drywall tools, replacement parts, schematics, and repair/service workflows.
+Drywall Toolbox is a contractor-focused headless commerce and service-operations platform for professional drywall tools, replacement parts, schematics, and repair/service workflows. The current launch host is `elliottm4.sg-host.com`; the legacy production origin remains only as migration input and for existing email identities.
 
 It combines:
 
@@ -219,7 +219,7 @@ It owns:
 
 This repository is both:
 
-1. production application source for `drywalltoolbox.com`; and
+1. production application source for the launch host `elliottm4.sg-host.com`; and
 2. a controlled operations workspace for catalog/media/source-data lifecycle management.
 
 `products/` and `scripts/` are core product infrastructure, not disposable support folders.
@@ -257,11 +257,11 @@ Operational data paths have evolved. Current code/scripts must be inspected befo
 
 ## Current delivery reality
 
-CI builds/lints the frontend, runs mobile payment-sheet and checkout-performance static smoke contracts, assembles a bounded deployment payload, and rejects forbidden runtime paths.
+CI builds/lints the frontend, validates custom PHP syntax and active domain wiring, assembles a bounded deployment payload, and rejects forbidden runtime paths.
 
 Merge is not deployment.
 
-The intended production release model is controlled deployment with confirmation, protected approval, backup, smoke validation, rollback, and restore capability. At this verification point, however, checked-in `.github/workflows/deploy.yml` ends after a placeholder continuation in the pre-deploy backup job and does not contain a complete executable upload/restore sequence. Production deployment automation must therefore not be represented as fully wired until active workflow source is restored and validated.
+The production release model is a controlled SiteGround file deployment with exact confirmation, protected approval, immutable payload, managed-surface backup, HTTP smoke validation, automatic managed-file rollback, and explicit restore. It intentionally excludes database and runtime-owned WordPress backup/restore. A successful workflow is not proof of Stripe, webhook, Veeqo, QuickBooks, or end-to-end shopper-session acceptance.
 
 ## One-line truth statement
 

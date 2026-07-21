@@ -78,7 +78,7 @@ async function fetchManifest() {
         if (!response.ok) continue;
         const data = await response.json();
         if (data?.performance?.asset_prewarm) return data.performance.asset_prewarm;
-      } catch (error) {
+      } catch {
         if (controller?.signal.aborted) break;
       }
     }

@@ -8,7 +8,7 @@ This directory owns the customer-facing Calculator Hub report/export presentatio
 
 Each calculator report section exposes semantic groups (for example project/specification inputs and calculated/material results). `CalculatorReport.jsx` renders those groups as structured report tables; the report template must not recalculate quantities.
 
-`CalculatorReport.jsx` uses the production white Drywall Toolbox logo at `https://drywalltoolbox.com/logos/logo-white.svg` in the dark report header. The document typography uses a rounded system-first font stack so export/print does not depend on a third-party font service.
+`CalculatorReport.jsx` uses the production white Drywall Toolbox logo at `https://elliottm4.sg-host.com/logos/logo-white.svg` in the dark report header. The document typography uses a rounded system-first font stack so export/print does not depend on a third-party font service.
 
 `calculator-report.css` owns the Letter-size preview and print rules. Print isolation is activated only while `body.dtb-calculator-report-printing` is present. During calculator printing, the normal application root is removed from print layout so hidden SPA content cannot create trailing blank PDF pages.
 

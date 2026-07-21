@@ -34,7 +34,7 @@ function baseUrl() {
   const runtimeHost = typeof window !== 'undefined' ? window.location.hostname : '';
   const runtimeOrigin = typeof window !== 'undefined' ? window.location.origin : '';
   return trimSlash(readPublicEnv('REACT_APP_API_BASE_URL'))
-    || (/github\.io$/i.test(runtimeHost) ? 'https://drywalltoolbox.com' : trimSlash(runtimeOrigin));
+    || (/github\.io$/i.test(runtimeHost) ? 'https://elliottm4.sg-host.com' : trimSlash(runtimeOrigin));
 }
 
 function authUrl(path) {

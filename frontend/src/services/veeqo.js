@@ -22,7 +22,7 @@ import { submitRepair } from '../api/repairs.js';
 const runtimeHost = typeof window !== 'undefined' ? window.location.hostname : '';
 const runtimeOrigin = typeof window !== 'undefined' ? window.location.origin : '';
 const envApiBase = ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' );
-const resolvedApiBase = envApiBase || ( /github\.io$/i.test( runtimeHost ) ? 'https://drywalltoolbox.com' : runtimeOrigin );
+const resolvedApiBase = envApiBase || ( /github\.io$/i.test( runtimeHost ) ? 'https://elliottm4.sg-host.com' : runtimeOrigin );
 
 const DTB_PROXY_BASE = `${ resolvedApiBase.replace( /\/+$/, '' ) }/wp-json/dtb/v1`;
 const FREE_SHIPPING_EXCLUDED_STATES = new Set( [ 'AK', 'ALASKA', 'HI', 'HAWAII' ] );

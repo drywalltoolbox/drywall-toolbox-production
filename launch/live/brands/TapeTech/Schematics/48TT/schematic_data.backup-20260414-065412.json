@@ -1,0 +1,1026 @@
+{
+  "schema_version": "2.0",
+  "diagram": {
+    "id": "tapetech-90-inside-corner-edger-tapetech-48tt-sch-schematic-page-001",
+    "title": "tapetech-90-inside-corner-edger-tapetech-48tt-sch-schematic-page-001",
+    "description": "Interactive parts schematic with normalized hotspot geometry.",
+    "pages": [
+      {
+        "page": 1,
+        "image": {
+          "src": "tapetech-90-inside-corner-edger-tapetech-48tt-sch-schematic-page-001-page-01.png",
+          "natural_width": 1459,
+          "natural_height": 1377
+        },
+        "coordinate_space": {
+          "origin": "top-left",
+          "x_axis": "right",
+          "y_axis": "down",
+          "unit": "px"
+        }
+      }
+    ]
+  },
+  "parts_catalog": [
+    {
+      "part_id": "059084",
+      "display_id": "059084",
+      "name": "Setscrew",
+      "sku": "059084",
+      "quantity": 2,
+      "notes": ""
+    },
+    {
+      "part_id": "059091",
+      "display_id": "059091",
+      "name": "Screw 6-32 X 1/2 Slotted Fil. Hd., S.S.",
+      "sku": "059091",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "359005",
+      "display_id": "359005",
+      "name": "Screw: 6-32 X 1/4 Bind Hd.",
+      "sku": "359005",
+      "quantity": 2,
+      "notes": ""
+    },
+    {
+      "part_id": "402002F",
+      "display_id": "402002F",
+      "name": "4800Spring Retainer",
+      "sku": "402002F",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "402006",
+      "display_id": "402006",
+      "name": "Insert Socket",
+      "sku": "402006",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "402012",
+      "display_id": "402012",
+      "name": "Ball Retainer",
+      "sku": "402012",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "409010",
+      "display_id": "409010",
+      "name": "Spring",
+      "sku": "409010",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "450009F",
+      "display_id": "450009F",
+      "name": "Blade, Carbide, 3\" C.F.",
+      "sku": "450009F",
+      "quantity": 2,
+      "notes": ""
+    },
+    {
+      "part_id": "480002F",
+      "display_id": "480002F",
+      "name": "4040Wear Pad",
+      "sku": "480002F",
+      "quantity": 2,
+      "notes": ""
+    },
+    {
+      "part_id": "480005",
+      "display_id": "480005",
+      "name": "Outside Tension Spring",
+      "sku": "480005",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "480007F",
+      "display_id": "480007F",
+      "name": "Adjust Arm, Right",
+      "sku": "480007F",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "480008F",
+      "display_id": "480008F",
+      "name": "Adjust Arm, Left",
+      "sku": "480008F",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "480015F",
+      "display_id": "480015F",
+      "name": "Easyroll Frame, Left",
+      "sku": "480015F",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "480016F",
+      "display_id": "480016F",
+      "name": "Easyroll Frame, Right",
+      "sku": "480016F",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "480017E",
+      "display_id": "480017E",
+      "name": "Center Clip",
+      "sku": "480017E",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "480021",
+      "display_id": "480021",
+      "name": "Inside Tension Spring",
+      "sku": "480021",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "480026",
+      "display_id": "480026",
+      "name": "Wheel, Grooved",
+      "sku": "480026",
+      "quantity": 2,
+      "notes": ""
+    },
+    {
+      "part_id": "480027",
+      "display_id": "480027",
+      "name": "Bushing",
+      "sku": "480027",
+      "quantity": 2,
+      "notes": ""
+    },
+    {
+      "part_id": "484014F",
+      "display_id": "484014F",
+      "name": "Center Clip Ass'Y",
+      "sku": "484014F",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "486001F",
+      "display_id": "486001F",
+      "name": "3\" Cf Head Easyroll, No Logo",
+      "sku": "486001F",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "489013",
+      "display_id": "489013",
+      "name": "6-32 X 1/8 Setscrew",
+      "sku": "489013",
+      "quantity": 12,
+      "notes": ""
+    },
+    {
+      "part_id": "489020",
+      "display_id": "489020",
+      "name": "Screw, 4-40 X 5/16 Nylock Pan Hd.",
+      "sku": "489020",
+      "quantity": 2,
+      "notes": ""
+    },
+    {
+      "part_id": "489022",
+      "display_id": "489022",
+      "name": "Screw, 4-40 X 31/64",
+      "sku": "489022",
+      "quantity": 2,
+      "notes": ""
+    },
+    {
+      "part_id": "489023",
+      "display_id": "489023",
+      "name": "Flat Washer, #6 S.S.",
+      "sku": "489023",
+      "quantity": 4,
+      "notes": ""
+    },
+    {
+      "part_id": "489028",
+      "display_id": "489028",
+      "name": "O\"Ring 568-108",
+      "sku": "489028",
+      "quantity": 4,
+      "notes": ""
+    },
+    {
+      "part_id": "489029",
+      "display_id": "489029",
+      "name": "Screw, 6-32 X 5/8 Soc. Hd. S.S.",
+      "sku": "489029",
+      "quantity": 2,
+      "notes": ""
+    },
+    {
+      "part_id": "059037",
+      "display_id": "059037",
+      "name": "Screw 4-40 X 1/4 Bind Hd. S.S",
+      "sku": "059037",
+      "quantity": 2,
+      "notes": ""
+    },
+    {
+      "part_id": "409011",
+      "display_id": "409011",
+      "name": "Skid",
+      "sku": "409011",
+      "quantity": 2,
+      "notes": ""
+    },
+    {
+      "part_id": "480001F",
+      "display_id": "480001F",
+      "name": "Part (480001F)",
+      "sku": "480001F",
+      "quantity": 1,
+      "notes": ""
+    }
+  ],
+  "hotspots": [
+    {
+      "hotspot_id": "p1-059091-01",
+      "part_ref": "059091",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 237,
+        "y_px": 130,
+        "width_px": 115,
+        "height_px": 33
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 100,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 16.25,
+        "y_pct": 9.45,
+        "width_pct": 7.9,
+        "height_pct": 2.4
+      }
+    },
+    {
+      "hotspot_id": "p1-402002f-01",
+      "part_ref": "402002F",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 235,
+        "y_px": 240,
+        "width_px": 131,
+        "height_px": 32
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 101,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 16.1,
+        "y_pct": 17.4,
+        "width_pct": 9,
+        "height_pct": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-409010-01",
+      "part_ref": "409010",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 552,
+        "y_px": 167,
+        "width_px": 133,
+        "height_px": 33
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 102,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 37.8,
+        "y_pct": 12.15,
+        "width_pct": 9.1,
+        "height_pct": 2.4
+      }
+    },
+    {
+      "hotspot_id": "p1-402012-01",
+      "part_ref": "402012",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 576,
+        "y_px": 275,
+        "width_px": 125,
+        "height_px": 32
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 103,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 39.45,
+        "y_pct": 20,
+        "width_pct": 8.6,
+        "height_pct": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-480002f-01",
+      "part_ref": "480002F",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 582,
+        "y_px": 373,
+        "width_px": 133,
+        "height_px": 30
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 104,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 39.9,
+        "y_pct": 27.1,
+        "width_pct": 9.1,
+        "height_pct": 2.2
+      }
+    },
+    {
+      "hotspot_id": "p1-480008f-01",
+      "part_ref": "480008F",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 605,
+        "y_px": 403,
+        "width_px": 168,
+        "height_px": 29
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 105,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 41.5,
+        "y_pct": 29.3,
+        "width_pct": 11.5,
+        "height_pct": 2.1
+      }
+    },
+    {
+      "hotspot_id": "p1-480001f-01",
+      "part_ref": "480001F",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 705,
+        "y_px": 448,
+        "width_px": 144,
+        "height_px": 34
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 106,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 48.35,
+        "y_pct": 32.5,
+        "width_pct": 9.9,
+        "height_pct": 2.5
+      }
+    },
+    {
+      "hotspot_id": "p1-489022-01",
+      "part_ref": "489022",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 716,
+        "y_px": 491,
+        "width_px": 112,
+        "height_px": 44
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 107,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 49.1,
+        "y_pct": 35.65,
+        "width_pct": 7.7,
+        "height_pct": 3.2
+      }
+    },
+    {
+      "hotspot_id": "p1-480021-01",
+      "part_ref": "480021",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 862,
+        "y_px": 421,
+        "width_px": 123,
+        "height_px": 45
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 108,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 59.05,
+        "y_pct": 30.6,
+        "width_pct": 8.4,
+        "height_pct": 3.3
+      }
+    },
+    {
+      "hotspot_id": "p1-480005-01",
+      "part_ref": "480005",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 988,
+        "y_px": 452,
+        "width_px": 142,
+        "height_px": 29
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 109,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 67.75,
+        "y_pct": 32.85,
+        "width_pct": 9.7,
+        "height_pct": 2.1
+      }
+    },
+    {
+      "hotspot_id": "p1-480015f-01",
+      "part_ref": "480015F",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 1090,
+        "y_px": 486,
+        "width_px": 156,
+        "height_px": 36
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 110,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 74.7,
+        "y_pct": 35.3,
+        "width_pct": 10.7,
+        "height_pct": 2.6
+      }
+    },
+    {
+      "hotspot_id": "p1-489013-01",
+      "part_ref": "489013",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 1191,
+        "y_px": 547,
+        "width_px": 112,
+        "height_px": 33
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 111,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 81.6,
+        "y_pct": 39.75,
+        "width_pct": 7.7,
+        "height_pct": 2.4
+      }
+    },
+    {
+      "hotspot_id": "p1-402006-01",
+      "part_ref": "402006",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 1227,
+        "y_px": 631,
+        "width_px": 128,
+        "height_px": 41
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 112,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 84.1,
+        "y_pct": 45.8,
+        "width_pct": 8.8,
+        "height_pct": 3
+      }
+    },
+    {
+      "hotspot_id": "p1-359005-01",
+      "part_ref": "359005",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 1306,
+        "y_px": 722,
+        "width_px": 111,
+        "height_px": 45
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 113,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 89.5,
+        "y_pct": 52.4,
+        "width_pct": 7.6,
+        "height_pct": 3.3
+      }
+    },
+    {
+      "hotspot_id": "p1-489020-01",
+      "part_ref": "489020",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 970,
+        "y_px": 881,
+        "width_px": 115,
+        "height_px": 47
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 114,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 66.5,
+        "y_pct": 64,
+        "width_pct": 7.9,
+        "height_pct": 3.4
+      }
+    },
+    {
+      "hotspot_id": "p1-480007f-01",
+      "part_ref": "480007F",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 646,
+        "y_px": 894,
+        "width_px": 149,
+        "height_px": 45
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 115,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 44.3,
+        "y_pct": 64.9,
+        "width_pct": 10.2,
+        "height_pct": 3.3
+      }
+    },
+    {
+      "hotspot_id": "p1-450009f-01",
+      "part_ref": "450009F",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 802,
+        "y_px": 1089,
+        "width_px": 149,
+        "height_px": 34
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 116,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 55,
+        "y_pct": 79.05,
+        "width_pct": 10.2,
+        "height_pct": 2.5
+      }
+    },
+    {
+      "hotspot_id": "p1-480016f-01",
+      "part_ref": "480016F",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 801,
+        "y_px": 1265,
+        "width_px": 149,
+        "height_px": 30
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 117,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 54.9,
+        "y_pct": 91.85,
+        "width_pct": 10.2,
+        "height_pct": 2.2
+      }
+    },
+    {
+      "hotspot_id": "p1-489029-01",
+      "part_ref": "489029",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 631,
+        "y_px": 1229,
+        "width_px": 128,
+        "height_px": 32
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 118,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 43.25,
+        "y_pct": 89.25,
+        "width_pct": 8.8,
+        "height_pct": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-409011-01",
+      "part_ref": "409011",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 639,
+        "y_px": 1127,
+        "width_px": 125,
+        "height_px": 33
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 119,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 43.8,
+        "y_pct": 81.85,
+        "width_pct": 8.6,
+        "height_pct": 2.4
+      }
+    },
+    {
+      "hotspot_id": "p1-489023-01",
+      "part_ref": "489023",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 498,
+        "y_px": 1206,
+        "width_px": 128,
+        "height_px": 43
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 120,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 34.15,
+        "y_pct": 87.6,
+        "width_pct": 8.8,
+        "height_pct": 3.1
+      }
+    },
+    {
+      "hotspot_id": "p1-480027-01",
+      "part_ref": "480027",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 436,
+        "y_px": 1102,
+        "width_px": 112,
+        "height_px": 43
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 121,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 29.9,
+        "y_pct": 80.05,
+        "width_pct": 7.7,
+        "height_pct": 3.1
+      }
+    },
+    {
+      "hotspot_id": "p1-484014f-01",
+      "part_ref": "484014F",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 185,
+        "y_px": 1194,
+        "width_px": 139,
+        "height_px": 47
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 122,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 12.65,
+        "y_pct": 86.7,
+        "width_pct": 9.5,
+        "height_pct": 3.4
+      }
+    },
+    {
+      "hotspot_id": "p1-480026-01",
+      "part_ref": "480026",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 117,
+        "y_px": 1130,
+        "width_px": 114,
+        "height_px": 39
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 123,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 8,
+        "y_pct": 82.05,
+        "width_pct": 7.8,
+        "height_pct": 2.8
+      }
+    },
+    {
+      "hotspot_id": "p1-489028-01",
+      "part_ref": "489028",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 59,
+        "y_px": 1062,
+        "width_px": 121,
+        "height_px": 32
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 124,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 4.05,
+        "y_pct": 77.1,
+        "width_pct": 8.3,
+        "height_pct": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-489023-02",
+      "part_ref": "489023",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 37,
+        "y_px": 975,
+        "width_px": 125,
+        "height_px": 40
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 125,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 2.55,
+        "y_pct": 70.8,
+        "width_pct": 8.6,
+        "height_pct": 2.9
+      }
+    },
+    {
+      "hotspot_id": "p1-059084-01",
+      "part_ref": "059084",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 70,
+        "y_px": 610,
+        "width_px": 128,
+        "height_px": 45
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 126,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 4.8,
+        "y_pct": 44.3,
+        "width_pct": 8.8,
+        "height_pct": 3.3
+      }
+    },
+    {
+      "hotspot_id": "p1-480017e-01",
+      "part_ref": "480017E",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 167,
+        "y_px": 509,
+        "width_px": 147,
+        "height_px": 34
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 127,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 11.45,
+        "y_pct": 36.95,
+        "width_pct": 10.1,
+        "height_pct": 2.5
+      }
+    },
+    {
+      "hotspot_id": "p1-059037-01",
+      "part_ref": "059037",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 667,
+        "y_px": 1023,
+        "width_px": 130,
+        "height_px": 34
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 128,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 45.7,
+        "y_pct": 74.3,
+        "width_pct": 8.9,
+        "height_pct": 2.5
+      }
+    }
+  ],
+  "ui_defaults": {
+    "shape_render": "auto",
+    "show_labels": false,
+    "hotspot_style": "outline",
+    "tap_target_min_px": 40
+  },
+  "validation": {
+    "require_unique_hotspot_id": true,
+    "require_part_ref_exists": true,
+    "clamp_hotspots_to_page_bounds": true,
+    "normalized_is_derived_from_px": true
+  }
+}

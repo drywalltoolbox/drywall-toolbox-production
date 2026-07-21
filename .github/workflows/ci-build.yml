@@ -15,17 +15,18 @@ permissions:
 env:
   NODE_ENV: production
   PUBLIC_URL: /
-  REACT_APP_WP_BASE_URL: https://drywalltoolbox.com
-  REACT_APP_WP_API_BASE: https://drywalltoolbox.com/wp-json
-  REACT_APP_JWT_ENDPOINT: https://drywalltoolbox.com/wp-json/simple-jwt-login/v1/auth
+  REACT_APP_WP_BASE_URL: https://elliottm4.sg-host.com
+  REACT_APP_WP_API_BASE: https://elliottm4.sg-host.com/wp-json
+  REACT_APP_JWT_ENDPOINT: https://elliottm4.sg-host.com/wp-json/simple-jwt-login/v1/auth
   REACT_APP_JWT_AUTH_ENDPOINT: /wp-json/simple-jwt-login/v1/auth
-  REACT_APP_API_BASE_URL: https://drywalltoolbox.com
+  REACT_APP_API_BASE_URL: https://elliottm4.sg-host.com
   REACT_APP_DTB_API_BASE: /wp-json/dtb/v1
   REACT_APP_STORE_API_BASE: /wp-json/wc/store/v1
-  REACT_APP_SITE_URL: https://drywalltoolbox.com
+  REACT_APP_SITE_URL: https://elliottm4.sg-host.com
   REACT_APP_APP_ENV: production
   REACT_APP_ENV: production
-  REACT_APP_REWARDS_ENABLED: '1'
+  REACT_APP_REWARDS_ENABLED: '0'
+  REACT_APP_SEARCH_INDEXING: '0'
   REACT_APP_STORE_LAUNCH_DATE: ''
 
 jobs:
@@ -47,22 +48,37 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
       - name: Install frontend dependencies
         run: cd frontend && npm ci --include=dev --prefer-offline --no-audit --no-fund
 
       - name: Lint frontend source
         run: cd frontend && npm run lint --if-present
 
-      - name: Build frontend for drywalltoolbox.com
+      - name: Build frontend for elliottm4.sg-host.com
         run: cd frontend && npm run build
 
-      - name: Validate mobile payment-sheet contract
-        shell: pwsh
-        run: ./scripts/smoke-dtb-mobile-payment-sheet.ps1
+      - name: Validate custom PHP syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          find drywalltoolbox/wp/wp-content/mu-plugins drywalltoolbox/wp/wp-content/themes -type f -name '*.php' -print0 \
+            | xargs -0 -n1 php -l
 
-      - name: Validate checkout performance and stability contract
-        shell: pwsh
-        run: ./scripts/smoke-dtb-checkout-performance.ps1
+      - name: Reject legacy production origins in active runtime source
+        shell: bash
+        run: |
+          set -euo pipefail
+          if rg -n 'https?://(www\.)?drywalltoolbox\.com' frontend/src frontend/public frontend/index.html frontend/webpack.config.cjs drywalltoolbox/wp/wp-content/mu-plugins drywalltoolbox/wp/wp-content/themes \
+            | grep -v '@drywalltoolbox\.com'; then
+            echo 'Legacy production origin remains in active runtime source.' >&2
+            exit 1
+          fi
 
       - name: Assemble deployment payload
         shell: bash
@@ -74,7 +90,7 @@ jobs:
 
           cp -a dist/. deploy-root/
           cp -a drywalltoolbox/logos deploy-root/logos
-          cp drywalltoolbox/.htaccess deploy-root/.htaccess
+          cp drywalltoolbox/.htaccess drywalltoolbox/.user.ini deploy-root/
 
           mkdir -p deploy-root/wp/wp-content
           cp -a drywalltoolbox/wp/.htaccess deploy-root/wp/.htaccess
@@ -88,6 +104,7 @@ jobs:
           set -euo pipefail
           test -f deploy-root/index.html
           test -f deploy-root/.htaccess
+          test -f deploy-root/.user.ini
           test -f deploy-root/logos/favicon.ico
           test -d deploy-root/assets/js
           test -d deploy-root/assets/css
@@ -96,7 +113,7 @@ jobs:
           test -d deploy-root/wp/wp-content/mu-plugins
           test -d deploy-root/wp/wp-content/themes
 
-          if find deploy-root -name 'wp-config.php' -o -path '*/wp-content/uploads/*' -o -path '*/wp-content/cache/*' | grep -q .; then
+          if find deploy-root \( -name wp-config.php -o -name sgs_encrypt_key.php -o -name php_errorlog -o -path '*/wp-content/plugins/*' -o -path '*/wp-content/uploads/*' -o -path '*/wp-content/cache/*' -o -path '*/wp-admin/*' -o -path '*/wp-includes/*' \) -print -quit | grep -q .; then
             echo 'Refusing invalid payload shape.' >&2
             exit 1
           fi

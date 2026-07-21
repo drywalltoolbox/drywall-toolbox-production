@@ -1,0 +1,1453 @@
+/**
+ * DTB Support — Support page module styles
+ *
+ * Scoped geometry/layout styles for the Support AdminShell workbench.
+ *
+ * @package drywall-toolbox
+ */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-page-body {
+	display: block;
+	padding-bottom: 24px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-workbench {
+	display: grid;
+	grid-template-columns: minmax(220px, 240px) minmax(0, 1fr);
+	gap: 12px;
+	align-items: start;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail {
+	position: sticky;
+	top: 0;
+	align-self: start;
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-md);
+	padding: 12px;
+	box-shadow: var(--dtb-shadow-sm);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-main {
+	min-width: 0;
+	display: grid;
+	gap: 12px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail-group {
+	margin: 12px 0 8px;
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: .05em;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail-group:first-child {
+	margin-top: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-queue {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 9px 10px;
+	border-radius: var(--dtb-radius-base);
+	border: 1px solid transparent;
+	color: var(--dtb-text);
+	text-decoration: none;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-queue:hover {
+	background: var(--dtb-surface-soft);
+	border-color: var(--dtb-border-soft);
+	text-decoration: none;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-queue.is-active {
+	background: var(--dtb-primary-soft);
+	border-color: rgba(29, 78, 216, .25);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-queue__copy {
+	min-width: 0;
+	display: grid;
+	gap: 2px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-queue__label {
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--dtb-text);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-queue__hint {
+	font-size: 11px;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-queue__count {
+	flex-shrink: 0;
+	min-width: 28px;
+	text-align: center;
+	padding: 2px 8px;
+	border-radius: var(--dtb-radius-full);
+	background: var(--dtb-bg-muted);
+	color: var(--dtb-text);
+	font-weight: 700;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-toolbar .dtb-search-wrap {
+	flex: 1 1 360px;
+	max-width: 520px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-filter {
+	min-width: 170px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-live-region {
+	position: relative;
+	margin: 0;
+	padding: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] #dtb-support-workspace .dtb-table-wrap {
+	margin: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-card {
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-base);
+	padding: 10px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-card + .dtb-support-context-card {
+	margin-top: 10px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-card h3 {
+	margin: 0 0 8px;
+	font-size: 12px;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-row {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 6px 0;
+	border-top: 1px solid var(--dtb-border-soft);
+	font-size: 12px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-row:first-of-type {
+	border-top: 0;
+	padding-top: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-row span {
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-row strong {
+	color: var(--dtb-text);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-context-muted {
+	margin: 0;
+	font-size: 12px;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] #dtb-support-ticket-modal.dtb-modal-overlay--open {
+	align-items: stretch;
+	padding: 12px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] #dtb-support-ticket-modal .dtb-modal {
+	width: calc(100vw - 24px);
+	height: calc(100vh - 24px);
+	max-width: none;
+	max-height: none;
+	border-radius: var(--dtb-radius-md);
+	display: flex;
+	flex-direction: column;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] #dtb-support-ticket-modal .dtb-modal__body {
+	flex: 1 1 auto;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	padding: 0;
+	background: var(--dtb-bg);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-loading,
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-error {
+	margin: 16px;
+	padding: 14px;
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-base);
+	background: var(--dtb-surface);
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal {
+	flex: 1 1 auto;
+	min-height: 0;
+	padding: 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	box-sizing: border-box;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal__header {
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-base);
+	padding: 12px;
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal__header h3 {
+	margin: 0;
+	font-size: 16px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal__header p {
+	margin: 4px 0 0;
+	color: var(--dtb-text-muted);
+	font-size: 12px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal__badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	justify-content: flex-end;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-pill {
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 9px;
+	border-radius: var(--dtb-radius-full);
+	background: var(--dtb-surface-soft);
+	border: 1px solid var(--dtb-border-soft);
+	font-size: 11px;
+	font-weight: 700;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal__body {
+	display: grid;
+	grid-template-columns: minmax(0, 1.6fr) minmax(260px, .8fr);
+	gap: 12px;
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+/* ── Left tabbed pane ─────────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-left {
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-base);
+	overflow: hidden;
+}
+
+/* Tab nav */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-tabs {
+	display: flex;
+	align-items: stretch;
+	gap: 0;
+	border-bottom: 1px solid var(--dtb-border-soft);
+	background: var(--dtb-bg);
+	flex-shrink: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-tab {
+	padding: 10px 16px;
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--dtb-text-muted);
+	background: transparent;
+	border: none;
+	border-bottom: 2px solid transparent;
+	cursor: pointer;
+	transition: color .15s, border-color .15s;
+	white-space: nowrap;
+	line-height: 1;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-tab:hover {
+	color: var(--dtb-text);
+	background: var(--dtb-surface-soft);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-tab.is-active {
+	color: var(--dtb-primary);
+	border-bottom-color: var(--dtb-primary);
+	background: var(--dtb-surface);
+}
+
+/* Tab panels */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-panel {
+	display: none;
+	flex: 1 1 auto;
+	overflow: auto;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-panel.is-active {
+	display: flex;
+	flex-direction: column;
+}
+
+/* Thread panel fills the left pane flex container */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-modal-panel[data-dtb-modal-panel="thread"] {
+	min-height: 0;
+}
+
+/* ── Reply / Note forms ───────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-reply-form,
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-actions-form {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 16px;
+	flex: 1 1 auto;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-actions-panel {
+	gap: 0;
+	overflow: auto;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-action-summary {
+	padding: 16px 16px 0;
+	display: grid;
+	gap: 6px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-action-summary strong {
+	display: block;
+	font-size: 15px;
+	color: var(--dtb-text);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-action-summary p {
+	margin: 0;
+	color: var(--dtb-text-muted);
+	font-size: 13px;
+	line-height: 1.45;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-form-label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--dtb-text-muted);
+	text-transform: uppercase;
+	letter-spacing: .04em;
+	margin-bottom: 4px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-form-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 2px 6px;
+	border-radius: var(--dtb-radius-full);
+	background: var(--dtb-warning-soft, rgba(234, 179, 8, .12));
+	border: 1px solid rgba(234, 179, 8, .3);
+	font-size: 10px;
+	font-weight: 700;
+	color: var(--dtb-warning, #ca8a04);
+	text-transform: uppercase;
+	letter-spacing: .03em;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-reply-textarea {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid var(--dtb-border);
+	border-radius: var(--dtb-radius-base);
+	background: var(--dtb-bg);
+	color: var(--dtb-text);
+	font-size: 13px;
+	line-height: 1.55;
+	resize: vertical;
+	transition: border-color .15s;
+	box-sizing: border-box;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-reply-textarea:focus {
+	border-color: var(--dtb-primary);
+	outline: none;
+	box-shadow: 0 0 0 2px rgba(29, 78, 216, .15);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-reply-textarea--sm {
+	min-height: 72px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-form-actions {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-form-status {
+	font-size: 12px;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-form-status.is-success {
+	color: var(--dtb-success, #16a34a);
+	font-weight: 600;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-form-status.is-error {
+	color: var(--dtb-danger, #dc2626);
+	font-weight: 600;
+}
+
+/* ── Actions grid ─────────────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-actions-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 14px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-form-group {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-form-group--full {
+	grid-column: 1 / -1;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-form-hint {
+	margin: 2px 0 0;
+	font-size: 11px;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-action-quickforms {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 14px;
+	padding: 0 16px 16px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-followup-form,
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-snooze-form {
+	display: grid;
+	gap: 8px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-inline-form {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: 8px;
+	align-items: center;
+}
+
+/* ── Thread panel: chat layout ────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-chat-panel {
+	flex-direction: column;
+	min-height: 0;
+	overflow: hidden;
+}
+
+/* Scrollable thread region */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-thread {
+	flex: 1 1 auto;
+	overflow-y: auto;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	scroll-behavior: smooth;
+}
+
+/* ── Chat rows ────────────────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-row {
+	display: flex;
+	gap: 10px;
+	max-width: 100%;
+}
+
+/* Inbound (customer) — left-aligned with avatar */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-row--inbound {
+	align-items: flex-end;
+	justify-content: flex-start;
+}
+
+/* Outbound (staff reply) — right-aligned, staff avatar on right */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-row--outbound {
+	justify-content: flex-end;
+	align-items: flex-end;
+}
+
+/* System event — centered */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-row--system {
+	justify-content: center;
+}
+
+/* Internal note — centered, full-width card */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-row--note {
+	justify-content: center;
+}
+
+/* ── Avatar circle ────────────────────────────────────────────────────────── */
+
+/* Customer avatar — neutral grey (left side, inbound) */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-avatar {
+	flex-shrink: 0;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	background: var(--dtb-bg-muted);
+	border: 1px solid var(--dtb-border-soft);
+	color: var(--dtb-text-muted);
+	font-size: 11px;
+	font-weight: 800;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+
+/* ── Bubble wrapper ───────────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-bubble-wrap {
+	max-width: 72%;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-meta {
+	font-size: 11px;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-meta--right {
+	text-align: right;
+}
+
+/* ── Bubbles ──────────────────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-bubble {
+	padding: 10px 13px;
+	border-radius: 12px;
+	font-size: 13px;
+	line-height: 1.55;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+/* Customer bubble — soft surface, rounded bottom-left flat */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-bubble--inbound {
+	background: var(--dtb-surface-soft);
+	border: 1px solid var(--dtb-border-soft);
+	color: var(--dtb-text);
+	border-bottom-left-radius: 3px;
+}
+
+/* Staff reply bubble — primary-tinted, rounded bottom-right flat */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-bubble--outbound {
+	background: var(--dtb-primary-soft);
+	border: 1px solid rgba(29, 78, 216, .2);
+	color: var(--dtb-text);
+	border-bottom-right-radius: 3px;
+}
+
+/* ── Staff avatar (outbound, right side) — blue to distinguish from customer ── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-avatar--staff {
+	background: var(--dtb-primary-soft);
+	border-color: rgba(29, 78, 216, .35);
+	color: var(--dtb-primary);
+	flex-shrink: 0;
+	align-self: flex-end;
+}
+
+/* ── Meta time span ───────────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-meta__time {
+	font-weight: 400;
+	color: var(--dtb-text-muted);
+}
+
+/* ── Internal note author ─────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-note__author {
+	font-weight: 600;
+	text-transform: none;
+	letter-spacing: 0;
+	color: var(--dtb-warning, #ca8a04);
+}
+
+/* ── Internal note card ───────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-note {
+	width: 100%;
+	max-width: 90%;
+	background: rgba(234, 179, 8, .07);
+	border: 1px dashed rgba(202, 138, 4, .4);
+	border-radius: var(--dtb-radius-base);
+	padding: 10px 13px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-note__label {
+	font-size: 11px;
+	font-weight: 700;
+	color: var(--dtb-warning, #ca8a04);
+	text-transform: uppercase;
+	letter-spacing: .04em;
+	margin-bottom: 5px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-note__time {
+	font-weight: 400;
+	text-transform: none;
+	letter-spacing: 0;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-note__body {
+	font-size: 13px;
+	color: var(--dtb-text);
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+/* ── System event marker ──────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-system-event {
+	font-size: 11px;
+	color: var(--dtb-text-muted);
+	background: var(--dtb-bg);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-full);
+	padding: 3px 10px;
+	display: inline-block;
+	text-align: center;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-system-event--danger {
+	background: rgba(220, 38, 38, .07);
+	border-color: rgba(220, 38, 38, .25);
+	color: var(--dtb-danger, #dc2626);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-system-time {
+	opacity: .7;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-empty {
+	margin: auto;
+	text-align: center;
+	color: var(--dtb-text-muted);
+	font-size: 13px;
+}
+
+/* ── Pinned compose bar ───────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-compose {
+	flex-shrink: 0;
+	border-top: 1px solid var(--dtb-border-soft);
+	background: var(--dtb-surface);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-compose__toolbar {
+	display: flex;
+	align-items: center;
+	gap: 0;
+	border-bottom: 1px solid var(--dtb-border-soft);
+	padding: 0 12px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-mode-btn {
+	padding: 8px 14px;
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--dtb-text-muted);
+	background: transparent;
+	border: none;
+	border-bottom: 2px solid transparent;
+	cursor: pointer;
+	transition: color .15s, border-color .15s;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-mode-btn:hover {
+	color: var(--dtb-text);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-mode-btn.is-active {
+	color: var(--dtb-primary);
+	border-bottom-color: var(--dtb-primary);
+}
+
+/* Note mode — amber accent on compose bar */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-compose--note {
+	background: rgba(234, 179, 8, .04);
+	border-top-color: rgba(202, 138, 4, .3);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-compose__form {
+	padding: 10px 12px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-compose__input-row {
+	display: flex;
+	gap: 10px;
+	align-items: flex-end;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-compose__textarea {
+	flex: 1 1 auto;
+	padding: 9px 11px;
+	border: 1px solid var(--dtb-border);
+	border-radius: var(--dtb-radius-base);
+	background: var(--dtb-bg);
+	color: var(--dtb-text);
+	font-size: 13px;
+	line-height: 1.5;
+	resize: none;
+	min-height: 72px;
+	max-height: 180px;
+	overflow-y: auto;
+	box-sizing: border-box;
+	transition: border-color .15s;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-compose__textarea:focus {
+	border-color: var(--dtb-primary);
+	outline: none;
+	box-shadow: 0 0 0 2px rgba(29, 78, 216, .15);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-compose--note .dtb-chat-compose__textarea {
+	border-color: rgba(202, 138, 4, .35);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-compose--note .dtb-chat-compose__textarea:focus {
+	border-color: rgba(202, 138, 4, .7);
+	box-shadow: 0 0 0 2px rgba(234, 179, 8, .15);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-compose__actions {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 6px;
+	flex-shrink: 0;
+}
+
+/* ── Remove old card-message styles (replaced by bubbles above) ───────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-thread,
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-context {
+	min-height: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-thread {
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-base);
+	padding: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	overflow: auto;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-message {
+	border: 1px solid var(--dtb-border-soft);
+	border-left: 3px solid var(--dtb-border);
+	border-radius: var(--dtb-radius-base);
+	background: var(--dtb-surface-soft);
+	padding: 10px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-message--message,
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-message--customer {
+	border-left-color: var(--dtb-primary);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-message--workflow {
+	border-left-color: var(--dtb-warning);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-message--delivery {
+	border-left-color: var(--dtb-danger);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-message__meta {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+	font-size: 11px;
+	color: var(--dtb-text-muted);
+	margin-bottom: 5px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-message__body {
+	font-size: 13px;
+	color: var(--dtb-text);
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-empty {
+	margin: 0;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-context {
+	display: grid;
+	gap: 10px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-card {
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-base);
+	padding: 10px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-card h4 {
+	margin: 0 0 7px;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: .04em;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-kv {
+	display: grid;
+	grid-template-columns: 110px 1fr;
+	gap: 8px;
+	font-size: 12px;
+	padding: 5px 0;
+	border-top: 1px solid var(--dtb-border-soft);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-kv:first-of-type {
+	border-top: 0;
+	padding-top: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-kv span {
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-kv strong {
+	color: var(--dtb-text);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail-list {
+	display: grid;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail-list li {
+	padding: 6px 8px;
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-sm);
+	background: var(--dtb-surface-muted);
+	color: var(--dtb-text);
+	font-size: 12px;
+	line-height: 1.35;
+}
+
+@media (max-width: 980px) {
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-workbench {
+		grid-template-columns: 1fr;
+	}
+
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-rail {
+		position: static;
+	}
+
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-modal__body {
+		grid-template-columns: 1fr;
+	}
+
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-actions-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-action-quickforms {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Queue list table (list_template layout)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-wrap {
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-base);
+	background: var(--dtb-surface);
+	overflow: hidden;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-table {
+	width: 100%;
+	border-collapse: collapse;
+	table-layout: auto;
+}
+
+/* ── Table header ─────────────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-th {
+	padding: 9px 12px;
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: .05em;
+	color: var(--dtb-text-muted);
+	border-bottom: 1px solid var(--dtb-border-soft);
+	background: var(--dtb-bg);
+	white-space: nowrap;
+	text-align: left;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-th--check {
+	width: 36px;
+	padding-right: 4px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-th--progress {
+	width: 180px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-th--actions {
+	width: 60px;
+}
+
+/* ── Table rows ───────────────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-row {
+	border-bottom: 1px solid var(--dtb-border-soft);
+	cursor: pointer;
+	transition: background .1s;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-row:last-child {
+	border-bottom: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-row:hover {
+	background: var(--dtb-surface-soft);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-row:focus-visible {
+	outline: none;
+	box-shadow: inset 0 0 0 2px var(--dtb-primary);
+}
+
+/* Unread (needs attention) rows — left accent bar */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-row.dtb-support-row--unread {
+	background: var(--dtb-primary-soft);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-row.dtb-support-row--unread:hover {
+	background: rgba(29, 78, 216, .08);
+}
+
+/* ── Table cells ──────────────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-td {
+	padding: 10px 12px;
+	vertical-align: middle;
+	font-size: 13px;
+	color: var(--dtb-text);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-td--check {
+	width: 36px;
+	padding-right: 4px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-td--ticket {
+	min-width: 200px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-td--status {
+	white-space: nowrap;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-td--customer {
+	min-width: 140px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-td--progress {
+	width: 180px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-td--actions {
+	width: 60px;
+	text-align: right;
+}
+
+/* ── Ticket column ────────────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-ref {
+	font-size: 11px;
+	font-family: monospace;
+	font-weight: 700;
+	color: var(--dtb-text-muted);
+	margin-bottom: 2px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-subject {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	flex-wrap: wrap;
+	line-height: 1.3;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-subject a {
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--dtb-text);
+	text-decoration: none;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 280px;
+	display: inline-block;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-row--unread .dtb-support-list-subject a {
+	font-weight: 700;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-subject a:hover {
+	color: var(--dtb-primary);
+	text-decoration: underline;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-time {
+	font-size: 11px;
+	color: var(--dtb-text-muted);
+	margin-top: 2px;
+}
+
+/* ── Customer column ──────────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-customer-name {
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--dtb-text);
+	line-height: 1.3;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-customer-email {
+	font-size: 11px;
+	color: var(--dtb-text-muted);
+	margin-top: 1px;
+}
+
+/* ── Progress column ──────────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-progress-wrap {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-progress {
+	flex: 1 1 auto;
+	height: 5px;
+	background: var(--dtb-bg-muted, rgba(0,0,0,.06));
+	border-radius: var(--dtb-radius-full);
+	overflow: hidden;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-progress__fill {
+	height: 100%;
+	border-radius: var(--dtb-radius-full);
+	transition: width .3s ease;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-progress__fill--primary {
+	background: var(--dtb-primary);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-progress__fill--success {
+	background: var(--dtb-success, #16a34a);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-progress__fill--warning {
+	background: var(--dtb-warning, #ca8a04);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-progress__fill--danger {
+	background: var(--dtb-danger, #dc2626);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-progress__fill--muted {
+	background: var(--dtb-text-muted);
+	opacity: .4;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-progress-pct {
+	flex-shrink: 0;
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--dtb-text-muted);
+	min-width: 30px;
+	text-align: right;
+}
+
+/* ── Select-all checkbox ──────────────────────────────────────────────────── */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-check-all {
+	cursor: pointer;
+}
+
+/* ── Responsive: collapse progress + customer on narrow screens ───────────── */
+
+@media (max-width: 860px) {
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-th--progress,
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-td--progress {
+		display: none;
+	}
+}
+
+@media (max-width: 640px) {
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-th--customer,
+	.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-list-td--customer {
+		display: none;
+	}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Email reading-pane modal header
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-header {
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-base);
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	overflow: hidden;
+	flex-shrink: 0;
+}
+
+/* Toolbar row */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 8px 14px;
+	border-bottom: 1px solid var(--dtb-border-soft);
+	background: var(--dtb-bg);
+	flex-wrap: wrap;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-toolbar__pills {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-toolbar__btns {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-shrink: 0;
+}
+
+/* Status + Priority pill color variants */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-pill--status.dtb-status--open,
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-pill--status.dtb-status--needs-reply {
+	background: rgba(29, 78, 216, .08);
+	border-color: rgba(29, 78, 216, .25);
+	color: var(--dtb-primary);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-pill--status.dtb-status--resolved {
+	background: rgba(22, 163, 74, .08);
+	border-color: rgba(22, 163, 74, .25);
+	color: var(--dtb-success, #16a34a);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-pill--status.dtb-status--closed {
+	background: var(--dtb-bg-muted);
+	border-color: var(--dtb-border-soft);
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-pill--priority.dtb-priority--urgent {
+	background: rgba(220, 38, 38, .08);
+	border-color: rgba(220, 38, 38, .3);
+	color: var(--dtb-danger, #dc2626);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-ticket-pill--priority.dtb-priority--high {
+	background: rgba(234, 179, 8, .1);
+	border-color: rgba(202, 138, 4, .3);
+	color: var(--dtb-warning, #ca8a04);
+}
+
+/* From row */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-from {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 14px 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-avatar {
+	flex-shrink: 0;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background: var(--dtb-primary-soft);
+	border: 1px solid rgba(29, 78, 216, .2);
+	color: var(--dtb-primary);
+	font-size: 12px;
+	font-weight: 800;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-from__copy {
+	flex: 1 1 auto;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-from__copy strong {
+	font-size: 14px;
+	color: var(--dtb-text);
+	line-height: 1.2;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-from__email {
+	font-size: 11px;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-ticket-ref {
+	flex-shrink: 0;
+	font-size: 11px;
+	font-weight: 700;
+	font-family: monospace;
+	color: var(--dtb-text-muted);
+	background: var(--dtb-bg-muted);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-base);
+	padding: 3px 8px;
+}
+
+/* Subject */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-subject {
+	margin: 6px 14px 0;
+	font-size: 17px;
+	font-weight: 700;
+	color: var(--dtb-text);
+	line-height: 1.3;
+}
+
+/* Meta row */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-meta {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 5px;
+	padding: 6px 14px 12px;
+	font-size: 11px;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-sep {
+	opacity: .4;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-due {
+	color: var(--dtb-danger, #dc2626);
+	font-weight: 600;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-support-email-due.is-overdue {
+	color: var(--dtb-danger, #dc2626);
+	font-weight: 700;
+}
+
+/* Overdue KV value in right sidebar */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-kv-overdue {
+	color: var(--dtb-danger, #dc2626) !important;
+	font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Macro / Quick Responses panel
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-panel {
+	position: absolute;
+	bottom: 100%;
+	left: 0;
+	right: 0;
+	z-index: 20;
+	background: var(--dtb-surface);
+	border: 1px solid var(--dtb-border-soft);
+	border-bottom: none;
+	border-radius: var(--dtb-radius-md) var(--dtb-radius-md) 0 0;
+	box-shadow: 0 -4px 16px rgba(0, 0, 0, .08);
+	max-height: 320px;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-panel[hidden] {
+	display: none;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-panel__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 8px 12px;
+	border-bottom: 1px solid var(--dtb-border-soft);
+	background: var(--dtb-bg);
+	flex-shrink: 0;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-panel__title {
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: .05em;
+	color: var(--dtb-text-muted);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-close {
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	font-size: 13px;
+	color: var(--dtb-text-muted);
+	padding: 2px 6px;
+	border-radius: var(--dtb-radius-base);
+	line-height: 1;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-close:hover {
+	background: var(--dtb-surface-soft);
+	color: var(--dtb-text);
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-panel__body {
+	overflow-y: auto;
+	padding: 10px 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-group__label {
+	font-size: 10px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: .06em;
+	color: var(--dtb-text-muted);
+	margin-bottom: 6px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-group__items {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-btn {
+	display: inline-flex;
+	align-items: center;
+	padding: 5px 11px;
+	background: var(--dtb-bg-muted);
+	border: 1px solid var(--dtb-border-soft);
+	border-radius: var(--dtb-radius-full);
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--dtb-text);
+	cursor: pointer;
+	transition: background .12s, border-color .12s, color .12s;
+	white-space: nowrap;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-macro-btn:hover {
+	background: var(--dtb-primary-soft);
+	border-color: rgba(29, 78, 216, .3);
+	color: var(--dtb-primary);
+}
+
+/* Macro toggle button active state */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-macro-toggle {
+	margin-left: auto;
+	font-size: 12px;
+	padding: 5px 10px;
+}
+
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-macro-toggle.is-active {
+	background: var(--dtb-primary-soft);
+	border-color: rgba(29, 78, 216, .3);
+	color: var(--dtb-primary);
+}
+
+/* Compose bar needs position:relative for the absolute panel */
+.dtb-admin[data-dtb-page="dtb-support"] .dtb-chat-compose {
+	position: relative;
+}

@@ -22,7 +22,7 @@ Source wins. Update durable docs when architecture, routes, constants, queues, a
 - Preserve module order: `dtb-platform`, `dtb-catalog-platform`, `dtb-commerce`, `dtb-order-platform`, `dtb-schematics`, `dtb-media`, `dtb-marketing`, `dtb-repair-service`, `dtb-integrations`, `dtb-support`, `dtb-returns`.
 - `products/`: production catalog/taxonomy/media/schematic business data. Preserve stable identifiers.
 - `scripts/`: repeatable, deterministic, non-destructive operational tooling.
-- `drywalltoolbox/`: tracked HostGator deployment mirror. Never edit `dist/` as source.
+- `drywalltoolbox/`: tracked SiteGround deployment source mirror. Never edit `dist/` as source.
 
 ## System authorities
 

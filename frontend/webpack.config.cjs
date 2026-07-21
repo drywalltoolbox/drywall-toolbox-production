@@ -112,13 +112,14 @@ module.exports = (envFlags, argv) => {
       ? path.resolve(__dirname, '..', 'dist-staging')
       : path.resolve(__dirname, '..', 'dist');
 
-  const DEV_PROXY_TARGET = env('REACT_APP_API_BASE_URL') || 'https://drywalltoolbox.com';
+  const DEV_PROXY_TARGET = env('REACT_APP_API_BASE_URL') || 'https://elliottm4.sg-host.com';
   const cacheName = `${mode}-${appEnv}-${PUBLIC_URL || 'root'}`.replace(/[^a-z0-9_.-]+/gi, '-');
-  const siteUrl = (env('REACT_APP_SITE_URL') || 'https://drywalltoolbox.com').replace(/\/+$/, '');
+  const siteUrl = (env('REACT_APP_SITE_URL') || 'https://elliottm4.sg-host.com').replace(/\/+$/, '');
   const searchIndexingEnabled = env('REACT_APP_SEARCH_INDEXING') !== '0' && appEnv === 'production';
   const robotsContent = searchIndexingEnabled
     ? 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1'
     : 'noindex, nofollow, noarchive';
+  const robotsRule = searchIndexingEnabled ? 'Allow: /' : 'Disallow: /';
 
   // ─── DefinePlugin values ────────────────────────────────────────────────
   const defines = {
@@ -377,6 +378,7 @@ module.exports = (envFlags, argv) => {
                 // HTML handled by HtmlWebpackPlugin
                 '**/index.html',
                 '**/.htaccess',
+                '**/robots.txt',
                 // CSV data files — served via WooCommerce REST API, not bundled
                 '**/*.csv',
                 '**/*.bak',
@@ -389,6 +391,17 @@ module.exports = (envFlags, argv) => {
                 // Scraped product data — source files only, not for dist
                 '**/scraped_results/**',
               ],
+            },
+          },
+          {
+            from: 'public/robots.txt',
+            to: 'robots.txt',
+            toType: 'file',
+            transform(content) {
+              return content
+                .toString()
+                .replaceAll('__DTB_SITE_URL__', siteUrl)
+                .replaceAll('__DTB_ROBOTS_RULE__', robotsRule);
             },
           },
           {
@@ -418,7 +431,9 @@ module.exports = (envFlags, argv) => {
         // Generates a production service worker in dist/service-worker.js.
         // Precaches all hashed JS/CSS chunks emitted by webpack (safe since
         // they are content-addressed and never change once deployed).
-        // Runtime caching covers images, fonts, and DTB/WC REST API responses.
+        // Runtime caching is limited to immutable public assets. Customer,
+        // authentication, DTB domain, and Woo Store API responses remain
+        // network-owned and are never persisted in the service-worker cache.
         new GenerateSW({
           clientsClaim: true,
           skipWaiting:  true,
@@ -432,6 +447,7 @@ module.exports = (envFlags, argv) => {
           exclude: [
             /\.map$/,
             /asset-manifest\.json$/,
+            /^\.htaccess$/,
             /\.(?:png|jpe?g|gif|webp|avif|svg|ico)$/i,   // all images → runtime cache
             /\.(?:woff2?|ttf|eot|otf)$/i,                  // fonts → runtime cache
             /^brands\//,                                    // brand image trees
@@ -442,17 +458,27 @@ module.exports = (envFlags, argv) => {
           // fails while the user is offline so the SPA shell remains usable.
           navigateFallback: publicPath + 'index.html',
           navigateFallbackDenylist: [
-            // Never intercept wp-json or admin requests.
+            // Never intercept native WordPress/WooCommerce navigation. The
+            // service worker must not turn checkout, payment returns, auth,
+            // callbacks, or server verification paths back into the SPA.
             /\/wp-json\//,
             /\/wp-admin\//,
             /\/wp\//,
+            /\/(?:staging\/\d+\/)?checkout(?:\/|$)/,
+            /\/order-pay(?:\/|$)/,
+            /\/wp-login\.php(?:\?|$)/,
+            /\/(?:dtb|wc-api)(?:\/|$)/,
+            /\/(?:wp-cron\.php|xmlrpc\.php)(?:\?|$)/,
+            /\/\.well-known\//,
+            /[?&](?:rest_route|wc-api)=/,
           ],
 
           // Runtime caching strategies
           runtimeCaching: [
-            // Images — CacheFirst with 1-year expiry; images are immutable once published
+            // Public application/catalog images only. Do not cache arbitrary
+            // image URLs because repair/support media can be customer-owned.
             {
-              urlPattern:  /\.(?:png|jpe?g|gif|webp|avif|svg|ico)$/i,
+              urlPattern:  /\/(?:assets|brands|logos|products|schematics)\/.*\.(?:png|jpe?g|gif|webp|avif|svg|ico)$/i,
               handler:     'CacheFirst',
               options: {
                 cacheName:  'dtb-images-v1',
@@ -466,27 +492,6 @@ module.exports = (envFlags, argv) => {
               options: {
                 cacheName:  'dtb-fonts-v1',
                 expiration: { maxEntries: 20, maxAgeSeconds: 365 * 24 * 60 * 60 },
-              },
-            },
-            // DTB REST API (dtb/v1) — StaleWhileRevalidate: renders instantly from
-            // cache, silently refreshed in background. Auth routes are excluded.
-            {
-              urlPattern:  /\/wp-json\/dtb\/v1\/(?!auth|jwt|login)/,
-              handler:     'StaleWhileRevalidate',
-              options: {
-                cacheName:  'dtb-api-v1',
-                expiration: { maxEntries: 60, maxAgeSeconds: 24 * 60 * 60 },
-              },
-            },
-            // WooCommerce Store API (wc/store/v1) — NetworkFirst so cart/checkout
-            // always get fresh data, but fall back to cache if offline.
-            {
-              urlPattern:  /\/wp-json\/wc\/store\/v1\//,
-              handler:     'NetworkFirst',
-              options: {
-                cacheName:            'dtb-wc-store-v1',
-                networkTimeoutSeconds: 4,
-                expiration:           { maxEntries: 30, maxAgeSeconds: 5 * 60 },
               },
             },
           ],

@@ -153,7 +153,7 @@ export default function CategoryPage() {
         noindex={loading}
         title={loading ? 'Loading category…' : categoryName}
         description={loading ? undefined : `Shop ${categoryName} drywall tools and equipment. Professional-grade products from top brands at unbeatable prices.`}
-        canonical={loading ? undefined : `https://drywalltoolbox.com/category/${slug}`}
+        canonical={loading ? undefined : `https://elliottm4.sg-host.com/category/${slug}`}
         schema={loading ? undefined : breadcrumbSchema}
       />
 

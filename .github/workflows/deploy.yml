@@ -1,10 +1,10 @@
-name: Controlled Deploy Drywall Toolbox Production
+name: Controlled SiteGround Release
 
 on:
   workflow_dispatch:
     inputs:
       action:
-        description: "Action to run"
+        description: Action to run
         required: true
         type: choice
         options:
@@ -12,32 +12,20 @@ on:
           - restore
         default: deploy
       confirm:
-        description: "Type DEPLOY for deploy, or RESTORE for restore"
+        description: Type DEPLOY for deploy, or RESTORE for restore
         required: true
         type: string
-      deploy_scope:
-        description: "Deploy mode (deploy action only)"
-        required: false
-        type: choice
-        options:
-          - full_payload
-          - selective
-        default: full_payload
-      deploy_items:
-        description: "Deploy action + selective scope only: comma or newline-separated paths from deploy-root (for example: index.html, assets/js/main.js, wp/wp-content/themes)"
-        required: false
-        type: string
       backup_run_id:
-        description: "Restore only: workflow run ID that contains the backup artifact"
+        description: Restore only - workflow run ID containing the backup artifact
         required: false
         type: string
       backup_artifact_name:
-        description: "Restore only: artifact name to restore (for example hostgator-backup-123456789-abc1234-20260530-104500)"
+        description: Restore only - exact siteground-backup artifact name
         required: false
         type: string
 
 concurrency:
-  group: production-release-control-${{ github.ref }}
+  group: siteground-production-release
   cancel-in-progress: false
 
 permissions:
@@ -46,34 +34,49 @@ permissions:
 
 env:
   NODE_ENV: production
-  # Production domain root. Do not set /drywall-toolbox here; that path is only
-  # for GitHub Pages and causes broken asset URLs on drywalltoolbox.com.
   PUBLIC_URL: /
-  REACT_APP_WP_BASE_URL: https://drywalltoolbox.com
-  REACT_APP_WP_API_BASE: https://drywalltoolbox.com/wp-json
-  REACT_APP_JWT_ENDPOINT: https://drywalltoolbox.com/wp-json/simple-jwt-login/v1/auth
+  REACT_APP_WP_BASE_URL: https://elliottm4.sg-host.com
+  REACT_APP_WP_API_BASE: https://elliottm4.sg-host.com/wp-json
+  REACT_APP_JWT_ENDPOINT: https://elliottm4.sg-host.com/wp-json/simple-jwt-login/v1/auth
   REACT_APP_JWT_AUTH_ENDPOINT: /wp-json/simple-jwt-login/v1/auth
-  REACT_APP_API_BASE_URL: https://drywalltoolbox.com
+  REACT_APP_API_BASE_URL: https://elliottm4.sg-host.com
   REACT_APP_DTB_API_BASE: /wp-json/dtb/v1
   REACT_APP_STORE_API_BASE: /wp-json/wc/store/v1
-  REACT_APP_SITE_URL: https://drywalltoolbox.com
+  REACT_APP_SITE_URL: https://elliottm4.sg-host.com
   REACT_APP_APP_ENV: production
   REACT_APP_ENV: production
-  REACT_APP_REWARDS_ENABLED: '1'
+  REACT_APP_REWARDS_ENABLED: '0'
+  REACT_APP_SEARCH_INDEXING: '0'
   REACT_APP_STORE_LAUNCH_DATE: ''
 
 jobs:
+  guard:
+    name: Validate release intent
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate dispatch inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ inputs.action }}" == "deploy" ]]; then
+            [[ "${{ inputs.confirm }}" == "DEPLOY" ]] || { echo 'Confirmation must be DEPLOY.' >&2; exit 1; }
+          else
+            [[ "${{ inputs.confirm }}" == "RESTORE" ]] || { echo 'Confirmation must be RESTORE.' >&2; exit 1; }
+            [[ -n "${{ inputs.backup_run_id }}" ]] || { echo 'backup_run_id is required.' >&2; exit 1; }
+            [[ "${{ inputs.backup_run_id }}" =~ ^[0-9]+$ ]] || { echo 'backup_run_id must be numeric.' >&2; exit 1; }
+            [[ "${{ inputs.backup_artifact_name }}" =~ ^siteground-backup-[A-Za-z0-9._-]+$ ]] || { echo 'Invalid backup_artifact_name.' >&2; exit 1; }
+          fi
+
   build-and-package:
-    name: Validate and build deployment payload
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'deploy' }}
+    name: Build immutable DTB payload
+    if: ${{ inputs.action == 'deploy' }}
+    needs: guard
     runs-on: ubuntu-latest
     timeout-minutes: 30
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -82,100 +85,196 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install frontend dependencies
-        run: cd frontend && npm ci --include=dev --prefer-offline --no-audit --no-fund
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
 
-      - name: Lint frontend source
-        run: cd frontend && npm run lint --if-present
+      - name: Install, lint, and build frontend
+        working-directory: frontend
+        run: |
+          npm ci --include=dev --prefer-offline --no-audit --no-fund
+          npm run lint
+          npm run build
 
-      - name: Build frontend for drywalltoolbox.com
-        run: cd frontend && npm run build
+      - name: Validate custom PHP syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          find drywalltoolbox/wp/wp-content/mu-plugins drywalltoolbox/wp/wp-content/themes -type f -name '*.php' -print0 \
+            | xargs -0 -n1 php -l
 
       - name: Assemble deployment payload
         shell: bash
         run: |
           set -euo pipefail
-
           rm -rf deploy-root
-          mkdir -p deploy-root
-
-          # React production output. Upload CONTENTS of dist/ to the web root.
+          mkdir -p deploy-root/wp/wp-content
           cp -a dist/. deploy-root/
           cp -a drywalltoolbox/logos deploy-root/logos
-
-          # Live root routing for React + /wp WordPress subdirectory.
-          cp drywalltoolbox/.htaccess deploy-root/.htaccess
-
-          # Tracked WordPress application code only. Never deploy wp-config.php,
-          # uploads, cache, plugins, or full WordPress core from this repository.
-          mkdir -p deploy-root/wp/wp-content
-          cp -a drywalltoolbox/wp/.htaccess deploy-root/wp/.htaccess
-          cp -a drywalltoolbox/wp/index.php deploy-root/wp/index.php
+          cp drywalltoolbox/.htaccess drywalltoolbox/.user.ini deploy-root/
+          cp drywalltoolbox/wp/.htaccess drywalltoolbox/wp/index.php deploy-root/wp/
           cp -a drywalltoolbox/wp/wp-content/mu-plugins deploy-root/wp/wp-content/mu-plugins
           cp -a drywalltoolbox/wp/wp-content/themes deploy-root/wp/wp-content/themes
 
-          echo 'Deployment payload:'
-          find deploy-root -maxdepth 3 -type f | sort | sed 's#^#  #' | head -200
-
-      - name: Validate deployment payload boundaries
+      - name: Enforce payload boundary
         shell: bash
         run: |
           set -euo pipefail
           test -f deploy-root/index.html
           test -f deploy-root/.htaccess
-          test -f deploy-root/logos/favicon.ico
-          test -d deploy-root/assets/js
-          test -d deploy-root/assets/css
+          test -f deploy-root/.user.ini
           test -f deploy-root/wp/.htaccess
           test -f deploy-root/wp/index.php
           test -d deploy-root/wp/wp-content/mu-plugins
           test -d deploy-root/wp/wp-content/themes
-
-          if find deploy-root -name 'wp-config.php' -o -path '*/wp-content/uploads/*' -o -path '*/wp-content/cache/*' | grep -q .; then
-            echo 'Refusing to deploy forbidden WordPress runtime/secrets payload.' >&2
+          if find deploy-root \( -name wp-config.php -o -name sgs_encrypt_key.php -o -name php_errorlog -o -path '*/wp-content/plugins/*' -o -path '*/wp-content/uploads/*' -o -path '*/wp-content/cache/*' -o -path '*/wp-admin/*' -o -path '*/wp-includes/*' \) -print -quit | grep -q .; then
+            echo 'Forbidden runtime-owned or secret content entered the payload.' >&2
             exit 1
           fi
 
-      - name: Upload deployment payload artifact
+      - name: Upload immutable deployment payload
         uses: actions/upload-artifact@v4
         with:
-          name: deploy-payload-${{ github.run_id }}
+          name: siteground-payload-${{ github.run_id }}
           path: deploy-root/
           if-no-files-found: error
           retention-days: 14
 
-  backup-remote:
-    name: Backup current production state (pre-deploy)
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'deploy' && inputs.confirm == 'DEPLOY' }}
-    needs: build-and-package
+  deploy:
+    name: Backup, deploy, and smoke SiteGround
+    if: ${{ inputs.action == 'deploy' }}
+    needs:
+      - guard
+      - build-and-package
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     environment:
-      name: hostgator-production
-    outputs:
-      backup_artifact_name: ${{ steps.meta.outputs.backup_artifact_name }}
-
+      name: siteground-production
+      url: https://elliottm4.sg-host.com
+    env:
+      SITEGROUND_SFTP_HOST: ${{ secrets.SITEGROUND_SFTP_HOST }}
+      SITEGROUND_SFTP_PORT: ${{ secrets.SITEGROUND_SFTP_PORT }}
+      SITEGROUND_SFTP_USERNAME: ${{ secrets.SITEGROUND_SFTP_USERNAME }}
+      SITEGROUND_SFTP_PASSWORD: ${{ secrets.SITEGROUND_SFTP_PASSWORD }}
+      SITEGROUND_REMOTE_DIR: ${{ secrets.SITEGROUND_REMOTE_DIR }}
     steps:
+      - name: Checkout release tooling
+        uses: actions/checkout@v4
+
+      - name: Download immutable deployment payload
+        uses: actions/download-artifact@v4
+        with:
+          name: siteground-payload-${{ github.run_id }}
+          path: deploy-root
+
+      - name: Install SFTP client
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Validate SiteGround secret contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ -n "$SITEGROUND_SFTP_HOST" ]]
+          [[ -n "$SITEGROUND_SFTP_USERNAME" ]]
+          [[ -n "$SITEGROUND_SFTP_PASSWORD" ]]
+          [[ -n "$SITEGROUND_REMOTE_DIR" ]]
+
       - name: Compute backup artifact name
-        id: meta
+        id: backup-meta
         shell: bash
         run: |
           set -euo pipefail
           stamp="$(date -u +%Y%m%d-%H%M%S)"
-          short_sha="${GITHUB_SHA::7}"
-          echo "backup_artifact_name=hostgator-backup-${GITHUB_RUN_ID}-${short_sha}-${stamp}" >> "$GITHUB_OUTPUT"
+          echo "name=siteground-backup-${GITHUB_RUN_ID}-${GITHUB_SHA::7}-${stamp}" >> "$GITHUB_OUTPUT"
 
-      - name: Install lftp
-        run: sudo apt-get update && sudo apt-get install -y lftp
-
-      - name: Download remote backup snapshot
+      - name: Back up the exact managed surface
         shell: bash
-        env:
-          FTP_HOST: ${{ secrets.HOSTGATOR_FTP_HOST }}
-          FTP_USERNAME: ${{ secrets.HOSTGATOR_FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.HOSTGATOR_FTP_PASSWORD }}
-          FTP_REMOTE_DIR: ${{ secrets.HOSTGATOR_FTP_REMOTE_DIR }}
+        run: bash launch/siteground-sftp-release.sh backup deploy-root siteground-backup
+
+      - name: Persist pre-deploy backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.backup-meta.outputs.name }}
+          path: siteground-backup/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Deploy with automatic file rollback
+        shell: bash
         run: |
           set -euo pipefail
-          # Remaining deployment/restore workflow is unchanged below this point.
-          echo "Continuing existing controlled deployment workflow..."
+          rollback() {
+            trap - ERR
+            echo 'Release failed; restoring the pre-deploy managed surface.' >&2
+            bash launch/siteground-sftp-release.sh restore deploy-root siteground-backup
+          }
+          trap rollback ERR
+          bash launch/siteground-sftp-release.sh deploy deploy-root siteground-backup
+          curl --fail --silent --show-error --retry 4 --retry-delay 5 --max-time 30 https://elliottm4.sg-host.com/ > /dev/null
+          curl --fail --silent --show-error --retry 4 --retry-delay 5 --max-time 30 https://elliottm4.sg-host.com/wp-json/dtb/v1/health \
+            | php -r '$data=json_decode(stream_get_contents(STDIN), true); exit(is_array($data) && ($data["status"] ?? null) === "ok" ? 0 : 1);'
+          curl --fail --silent --show-error --retry 4 --retry-delay 5 --max-time 30 https://elliottm4.sg-host.com/checkout/ > /dev/null
+          trap - ERR
+
+      - name: Record release evidence
+        shell: bash
+        run: |
+          {
+            echo '### SiteGround release completed'
+            echo '- Host: `https://elliottm4.sg-host.com`'
+            echo '- Payload: `siteground-payload-${{ github.run_id }}`'
+            echo '- Rollback artifact: `${{ steps.backup-meta.outputs.name }}`'
+            echo '- File smoke: root, DTB health, checkout returned successful HTTP responses'
+            echo '- Database, Stripe, webhook, Veeqo, and QuickBooks runtime acceptance remain separate operator checks'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  restore:
+    name: Restore a managed-surface backup
+    if: ${{ inputs.action == 'restore' }}
+    needs: guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: siteground-production
+      url: https://elliottm4.sg-host.com
+    env:
+      SITEGROUND_SFTP_HOST: ${{ secrets.SITEGROUND_SFTP_HOST }}
+      SITEGROUND_SFTP_PORT: ${{ secrets.SITEGROUND_SFTP_PORT }}
+      SITEGROUND_SFTP_USERNAME: ${{ secrets.SITEGROUND_SFTP_USERNAME }}
+      SITEGROUND_SFTP_PASSWORD: ${{ secrets.SITEGROUND_SFTP_PASSWORD }}
+      SITEGROUND_REMOTE_DIR: ${{ secrets.SITEGROUND_REMOTE_DIR }}
+    steps:
+      - name: Checkout release tooling
+        uses: actions/checkout@v4
+
+      - name: Download selected backup
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.backup_artifact_name }}
+          path: siteground-backup
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.backup_run_id }}
+
+      - name: Install SFTP client
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Restore managed files and smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p unused-payload
+          bash launch/siteground-sftp-release.sh restore unused-payload siteground-backup
+          curl --fail --silent --show-error --retry 4 --retry-delay 5 --max-time 30 https://elliottm4.sg-host.com/ > /dev/null
+          curl --fail --silent --show-error --retry 4 --retry-delay 5 --max-time 30 https://elliottm4.sg-host.com/wp-json/dtb/v1/health > /dev/null
+
+      - name: Record restore evidence
+        shell: bash
+        run: |
+          {
+            echo '### SiteGround restore completed'
+            echo '- Backup: `${{ inputs.backup_artifact_name }}` from run `${{ inputs.backup_run_id }}`'
+            echo '- Root and DTB health returned successful HTTP responses'
+          } >> "$GITHUB_STEP_SUMMARY"

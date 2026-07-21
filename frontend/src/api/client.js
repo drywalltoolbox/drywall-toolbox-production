@@ -23,7 +23,7 @@ const runtimeOrigin = typeof window !== 'undefined' ? window.location.origin : '
 const envApiBase = (process.env.REACT_APP_API_BASE_URL || '').replace(/\/+$/, '');
 
 export const API_BASE_URL =
-  envApiBase || (/github\.io$/i.test(runtimeHost) ? 'https://drywalltoolbox.com' : runtimeOrigin);
+  envApiBase || (/github\.io$/i.test(runtimeHost) ? 'https://elliottm4.sg-host.com' : runtimeOrigin);
 
 const configuredWpBase = (process.env.REACT_APP_WP_BASE_URL || '').replace(/\/+$/, '');
 const WP_API_BASE = configuredWpBase
@@ -57,7 +57,7 @@ function buildApiRequestUrls(endpoint) {
   const urls = [];
 
   for (const base of bases) {
-    // Always try the canonical /wp-json alias first (HostGator root alias).
+    // Always try the canonical /wp-json alias first (public root alias).
     urls.push(`${base}${normalizedEndpoint}`);
     // Fall back to the explicit /wp sub-directory where WP is installed.
     urls.push(`${base}/wp/wp-json${restPath}`);

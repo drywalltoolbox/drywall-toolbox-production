@@ -354,7 +354,7 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
   const unifiedHeadingMeta = isCategoryProductRoute
     ? `${categoryScopeLabel || 'All brands'}${total > 0 ? ` · ${total.toLocaleString()} product${total === 1 ? '' : 's'}` : ''}`
     : `${isPartsPage ? 'Replacement parts and service components' : 'All brands and categories'}${total > 0 ? ` · ${total.toLocaleString()} product${total === 1 ? '' : 's'}` : ''}`;
-  const canonicalUrl = isPartsPage ? 'https://drywalltoolbox.com/parts' : 'https://drywalltoolbox.com/products';
+  const canonicalUrl = isPartsPage ? 'https://elliottm4.sg-host.com/parts' : 'https://elliottm4.sg-host.com/products';
   const seoDescription = isPartsPage
     ? 'Shop professional drywall replacement parts, service kits, and repair components from leading brands.'
     : 'Shop professional drywall tools and accessories from leading drywall brands.';

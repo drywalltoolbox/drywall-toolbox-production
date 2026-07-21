@@ -92,20 +92,22 @@ define( 'WP_DEBUG', false );
 /**
  * Drywall Toolbox live routing architecture.
  *
- * - Domain document root: /public_html/drywalltoolbox/
- * - WordPress core files: /public_html/drywalltoolbox/wp/
- * - Public site URL:       https://drywalltoolbox.com
- * - Public admin URL:      https://drywalltoolbox.com/wp-admin/
- * - Public REST URL:       https://drywalltoolbox.com/wp-json/
+ * - Domain document root: SiteGround directory for elliottm4.sg-host.com
+ * - WordPress core files: document-root/wp/
+ * - Public site URL:       https://elliottm4.sg-host.com
+ * - Public admin URL:      https://elliottm4.sg-host.com/wp-admin/
+ * - Public REST URL:       https://elliottm4.sg-host.com/wp-json/
  */
-define( 'WP_HOME',    'https://drywalltoolbox.com' );
-define( 'WP_SITEURL', 'https://drywalltoolbox.com' );
+define( 'WP_HOME',    'https://elliottm4.sg-host.com' );
+define( 'WP_SITEURL', 'https://elliottm4.sg-host.com/wp' );
+define( 'WP_ENVIRONMENT_TYPE', 'staging' );
+define( 'DRYWALL_ALLOWED_ORIGIN', 'https://elliottm4.sg-host.com' );
 
 /**
  * Production HTTPS, cookie, and admin-runtime hardening.
  *
  * The live site exposes WordPress through root-mounted /wp-admin and /wp-json
- * aliases while the WordPress files live under /wp. Woo Admin and WooPayments
+ * aliases while the WordPress files live under /wp. Woo Admin and WordPress
  * authenticate REST calls with native WordPress auth cookies plus X-WP-Nonce,
  * so auth cookies must be valid for root /wp-json requests.
  */
@@ -122,7 +124,6 @@ define( 'FORCE_SSL_ADMIN', true );
 define( 'COOKIEPATH', '/' );
 define( 'SITECOOKIEPATH', '/' );
 define( 'ADMIN_COOKIE_PATH', '/' );
-define( 'COOKIE_DOMAIN', 'drywalltoolbox.com' );
 
 define( 'DISALLOW_FILE_EDIT', true );
 define( 'WP_MEMORY_LIMIT', '256M' );

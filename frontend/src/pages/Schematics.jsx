@@ -3598,7 +3598,7 @@ const ALLOWED_BRANDS = [
       <SEOHead
         title="Tool Schematics & Diagrams"
         description="Interactive exploded-view schematics and part diagrams for professional drywall finishing tools. Find replacement parts for TapeTech, Columbia, Asgard, and more."
-        canonical="https://drywalltoolbox.com/schematics"
+        canonical="https://elliottm4.sg-host.com/schematics"
         schema={buildBreadcrumbSchema([
           { label: 'Home',       path: '/'            },
           { label: 'Schematics', path: '/schematics'  },

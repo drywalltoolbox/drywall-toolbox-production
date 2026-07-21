@@ -20,7 +20,7 @@
  * }
  */
 
-// Use REACT_APP_API_BASE_URL (e.g. https://drywalltoolbox.com) — the same
+// Use REACT_APP_API_BASE_URL (e.g. https://elliottm4.sg-host.com) — the same
 // base used by all other dtb/v1 endpoints.  This resolves to the canonical
 // /wp-json/ alias at the domain root, which is properly handled by the root
 // .htaccess rewrite and our CORS mu-plugin.
@@ -32,7 +32,7 @@ const _apiBase = ( process.env.REACT_APP_API_BASE_URL || '' ).trim().replace( /\
 
 const WP_API_BASE = _apiBase
   ? `${ _apiBase }/wp-json`
-  : 'https://drywalltoolbox.com/wp-json';
+  : 'https://elliottm4.sg-host.com/wp-json';
 
 /** Full URL of the schematics manifest endpoint. */
 export const SCHEMATICS_MEDIA_URL = `${WP_API_BASE}/dtb/v1/schematics/media`;

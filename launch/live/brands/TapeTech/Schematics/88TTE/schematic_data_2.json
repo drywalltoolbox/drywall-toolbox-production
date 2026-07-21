@@ -1,0 +1,788 @@
+{
+  "schema_version": "2.0",
+  "diagram": {
+    "id": "88tte-sch-page-2",
+    "title": "88TTE_SCH_page_2",
+    "description": "Interactive parts schematic with normalized hotspot geometry.",
+    "pages": [
+      {
+        "page": 1,
+        "image": {
+          "src": "88tte-sch-page-2-page-01.png",
+          "natural_width": 2325,
+          "natural_height": 1130
+        },
+        "coordinate_space": {
+          "origin": "top-left",
+          "x_axis": "right",
+          "y_axis": "down",
+          "unit": "px"
+        }
+      }
+    ]
+  },
+  "parts_catalog": [
+    {
+      "part_id": "190034",
+      "display_id": "190034",
+      "name": "Part (190034)",
+      "sku": "190034",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "819038",
+      "display_id": "819038",
+      "name": "Part (819038)",
+      "sku": "819038",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "2X 889055",
+      "display_id": "2X 889055",
+      "name": "Part (2X 889055)",
+      "sku": "2X 889055",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "190036",
+      "display_id": "190036",
+      "name": "Part (190036)",
+      "sku": "190036",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "190033",
+      "display_id": "190033",
+      "name": "Part (190033)",
+      "sku": "190033",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "880006F",
+      "display_id": "880006F",
+      "name": "Part (880006F)",
+      "sku": "880006F",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "882016",
+      "display_id": "882016",
+      "name": "Part (882016)",
+      "sku": "882016",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "889015\nLOCTITE 243",
+      "display_id": "889015\nLOCTITE 243",
+      "name": "Part (889015\nLOCTITE 243)",
+      "sku": "889015\nLOCTITE 243",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "880004",
+      "display_id": "880004",
+      "name": "Part (880004)",
+      "sku": "880004",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "881005",
+      "display_id": "881005",
+      "name": "Part (881005)",
+      "sku": "881005",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "889016",
+      "display_id": "889016",
+      "name": "Part (889016)",
+      "sku": "889016",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "DETAIL A\nSCALE 3 : 4",
+      "display_id": "DETAIL A\nSCALE 3 : 4",
+      "name": "Part (DETAIL A\nSCALE 3 : 4)",
+      "sku": "DETAIL A\nSCALE 3 : 4",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "2X 059037\nLOCTITE 243",
+      "display_id": "2X 059037\nLOCTITE 243",
+      "name": "Part (2X 059037\nLOCTITE 243)",
+      "sku": "2X 059037\nLOCTITE 243",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "883011",
+      "display_id": "883011",
+      "name": "Part (883011)",
+      "sku": "883011",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "889017",
+      "display_id": "889017",
+      "name": "Part (889017)",
+      "sku": "889017",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "880053",
+      "display_id": "880053",
+      "name": "Part (880053)",
+      "sku": "880053",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "889057",
+      "display_id": "889057",
+      "name": "Part (889057)",
+      "sku": "889057",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "499023",
+      "display_id": "499023",
+      "name": "Part (499023)",
+      "sku": "499023",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "883014",
+      "display_id": "883014",
+      "name": "Part (883014)",
+      "sku": "883014",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "882013",
+      "display_id": "882013",
+      "name": "Part (882013)",
+      "sku": "882013",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "883003",
+      "display_id": "883003",
+      "name": "Part (883003)",
+      "sku": "883003",
+      "quantity": 1,
+      "notes": ""
+    },
+    {
+      "part_id": "DETAIL B\nSCALE 3 : 4",
+      "display_id": "DETAIL B\nSCALE 3 : 4",
+      "name": "Part (DETAIL B\nSCALE 3 : 4)",
+      "sku": "DETAIL B\nSCALE 3 : 4",
+      "quantity": 1,
+      "notes": ""
+    }
+  ],
+  "hotspots": [
+    {
+      "hotspot_id": "p1-190034-01",
+      "part_ref": "190034",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 159,
+        "y_px": 117,
+        "width_px": 133,
+        "height_px": 29
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 100,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 6.831,
+        "y_pct": 10.377,
+        "width_pct": 5.7,
+        "height_pct": 2.6
+      }
+    },
+    {
+      "hotspot_id": "p1-819038-01",
+      "part_ref": "819038",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 146,
+        "y_px": 158,
+        "width_px": 133,
+        "height_px": 26
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 101,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 6.265,
+        "y_pct": 14.009,
+        "width_pct": 5.7,
+        "height_pct": 2.3
+      }
+    },
+    {
+      "hotspot_id": "p1-2x889055-01",
+      "part_ref": "2X 889055",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 442,
+        "y_px": 45,
+        "width_px": 179,
+        "height_px": 38
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 102,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 19.031,
+        "y_pct": 4.018,
+        "width_pct": 7.7,
+        "height_pct": 3.4
+      }
+    },
+    {
+      "hotspot_id": "p1-190036-01",
+      "part_ref": "190036",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 452,
+        "y_px": 112,
+        "width_px": 133,
+        "height_px": 29
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 103,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 19.455,
+        "y_pct": 9.9,
+        "width_pct": 5.7,
+        "height_pct": 2.6
+      }
+    },
+    {
+      "hotspot_id": "p1-190033-01",
+      "part_ref": "190033",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 453,
+        "y_px": 184,
+        "width_px": 133,
+        "height_px": 25
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 104,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 19.467,
+        "y_pct": 16.322,
+        "width_pct": 5.7,
+        "height_pct": 2.2
+      }
+    },
+    {
+      "hotspot_id": "p1-880006f-01",
+      "part_ref": "880006F",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 158,
+        "y_px": 440,
+        "width_px": 135,
+        "height_px": 40
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 105,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 6.8,
+        "y_pct": 38.9,
+        "width_pct": 5.8,
+        "height_pct": 3.5
+      }
+    },
+    {
+      "hotspot_id": "p1-882016-01",
+      "part_ref": "882016",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 146,
+        "y_px": 840,
+        "width_px": 121,
+        "height_px": 40
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 106,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 6.3,
+        "y_pct": 74.3,
+        "width_pct": 5.2,
+        "height_pct": 3.5
+      }
+    },
+    {
+      "hotspot_id": "p1-889015loctite243-01",
+      "part_ref": "889015\nLOCTITE 243",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 146,
+        "y_px": 888,
+        "width_px": 186,
+        "height_px": 69
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 107,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 6.3,
+        "y_pct": 78.6,
+        "width_pct": 8,
+        "height_pct": 6.1
+      }
+    },
+    {
+      "hotspot_id": "p1-880004-01",
+      "part_ref": "880004",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 560,
+        "y_px": 750,
+        "width_px": 121,
+        "height_px": 40
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 108,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 24.1,
+        "y_pct": 66.4,
+        "width_pct": 5.2,
+        "height_pct": 3.5
+      }
+    },
+    {
+      "hotspot_id": "p1-881005-01",
+      "part_ref": "881005",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 791,
+        "y_px": 750,
+        "width_px": 121,
+        "height_px": 40
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 109,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 34,
+        "y_pct": 66.4,
+        "width_pct": 5.2,
+        "height_pct": 3.5
+      }
+    },
+    {
+      "hotspot_id": "p1-889016-01",
+      "part_ref": "889016",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 784,
+        "y_px": 541,
+        "width_px": 121,
+        "height_px": 41
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 110,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 33.7,
+        "y_pct": 47.9,
+        "width_pct": 5.2,
+        "height_pct": 3.6
+      }
+    },
+    {
+      "hotspot_id": "p1-detailascale34-01",
+      "part_ref": "DETAIL A\nSCALE 3 : 4",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 500,
+        "y_px": 981,
+        "width_px": 172,
+        "height_px": 68
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 111,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 21.5,
+        "y_pct": 86.8,
+        "width_pct": 7.4,
+        "height_pct": 6
+      }
+    },
+    {
+      "hotspot_id": "p1-2x059037loctite243-01",
+      "part_ref": "2X 059037\nLOCTITE 243",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 1339,
+        "y_px": 145,
+        "width_px": 186,
+        "height_px": 60
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 112,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 57.6,
+        "y_pct": 12.8,
+        "width_pct": 8,
+        "height_pct": 5.3
+      }
+    },
+    {
+      "hotspot_id": "p1-883011-01",
+      "part_ref": "883011",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 1362,
+        "y_px": 313,
+        "width_px": 116,
+        "height_px": 38
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 113,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 58.6,
+        "y_pct": 27.7,
+        "width_pct": 5,
+        "height_pct": 3.4
+      }
+    },
+    {
+      "hotspot_id": "p1-889017-01",
+      "part_ref": "889017",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 1421,
+        "y_px": 747,
+        "width_px": 119,
+        "height_px": 40
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 114,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 61.1,
+        "y_pct": 66.1,
+        "width_pct": 5.1,
+        "height_pct": 3.5
+      }
+    },
+    {
+      "hotspot_id": "p1-880053-01",
+      "part_ref": "880053",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 1404,
+        "y_px": 925,
+        "width_px": 121,
+        "height_px": 40
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 115,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 60.4,
+        "y_pct": 81.9,
+        "width_pct": 5.2,
+        "height_pct": 3.5
+      }
+    },
+    {
+      "hotspot_id": "p1-889057-01",
+      "part_ref": "889057",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 1936,
+        "y_px": 33,
+        "width_px": 119,
+        "height_px": 40
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 116,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 83.262,
+        "y_pct": 2.927,
+        "width_pct": 5.1,
+        "height_pct": 3.5
+      }
+    },
+    {
+      "hotspot_id": "p1-499023-01",
+      "part_ref": "499023",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 1931,
+        "y_px": 107,
+        "width_px": 121,
+        "height_px": 29
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 117,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 83.072,
+        "y_pct": 9.505,
+        "width_pct": 5.2,
+        "height_pct": 2.6
+      }
+    },
+    {
+      "hotspot_id": "p1-883014-01",
+      "part_ref": "883014",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 1932,
+        "y_px": 167,
+        "width_px": 119,
+        "height_px": 40
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 118,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 83.1,
+        "y_pct": 14.8,
+        "width_pct": 5.1,
+        "height_pct": 3.5
+      }
+    },
+    {
+      "hotspot_id": "p1-882013-01",
+      "part_ref": "882013",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 1930,
+        "y_px": 229,
+        "width_px": 119,
+        "height_px": 40
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 119,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 83,
+        "y_pct": 20.3,
+        "width_pct": 5.1,
+        "height_pct": 3.5
+      }
+    },
+    {
+      "hotspot_id": "p1-883003-01",
+      "part_ref": "883003",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 1888,
+        "y_px": 925,
+        "width_px": 121,
+        "height_px": 40
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 120,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 81.2,
+        "y_pct": 81.9,
+        "width_pct": 5.2,
+        "height_pct": 3.5
+      }
+    },
+    {
+      "hotspot_id": "p1-detailbscale34-01",
+      "part_ref": "DETAIL B\nSCALE 3 : 4",
+      "page": 1,
+      "shape": {
+        "type": "rect",
+        "x_px": 1846,
+        "y_px": 1027,
+        "width_px": 172,
+        "height_px": 68
+      },
+      "rotation_deg": 0,
+      "anchor": "center",
+      "z_index": 121,
+      "interaction": {
+        "tap_target_min_px": 40,
+        "hit_slop_px": 6,
+        "enabled": true
+      },
+      "normalized": {
+        "x_pct": 79.4,
+        "y_pct": 90.9,
+        "width_pct": 7.4,
+        "height_pct": 6
+      }
+    }
+  ],
+  "ui_defaults": {
+    "shape_render": "auto",
+    "show_labels": false,
+    "hotspot_style": "outline",
+    "tap_target_min_px": 40
+  },
+  "validation": {
+    "require_unique_hotspot_id": true,
+    "require_part_ref_exists": true,
+    "clamp_hotspots_to_page_bounds": true,
+    "normalized_is_derived_from_px": true
+  }
+}

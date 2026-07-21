@@ -188,7 +188,7 @@ export default function RepairPackages() {
       <SEOHead
         title="Repair Service Packages"
         description="Compare DTB standard repair packages and diagnostic quote-first paths."
-        canonical="https://drywalltoolbox.com/repairs/packages"
+        canonical="https://elliottm4.sg-host.com/repairs/packages"
       />
 
       <section className="repair-packages-hero">

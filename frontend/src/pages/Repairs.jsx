@@ -484,7 +484,7 @@ export default function Repairs() {
       <SEOHead
         title="Drywall Tool Repair Services"
         description="Package-driven drywall tool repair services for TapeTech, Columbia, Asgard, Graco, and other professional finishing tools."
-        canonical="https://drywalltoolbox.com/repairs"
+        canonical="https://elliottm4.sg-host.com/repairs"
       />
 
       <section style={{
@@ -1498,7 +1498,7 @@ export function RepairStartExperience() {
       <SEOHead
         title="Tool Repair Services"
         description="Professional drywall tool repair services and guides. Find repair solutions for TapeTech, Columbia, Asgard, Graco, and other professional drywall finishing tools."
-        canonical="https://drywalltoolbox.com/repairs"
+        canonical="https://elliottm4.sg-host.com/repairs"
       />
 
       {/* ── Repair Request Form ──────────────────────────────────────────── */}

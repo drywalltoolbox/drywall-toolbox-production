@@ -214,18 +214,7 @@ The bottom payment sheet and mobile `Pay now` label apply only below the mobile 
 
 ## Verification
 
-Static contract validation:
-
-```powershell
-./scripts/smoke-dtb-mobile-payment-sheet.ps1
-./scripts/smoke-dtb-checkout-performance.ps1
-```
-
-Mobile PageSpeed checkout-shell baseline:
-
-```powershell
-./scripts/audit-dtb-checkout-pagespeed.ps1 -Url "https://drywalltoolbox.com/checkout/"
-```
+The historical standalone mobile-checkout/performance/PageSpeed scripts are absent from active source. Use CI PHP/domain/payload checks plus targeted session-preserving browser validation against `https://elliottm4.sg-host.com/checkout/`.
 
 A public PageSpeed run does not reproduce a real Woo cart/session. Release acceptance also requires a session-preserving mobile Lighthouse/WebPageTest run against staging with a real cart.
 

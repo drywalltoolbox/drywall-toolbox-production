@@ -84,7 +84,7 @@ export default function FAQ() {
       <SEOHead
         title="FAQ — Drywall Tool Repair & Maintenance"
         description="Answers to common questions about drywall tool repair services, pricing, warranties, maintenance, parts, accounts, and shipping."
-        canonical="https://drywalltoolbox.com/faq"
+        canonical="https://elliottm4.sg-host.com/faq"
       />
 
       <section style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1d4ed8 100%)', padding: 'clamp(3.5rem, 8vw, 6rem) clamp(1.5rem, 5vw, 3rem) clamp(3rem, 6vw, 5rem)', position: 'relative', overflow: 'hidden' }}>

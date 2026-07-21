@@ -69,7 +69,7 @@ const SHIPPING_RATES = [
 const SHIPPING_FAQS = [
   {
     q: 'How do I track my shipment?',
-    a: 'A tracking number is emailed automatically the moment your order ships. You can also find live tracking and your full order history in your Account Dashboard under Order History, or visit drywalltoolbox.com/track.',
+    a: 'A tracking number is emailed automatically the moment your order ships. You can also find live tracking and your full order history in your Account Dashboard under Order History, or visit elliottm4.sg-host.com/track.',
   },
   {
     q: 'Can I modify or cancel my order after it\'s placed?',
@@ -103,7 +103,7 @@ export default function ShippingPolicy() {
       <SEOHead
         title="Shipping Policy"
         description="Drywall Toolbox shipping policy: free shipping on orders over $75, same-day processing by 12 PM CST, UPS, FedEx &amp; USPS service levels, international shipping, and tracking information."
-        canonical="https://drywalltoolbox.com/shipping-policy"
+        canonical="https://elliottm4.sg-host.com/shipping-policy"
       />
 
       {/* ── Hero strip ─────────────────────────────────────────────────────── */}

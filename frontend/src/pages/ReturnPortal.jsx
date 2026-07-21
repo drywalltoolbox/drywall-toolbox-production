@@ -174,7 +174,7 @@ export default function ReturnPortal() {
       <SEOHead
         title="Return Portal"
         description="Start a return or exchange with Drywall Toolbox. Enter your order number and email to begin. 45-day return window, no restocking fee on unused approved returns."
-        canonical="https://drywalltoolbox.com/returns"
+        canonical="https://elliottm4.sg-host.com/returns"
       />
 
       {/* ── Hero strip ─────────────────────────────────────────────────────── */}

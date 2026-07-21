@@ -35,7 +35,7 @@ export default function RepairTrack() {
       <SEOHead
         title="Track Repair"
         description="Track a DTB drywall tool repair request by repair number and token."
-        canonical="https://drywalltoolbox.com/repairs/track"
+        canonical="https://elliottm4.sg-host.com/repairs/track"
       />
 
       <section style={{ padding: 'clamp(56px, 9vw, 92px) clamp(1.5rem, 5vw, 3rem)' }}>

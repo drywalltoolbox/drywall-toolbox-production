@@ -1,5 +1,5 @@
 User-agent: *
-Allow: /
+__DTB_ROBOTS_RULE__
 
 # Private / utility pages — no crawl benefit, can expose account data
 Disallow: /dashboard
@@ -13,7 +13,7 @@ Disallow: /rewards
 Disallow: /settings/
 
 # WP admin and REST API — already blocked by server, belt-and-suspenders
-Disallow: /wp/wp-admin/
-Disallow: /wp/wp-json/
+Disallow: /wp-admin/
+Disallow: /wp-json/
 
-Sitemap: https://drywalltoolbox.com/sitemap.xml
+Sitemap: __DTB_SITE_URL__/sitemap.xml

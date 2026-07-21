@@ -10,7 +10,7 @@
 const runtimeHost = typeof window !== 'undefined' ? window.location.hostname : '';
 const runtimeOrigin = typeof window !== 'undefined' ? window.location.origin : '';
 const envApiBase = ( process.env.REACT_APP_API_BASE_URL || '' ).replace( /\/+$/, '' );
-const resolvedApiBase = envApiBase || ( /github\.io$/i.test( runtimeHost ) ? 'https://drywalltoolbox.com' : runtimeOrigin );
+const resolvedApiBase = envApiBase || ( /github\.io$/i.test( runtimeHost ) ? 'https://elliottm4.sg-host.com' : runtimeOrigin );
 const configuredStorePath = ( process.env.REACT_APP_STORE_API_BASE || '/wp-json/wc/store/v1' ).replace( /\/+$/, '' );
 const CART_TOKEN_STORAGE_KEY = 'dtb:store-api-cart-token:v1';
 

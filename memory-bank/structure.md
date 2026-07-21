@@ -1,6 +1,6 @@
 # Structure
 
-Last verified against active source: 2026-07-20 (current `main` head observed at `763a58779b75951ae96fd5c65c65b3e965af06f8`).
+Last verified against active source: 2026-07-21.
 
 ## Architecture truth
 
@@ -26,7 +26,7 @@ drywall-toolbox/
 │     └─ deploy.yml
 ├─ dist/                                  generated frontend build output
 ├─ docs/                                  current architecture/operations/reference docs
-├─ drywalltoolbox/                        tracked HostGator deployment mirror
+├─ drywalltoolbox/                        tracked SiteGround deployment source mirror
 │  ├─ .htaccess                           domain-root routing/security/cache policy
 │  ├─ logos/
 │  └─ wp/
@@ -36,6 +36,8 @@ drywall-toolbox/
 │        ├─ mu-plugins/                    canonical DTB backend platform
 │        └─ themes/                        headless/backend-support themes
 ├─ frontend/                              React storefront source
+├─ launch/                                SiteGround assembly/release tooling
+│  └─ live/                               generated runtime-safe deployment overlay
 ├─ memory-bank/                           durable project context
 │  ├─ product.md
 │  ├─ structure.md
@@ -50,7 +52,7 @@ drywall-toolbox/
 ## Production topology
 
 ```text
-/public_html/drywalltoolbox/              public document root
+SiteGround document root for elliottm4.sg-host.com
 ├─ index.html                             React application shell
 ├─ assets/                                compiled React assets
 ├─ .htaccess                              HTTPS, WP/REST aliases, native checkout routing, SPA fallback
@@ -469,8 +471,8 @@ Current build job:
 3. `npm ci --include=dev`;
 4. frontend lint;
 5. frontend production build;
-6. `scripts/smoke-dtb-mobile-payment-sheet.ps1`;
-7. `scripts/smoke-dtb-checkout-performance.ps1`;
+6. custom MU-plugin/theme PHP syntax validation;
+7. active-source legacy-origin rejection;
 8. assemble bounded `deploy-root` payload;
 9. validate required payload shape and reject forbidden runtime content.
 
@@ -478,22 +480,9 @@ CI does not deploy production.
 
 ### Deployment workflow current state
 
-`.github/workflows/deploy.yml` currently defines manual `deploy`/`restore` inputs, confirmation controls, full/selective scope inputs, build/package behavior, a protected `hostgator-production` environment for the pre-deploy backup job, and backup metadata setup.
+`.github/workflows/deploy.yml` defines a manual, full-payload SiteGround release and managed-file restore contract. It requires exact `DEPLOY`/`RESTORE` confirmation, protected `siteground-production` approval, and SiteGround SFTP secrets. Deploy builds and validates an immutable artifact, snapshots the exact DTB-managed remote paths, uploads only the public SPA/root routing plus canonical MU-plugin/theme paths, runs root/DTB-health/checkout HTTP smoke checks, and automatically restores the managed surface on failure. Standalone restore requires the exact backup run and artifact name.
 
-At the verified current source state, the checked-in workflow ends after a placeholder step:
-
-```text
-Continuing existing controlled deployment workflow...
-```
-
-The active file does not presently contain a complete executable upload/smoke/rollback/restore sequence after that point.
-
-Therefore:
-
-- merge is not deployment;
-- workflow presence is not proof of production release capability;
-- do not claim automated deploy/rollback/restore completed unless active workflow source and run evidence prove it;
-- the intended controlled release contract must be restored/validated before relying on it operationally.
+The release never uploads or deletes WordPress core, regular plugins, uploads, cache, upgrade state, `wp-config.php`, `sgs_encrypt_key.php`, logs, or database content. Merge is not deployment, and successful file smoke is not payment/integration acceptance.
 
 ## Navigation model for engineers
 

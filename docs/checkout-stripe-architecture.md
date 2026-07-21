@@ -265,4 +265,4 @@ php -l drywalltoolbox/wp/wp-content/mu-plugins/dtb-integrations/OperationalPipel
 git diff --check
 ```
 
-Runtime validation is mandatory. Static source checks cannot prove Stripe account connection, webhook health, wallet eligibility, Woo session cookies, HostGator rewrite/cache behavior, or external Veeqo/QuickBooks responses.
+Runtime validation is mandatory. Static source checks cannot prove Stripe account connection, webhook health, wallet eligibility, Woo session cookies, SiteGround rewrite/cache behavior, or external Veeqo/QuickBooks responses.

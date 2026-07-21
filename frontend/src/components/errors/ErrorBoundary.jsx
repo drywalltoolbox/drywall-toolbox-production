@@ -22,7 +22,7 @@ class ErrorBoundary extends Component {
 
   componentDidCatch(error, info) {
     // In production webpack drops console calls, but this intentional error
-    // log is preserved here so the error appears in HostGator's error log
+    // log is preserved here so the error appears in browser diagnostics
     // if server-side logging is configured.  The guard prevents leaking info
     // in development where the React overlay is already shown.
     if (process.env.NODE_ENV === 'production') {

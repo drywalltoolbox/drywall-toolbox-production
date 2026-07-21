@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://drywalltoolbox.com",
+  "homepage": "https://elliottm4.sg-host.com",
   "scripts": {
     "dev": "webpack serve --config webpack.config.cjs --mode development",
     "build": "node scripts/assert-public-env-safe.cjs pre && node scripts/clean-build-artifacts.cjs production && webpack --config webpack.config.cjs --mode production && node scripts/assert-public-env-safe.cjs post",

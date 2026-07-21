@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import SEOHead from '../components/shared/SEOHead';
 import { apiClient } from '../api/client';
@@ -77,7 +77,7 @@ export default function Contact() {
       <SEOHead
         title="Contact Us"
         description="Get in touch with the Drywall Toolbox team. Expert support from real people who know drywall tools."
-        canonical="https://drywalltoolbox.com/contact"
+        canonical="https://elliottm4.sg-host.com/contact"
       />
 
       {/* Hero strip */}

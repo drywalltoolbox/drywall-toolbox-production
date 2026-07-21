@@ -116,7 +116,7 @@ export default function ReturnPolicy() {
       <SEOHead
         title="Return Policy"
         description="Drywall Toolbox return policy: 45-day returns, no restocking fee on unused approved returns, Return ID instructions, refund timing, and warranty support."
-        canonical="https://drywalltoolbox.com/return-policy"
+        canonical="https://elliottm4.sg-host.com/return-policy"
       />
 
       <section className="store-policy-hero">

@@ -268,13 +268,7 @@ Current technical responsibilities include:
 
 It must not clone/reparent provider payment nodes, create payment objects, independently calculate final payable totals, or replace Woo submission.
 
-Static contract:
-
-```powershell
-./scripts/smoke-dtb-mobile-payment-sheet.ps1
-```
-
-The smoke script verifies required source/assets, accessibility/runtime tokens, bootstrap wiring, and absence of independent Stripe orchestration tokens.
+The historical standalone mobile-payment smoke script is absent from active source. CI still validates PHP syntax and the bounded runtime payload; targeted browser acceptance must verify the accessibility/runtime contract and absence of independent Stripe orchestration.
 
 ### Checkout performance/stability
 
@@ -320,19 +314,7 @@ Security contract:
 - no cart/order/payment writes;
 - no synchronous external calls.
 
-Static contract:
-
-```powershell
-./scripts/smoke-dtb-checkout-performance.ps1
-```
-
-The smoke validates source wiring, security/performance tokens, forbidden payment-orchestration tokens, prewarm scheduling, and asset-version synchronization.
-
-Optional PageSpeed shell audit:
-
-```powershell
-./scripts/audit-dtb-checkout-pagespeed.ps1 -Url "https://drywalltoolbox.com/checkout/"
-```
+The historical standalone checkout-performance and PageSpeed scripts are absent from active source. Validate source wiring, security/performance boundaries, prewarm scheduling, and asset-version synchronization through CI plus targeted browser/runtime checks.
 
 A public PageSpeed run is only a shell baseline because it cannot reproduce shopper-specific Woo cookie/cart state.
 
@@ -487,15 +469,15 @@ Current build job:
 3. `npm ci --include=dev --prefer-offline --no-audit --no-fund`;
 4. `npm run lint --if-present`;
 5. production frontend build;
-6. `./scripts/smoke-dtb-mobile-payment-sheet.ps1`;
-7. `./scripts/smoke-dtb-checkout-performance.ps1`;
+6. custom MU-plugin/theme PHP syntax validation;
+7. active-source legacy-origin rejection;
 8. assemble `deploy-root` from `dist`, root routing/logos, tracked WP entry files, mu-plugins, themes;
 9. validate required payload shape;
-10. reject `wp-config.php`, uploads, or cache paths.
+10. reject `wp-config.php`, runtime plugins/core, uploads, caches, logs, and secret paths.
 
 CI build success is not deployment.
 
-## Deployment current state
+## SiteGround deployment contract
 
 Active workflow:
 
@@ -507,22 +489,24 @@ Current checked-in source defines:
 
 - manual `deploy` / `restore` action choice;
 - confirmation input;
-- full/selective deploy scope inputs;
 - backup-run/artifact inputs for restore intent;
-- build/package job;
+- immutable build/package job;
 - bounded payload assembly/validation;
 - upload of deployment payload artifact;
-- protected `hostgator-production` environment on the pre-deploy backup job;
-- backup artifact naming and remote-backup setup.
-
-Critical current-source limitation: the file ends after a placeholder pre-deploy backup continuation step (`Continuing existing controlled deployment workflow...`). The checked-in workflow does not currently contain a complete executable upload-to-production, smoke, rollback, or restore sequence after that point.
+- protected `siteground-production` environment;
+- SiteGround SFTP secret validation;
+- exact managed-surface pre-deploy backup artifact;
+- convergent upload of DTB-owned directories only;
+- root, DTB health, and native checkout HTTP smoke checks;
+- automatic managed-file rollback on release failure;
+- explicit cross-run backup restore.
 
 Therefore:
 
 - merge is not deployment;
 - workflow dispatch is not proof of completed production release;
-- do not claim rollback/restore automation is complete until active source contains and validates it;
-- production release automation has residual operational risk until the intended controlled deploy/restore sequence is restored.
+- file backup/restore does not include the database or runtime-owned WordPress trees;
+- passing HTTP smoke does not prove Stripe, webhook, Veeqo, QuickBooks, or session-preserving checkout acceptance.
 
 ## Validation baseline
 
@@ -535,12 +519,7 @@ npm run lint
 npm run build
 ```
 
-Checkout static contracts:
-
-```powershell
-./scripts/smoke-dtb-mobile-payment-sheet.ps1
-./scripts/smoke-dtb-checkout-performance.ps1
-```
+The historical checkout smoke scripts are absent from active source. Use CI PHP/domain/payload validation plus targeted session-preserving checkout/payment acceptance; never report a missing script as having passed.
 
 Targeted PHP syntax should cover each changed PHP file, especially checkout/payment/order/integration code.
 

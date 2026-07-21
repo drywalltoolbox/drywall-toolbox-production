@@ -1,6 +1,6 @@
 import './calculator-report.css'
 
-const LOGO_URL = 'https://drywalltoolbox.com/logos/logo-white.svg'
+const LOGO_URL = 'https://elliottm4.sg-host.com/logos/logo-white.svg'
 
 export default function CalculatorReport({ report }) {
   return (
@@ -98,7 +98,7 @@ export default function CalculatorReport({ report }) {
       <footer className="dtb-report-footer">
         <div className="dtb-report-footer-brand">
           <strong>Drywall Toolbox</strong>
-          <span>drywalltoolbox.com</span>
+          <span>elliottm4.sg-host.com</span>
         </div>
         <p>{report.disclaimer}</p>
       </footer>

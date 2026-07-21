@@ -6,7 +6,7 @@
  * Authentication: WooCommerce Application Passwords (more secure than consumer keys for client-side).
  * Env vars are injected at build time by webpack DefinePlugin:
  *   REACT_APP_WC_BASE_URL        – WooCommerce REST API base
- *                                   e.g. https://drywalltoolbox.com/wp-json/wc/v3
+ *                                   e.g. https://elliottm4.sg-host.com/wp-json/wc/v3
  *   REACT_APP_WC_AUTH_USER       – WooCommerce Application Password username
  *   REACT_APP_WC_AUTH_PASS       – WooCommerce Application Password password
  *

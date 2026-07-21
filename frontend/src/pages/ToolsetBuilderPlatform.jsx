@@ -63,7 +63,7 @@ export default function ToolsetBuilderPlatform() {
       <SEOHead
         title="Toolset Builder"
         description="Configure toolsets from canonical DTB templates and eligible slot options."
-        canonical="https://drywalltoolbox.com/toolset-builder"
+        canonical="https://elliottm4.sg-host.com/toolset-builder"
       />
 
       <div className="container mx-auto px-4 py-6 space-y-6">

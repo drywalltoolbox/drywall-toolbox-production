@@ -74,7 +74,7 @@ export default function Home() {
         title="Drywall Toolbox"
         noSuffix
         description="Top trusted one-stop shop for professional drywall tools. Get production-grade tools and parts at unbeatable prices with lightning-fast shipping."
-        canonical="https://drywalltoolbox.com/"
+        canonical="https://elliottm4.sg-host.com/"
         schema={[buildOrganizationSchema(), buildSiteLinksSearchBoxSchema()]}
       />
 

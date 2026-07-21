@@ -109,19 +109,7 @@ Telemetry writes use DTB logging and are not synchronous external calls.
 
 ## Performance testing
 
-Static contract:
-
-```powershell
-./scripts/smoke-dtb-checkout-performance.ps1
-```
-
-Google PageSpeed Insights mobile shell audit:
-
-```powershell
-./scripts/audit-dtb-checkout-pagespeed.ps1 \
-  -Url "https://drywalltoolbox.com/checkout/" \
-  -OutputPath "artifacts/checkout-pagespeed-mobile.json"
-```
+The historical standalone checkout-performance/PageSpeed scripts are absent from active source. Use current CI validation and run a session-preserving mobile Lighthouse or WebPageTest checkout flow with a real cart at `https://elliottm4.sg-host.com/checkout/`.
 
 For higher API quotas, set `GOOGLE_PAGESPEED_API_KEY` in the operator environment. Never commit the key.
 
