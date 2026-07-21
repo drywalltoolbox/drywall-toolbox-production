@@ -1,0 +1,218 @@
+name: Build DTB Production Launch Source Package
+
+on:
+  push:
+    branches:
+      - chore/dtb-production-launch-package
+    paths-ignore:
+      - 'dtb-production/**'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - 'dtb-production/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dtb-production-package-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  materialize-production-source:
+    name: Curate and validate dtb-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout source branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - name: Assemble strict production source tree
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf dtb-production
+          mkdir -p dtb-production
+
+          # Current engineering authority and durable architecture context only.
+          cp AGENTS.md dtb-production/AGENTS.md
+          mkdir -p dtb-production/memory-bank
+          cp memory-bank/product.md dtb-production/memory-bank/product.md
+          cp memory-bank/structure.md dtb-production/memory-bank/structure.md
+          cp memory-bank/tech.md dtb-production/memory-bank/tech.md
+
+          # Current production CI/release workflows only.
+          mkdir -p dtb-production/.github/workflows
+          cp .github/workflows/ci-build.yml dtb-production/.github/workflows/ci-build.yml
+          cp .github/workflows/deploy.yml dtb-production/.github/workflows/deploy.yml
+
+          # Frontend production source. Keep only files needed to build/validate the storefront.
+          mkdir -p dtb-production/frontend/scripts
+          cp -a frontend/src dtb-production/frontend/src
+          cp -a frontend/public dtb-production/frontend/public
+          cp frontend/package.json dtb-production/frontend/package.json
+          cp frontend/package-lock.json dtb-production/frontend/package-lock.json
+          cp frontend/webpack.config.cjs dtb-production/frontend/webpack.config.cjs
+          cp frontend/eslint.config.js dtb-production/frontend/eslint.config.js
+          cp frontend/babel.config.json dtb-production/frontend/babel.config.json
+          cp frontend/postcss.config.js dtb-production/frontend/postcss.config.js
+          cp frontend/index.html dtb-production/frontend/index.html
+          cp frontend/error-page.html dtb-production/frontend/error-page.html
+          cp frontend/scripts/assert-public-env-safe.cjs dtb-production/frontend/scripts/assert-public-env-safe.cjs
+          cp frontend/scripts/clean-build-artifacts.cjs dtb-production/frontend/scripts/clean-build-artifacts.cjs
+          if [ -f frontend/.env.example ]; then
+            cp frontend/.env.example dtb-production/frontend/.env.example
+          fi
+
+          # Production web-root routing/assets.
+          cp drywalltoolbox/.htaccess dtb-production/.htaccess
+          cp -a drywalltoolbox/logos dtb-production/logos
+
+          # Tracked WordPress application code only; never copy runtime-owned WordPress state.
+          mkdir -p dtb-production/wp/wp-content
+          cp drywalltoolbox/wp/.htaccess dtb-production/wp/.htaccess
+          cp drywalltoolbox/wp/index.php dtb-production/wp/index.php
+          cp -a drywalltoolbox/wp/wp-content/mu-plugins dtb-production/wp/wp-content/mu-plugins
+          cp -a drywalltoolbox/wp/wp-content/themes dtb-production/wp/wp-content/themes
+
+          # Product authority: ONLY the two current launch/runtime import CSVs.
+          # Do not copy historical/stage/audit CSV generations from products/Production/catalogs.
+          mapfile -d '' official_csvs < <(find products/launch/official -maxdepth 1 -type f -name '*.csv' -print0 | sort -z)
+          if [ "${#official_csvs[@]}" -ne 2 ]; then
+            echo "Expected exactly 2 authoritative CSVs in products/launch/official; found ${#official_csvs[@]}." >&2
+            printf '  %s\n' "${official_csvs[@]:-}"
+            exit 1
+          fi
+          mkdir -p dtb-production/products/launch/official
+          for file in "${official_csvs[@]}"; do
+            cp "$file" dtb-production/products/launch/official/
+          done
+
+          # Current machine-readable catalog governance only; no legacy catalog CSVs or reports.
+          mkdir -p dtb-production/products/Production/catalogs/config
+          cp products/Production/catalogs/config/production_taxonomy_policy.json \
+            dtb-production/products/Production/catalogs/config/production_taxonomy_policy.json
+          if [ -f products/Production/catalogs/config/product_category_map.json ]; then
+            cp products/Production/catalogs/config/product_category_map.json \
+              dtb-production/products/Production/catalogs/config/product_category_map.json
+          fi
+
+          cat > dtb-production/PRODUCTION-PACKAGE.md <<'EOF'
+          # DTB Production Launch Source Package
+
+          This directory is a curated copy of current source and production data required to build, operate, validate, and deploy Drywall Toolbox for launch.
+
+          Included:
+          - `AGENTS.md`
+          - current `memory-bank/{product,structure,tech}.md`
+          - `.github/workflows/{ci-build,deploy}.yml`
+          - curated `frontend/` production source and mandatory build-safety files
+          - tracked `wp/` application code (`mu-plugins`, themes, routing/index files)
+          - exactly two authoritative runtime/import CSVs from `products/launch/official/`
+          - current taxonomy/category governance JSON from `products/Production/catalogs/config/`
+          - production root `.htaccess` and `logos/`
+
+          Excluded:
+          - root `scripts/`
+          - legacy/stage/historical catalog CSV generations outside `products/launch/official/`
+          - research/reference docs, scraped data, reports, audits, source-history and scratch data
+          - generated `dist/`, `node_modules/`, caches and local/staging env files
+          - `wp-config.php`, WordPress core, regular plugins, uploads, cache, runtime state and secrets
+
+          Canonical source remains outside this generated directory. Regenerate; do not hand-edit copied content here.
+          EOF
+
+      - name: Validate production source boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f dtb-production/AGENTS.md
+          test -f dtb-production/memory-bank/product.md
+          test -f dtb-production/memory-bank/structure.md
+          test -f dtb-production/memory-bank/tech.md
+          test -f dtb-production/.github/workflows/ci-build.yml
+          test -f dtb-production/.github/workflows/deploy.yml
+
+          test -d dtb-production/frontend/src
+          test -d dtb-production/frontend/public
+          test -f dtb-production/frontend/package.json
+          test -f dtb-production/frontend/package-lock.json
+          test -f dtb-production/frontend/webpack.config.cjs
+          test -f dtb-production/frontend/scripts/assert-public-env-safe.cjs
+          test -f dtb-production/frontend/scripts/clean-build-artifacts.cjs
+
+          test -f dtb-production/.htaccess
+          test -d dtb-production/logos
+          test -f dtb-production/wp/.htaccess
+          test -f dtb-production/wp/index.php
+          test -d dtb-production/wp/wp-content/mu-plugins
+          test -d dtb-production/wp/wp-content/themes
+
+          test -d dtb-production/products/launch/official
+          test "$(find dtb-production/products/launch/official -maxdepth 1 -type f -name '*.csv' | wc -l)" -eq 2
+          test -f dtb-production/products/launch/official/dtb_woocommerce_official_catalog.csv
+          test -f dtb-production/products/Production/catalogs/config/production_taxonomy_policy.json
+
+          # No other catalog CSV generation may leak into the production capsule.
+          extra_product_csvs="$(find dtb-production/products -type f -name '*.csv' ! -path 'dtb-production/products/launch/official/*' -print)"
+          if [ -n "$extra_product_csvs" ]; then
+            echo 'Unexpected non-authoritative product CSVs found:' >&2
+            printf '%s\n' "$extra_product_csvs" >&2
+            exit 1
+          fi
+
+          # Explicitly reject development/research/runtime-owned content.
+          test ! -e dtb-production/scripts
+          test ! -e dtb-production/docs
+          test ! -e dtb-production/frontend/server
+          test ! -e dtb-production/dist
+          test ! -e dtb-production/dist-staging
+
+          if find dtb-production \
+            \( -name 'wp-config.php' \
+            -o -path '*/wp-content/uploads/*' \
+            -o -path '*/wp-content/cache/*' \
+            -o -path '*/wp-content/plugins/*' \
+            -o -name 'node_modules' \
+            -o -name '.cache' \
+            -o -name '.env.staging' \
+            -o -name '.env.local' \
+            -o -name '*.bak' \) | grep -q .; then
+            echo 'Forbidden secret, runtime, dependency, cache, staging, backup, or regular-plugin content found.' >&2
+            exit 1
+          fi
+
+          if find dtb-production/products -type d \
+            \( -name reports -o -name sources -o -name scraped_results -o -name scratch -o -name refs -o -name tools \) | grep -q .; then
+            echo 'Forbidden product research/report/source-history/tool directory found.' >&2
+            exit 1
+          fi
+
+          echo 'Authoritative launch CSVs:'
+          find dtb-production/products/launch/official -maxdepth 1 -type f -name '*.csv' -print | sort
+          echo 'Validated production source package.'
+
+      - name: Commit generated package
+        if: ${{ github.event_name != 'pull_request' }}
+        shell: bash
+        env:
+          TARGET_BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A dtb-production
+          if git diff --cached --quiet; then
+            echo 'dtb-production is already current.'
+            exit 0
+          fi
+          git commit -m 'chore: materialize curated production source package'
+          git push origin HEAD:${TARGET_BRANCH}
