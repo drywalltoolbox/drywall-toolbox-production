@@ -56,6 +56,14 @@ jobs:
       - name: Build frontend for drywalltoolbox.com
         run: cd frontend && npm run build
 
+      - name: Validate mobile payment-sheet contract
+        shell: pwsh
+        run: ./scripts/smoke-dtb-mobile-payment-sheet.ps1
+
+      - name: Validate checkout performance and stability contract
+        shell: pwsh
+        run: ./scripts/smoke-dtb-checkout-performance.ps1
+
       - name: Assemble deployment payload
         shell: bash
         run: |
