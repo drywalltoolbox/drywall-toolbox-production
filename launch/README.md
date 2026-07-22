@@ -28,15 +28,32 @@ The temporary SiteGround host remains non-indexable until payment and launch acc
 From the repository root:
 
 ```powershell
-cd frontend
-npm ci --include=dev
-npm run lint
-npm run build:siteground-root
+./launch/scripts/assemble-siteground.ps1
 ```
 
-Then copy the contents of repository `dist/` to `launch/live/`, copy the canonical root/WordPress routing files, and synchronize the complete canonical MU-plugin and theme directories. Do not copy server secrets or runtime-owned WordPress trees into a deployment artifact.
+The assembly script installs dependencies, lints and builds the frontend, then reconstructs `launch/live/` from `dist/` and the bounded `drywalltoolbox/` deployment mirror. Use `-SkipInstall` or `-SkipBuild` only when the corresponding dependency/build output is already current. Do not copy server secrets or runtime-owned WordPress trees into a deployment artifact.
 
 Do not upload `dist-staging/` to `public_html/`. The staging build is compiled for `/staging/2972/` and will produce 404s for root-deployed assets such as `/staging/2972/assets/js/main.js`.
+
+## GitHub Actions deployment
+
+The production release is `.github/workflows/deploy.yml` (`Controlled SiteGround Release`). It is manual-only and deploys over SFTP. It does not use `launch/wp/.git`; that nested repository is a local/runtime WordPress snapshot and is intentionally excluded from the outer repository.
+
+Configure the GitHub environment named `siteground-production` with a required reviewer and these environment secrets:
+
+```text
+SITEGROUND_SFTP_HOST
+SITEGROUND_SFTP_PORT
+SITEGROUND_SFTP_USERNAME
+SITEGROUND_SFTP_PASSWORD
+SITEGROUND_REMOTE_DIR
+```
+
+Copy the SFTP host, port, username, and password from SiteGround Site Tools. Set `SITEGROUND_REMOTE_DIR` to the exact remote directory that File Manager identifies as the document root for `elliottm4.sg-host.com`; do not guess this value and do not paste credentials into repository files or support messages.
+
+Before the first production release, run `CI Build Validation - No Deploy` from `main`. After it passes, run `Controlled SiteGround Release`, choose `deploy`, enter `DEPLOY`, and approve the protected environment. The workflow builds an immutable payload, backs up exactly the managed file surface, uploads only that surface, performs HTTP smoke checks, and automatically restores the file backup if deployment or smoke checks fail. Database and external-service rollback remain operator-owned.
+
+For an explicit file restore, rerun `Controlled SiteGround Release` with `restore`, enter `RESTORE`, and provide the original workflow run ID and exact `siteground-backup-*` artifact name.
 
 ## Required runtime actions
 

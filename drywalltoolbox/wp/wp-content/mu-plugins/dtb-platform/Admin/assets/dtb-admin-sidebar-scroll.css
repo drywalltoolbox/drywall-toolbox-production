@@ -1,0 +1,84 @@
+/**
+ * DTB Admin — WordPress Sidebar Scroll Fix
+ *
+ * Global, intentionally narrow wp-admin chrome fix.
+ * Makes the left admin navigation independently scrollable on desktop screens
+ * while preserving WordPress hover/flyout submenu navigation.
+ */
+
+@media screen and (min-width: 783px) {
+  body.wp-admin:not(.folded) #adminmenuback {
+    position: fixed !important;
+    top: 32px !important;
+    bottom: 0 !important;
+    height: auto !important;
+  }
+
+  body.wp-admin:not(.folded) #adminmenuwrap {
+    position: fixed !important;
+    top: 32px !important;
+    bottom: 0 !important;
+    height: auto !important;
+    max-height: calc(100vh - 32px) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    padding-bottom: 28px !important;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    -webkit-overflow-scrolling: touch;
+    z-index: 9990;
+  }
+
+  /*
+   * Keep the sidebar scrollable while preserving WordPress' intentional submenu
+   * state. Do not bind this fixed flyout treatment to plain li:hover; that makes
+   * flyouts open while the operator is just scrolling or crossing the sidebar.
+   */
+  body.wp-admin:not(.folded) #adminmenu > li.opensub > .wp-submenu,
+  body.wp-admin:not(.folded) #adminmenu > li.dtb-admin-menu-flyout-active > .wp-submenu {
+    position: fixed !important;
+    top: var(--dtb-admin-flyout-top, 32px) !important;
+    left: var(--dtb-admin-flyout-left, 160px) !important;
+    max-height: var(--dtb-admin-flyout-max-height, calc(100vh - 44px)) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    z-index: 10020 !important;
+  }
+
+  body.wp-admin:not(.folded) #adminmenu {
+    margin-top: 0 !important;
+    margin-bottom: 24px !important;
+  }
+
+  body.wp-admin:not(.folded) #collapse-menu {
+    margin-bottom: 12px !important;
+  }
+
+  body.wp-admin:not(.folded) #adminmenuwrap::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  body.wp-admin:not(.folded) #adminmenuwrap::-webkit-scrollbar-track {
+    background: #1d2327;
+  }
+
+  body.wp-admin:not(.folded) #adminmenuwrap::-webkit-scrollbar-thumb {
+    background: #50575e;
+    border-radius: 999px;
+  }
+
+  body.wp-admin:not(.folded) #adminmenuwrap::-webkit-scrollbar-thumb:hover {
+    background: #646970;
+  }
+}
+
+@media screen and (min-width: 783px) {
+  body.wp-admin.folded #adminmenuwrap {
+    overflow: visible !important;
+  }
+
+  body.wp-admin.folded #adminmenu > li.wp-has-submenu:hover > .wp-submenu,
+  body.wp-admin.folded #adminmenu > li.opensub > .wp-submenu {
+    z-index: 10020 !important;
+  }
+}

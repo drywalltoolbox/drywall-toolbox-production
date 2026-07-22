@@ -82,10 +82,10 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '20'
           cache: npm
@@ -177,7 +177,7 @@ jobs:
       SITEGROUND_REMOTE_DIR: ${{ secrets.SITEGROUND_REMOTE_DIR }}
     steps:
       - name: Checkout release tooling
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Download immutable deployment payload
         uses: actions/download-artifact@v4
@@ -207,7 +207,7 @@ jobs:
 
       - name: Back up the exact managed surface
         shell: bash
-        run: bash launch/siteground-sftp-release.sh backup deploy-root siteground-backup
+        run: bash launch/scripts/siteground-sftp-release.sh backup deploy-root siteground-backup
 
       - name: Persist pre-deploy backup
         uses: actions/upload-artifact@v4
@@ -224,10 +224,10 @@ jobs:
           rollback() {
             trap - ERR
             echo 'Release failed; restoring the pre-deploy managed surface.' >&2
-            bash launch/siteground-sftp-release.sh restore deploy-root siteground-backup
+            bash launch/scripts/siteground-sftp-release.sh restore deploy-root siteground-backup
           }
           trap rollback ERR
-          bash launch/siteground-sftp-release.sh deploy deploy-root siteground-backup
+          bash launch/scripts/siteground-sftp-release.sh deploy deploy-root siteground-backup
           curl --fail --silent --show-error --retry 4 --retry-delay 5 --max-time 30 https://elliottm4.sg-host.com/ > /dev/null
           curl --fail --silent --show-error --retry 4 --retry-delay 5 --max-time 30 https://elliottm4.sg-host.com/wp-json/dtb/v1/health \
             | php -r '$data=json_decode(stream_get_contents(STDIN), true); exit(is_array($data) && ($data["status"] ?? null) === "ok" ? 0 : 1);'
@@ -263,7 +263,7 @@ jobs:
       SITEGROUND_REMOTE_DIR: ${{ secrets.SITEGROUND_REMOTE_DIR }}
     steps:
       - name: Checkout release tooling
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Download selected backup
         uses: actions/download-artifact@v4
@@ -282,7 +282,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p unused-payload
-          bash launch/siteground-sftp-release.sh restore unused-payload siteground-backup
+          bash launch/scripts/siteground-sftp-release.sh restore unused-payload siteground-backup
           curl --fail --silent --show-error --retry 4 --retry-delay 5 --max-time 30 https://elliottm4.sg-host.com/ > /dev/null
           curl --fail --silent --show-error --retry 4 --retry-delay 5 --max-time 30 https://elliottm4.sg-host.com/wp-json/dtb/v1/health > /dev/null
 

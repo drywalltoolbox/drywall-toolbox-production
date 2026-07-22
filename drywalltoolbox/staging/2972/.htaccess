@@ -1,0 +1,134 @@
+# BEGIN NFD Htaccess
+# Managed by Newfold Htaccess Manager v1.0.0 (drywalltoolbox.com)
+# STATE sha256: c36bc9972a841377b433253a917c5b7d953fb468bd4d4f31138d090c34af86b2 applied: 2026-05-29T10:16:22Z
+
+# BEGIN Newfold Browser Cache
+<IfModule mod_expires.c>
+	ExpiresActive On
+	ExpiresDefault "access plus 24 hours"
+	ExpiresByType text/html "access plus 2 hours"
+	ExpiresByType image/jpg "access plus 24 hours"
+	ExpiresByType image/jpeg "access plus 24 hours"
+	ExpiresByType image/gif "access plus 24 hours"
+	ExpiresByType image/png "access plus 24 hours"
+	ExpiresByType image/webp "access plus 24 hours"
+	ExpiresByType text/css "access plus 24 hours"
+	ExpiresByType text/javascript "access plus 24 hours"
+	ExpiresByType application/pdf "access plus 1 week"
+	ExpiresByType image/x-icon "access plus 1 year"
+</IfModule>
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/(cart|checkout|wp-admin|wp-json) [NC]
+<IfModule mod_headers.c>
+Header set Cache-Control "no-cache, no-store, must-revalidate"
+Header set Pragma "no-cache"
+Header set Expires 0
+</IfModule>
+</IfModule>
+# END Newfold Browser Cache
+
+# BEGIN NFD EPC
+<IfModule mod_expires.c>
+	ExpiresActive On
+	ExpiresByType image/jpg "access plus 1 year"
+	ExpiresByType image/jpeg "access plus 1 year"
+	ExpiresByType image/gif "access plus 1 year"
+	ExpiresByType image/png "access plus 1 year"
+	ExpiresByType text/css "access plus 1 month"
+	ExpiresByType application/pdf "access plus 1 month"
+	ExpiresByType text/javascript "access plus 1 month"
+	ExpiresByType text/html "access plus 2 hours"
+	ExpiresByType image/x-icon "access plus 1 year"
+	ExpiresDefault "access plus 6 hours"
+</IfModule>
+# END NFD EPC
+
+# BEGIN Drywall Toolbox Staging SPA
+DirectoryIndex index.html index.php
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteBase /staging/2972/
+
+	# Keep REST API requests on WordPress routes (JSON), never SPA HTML.
+	RewriteRule ^wp-json/?$ /wp/index.php?rest_route=/ [QSA,L]
+	RewriteRule ^wp-json/(.*)$ /wp/index.php?rest_route=/$1 [QSA,L]
+	RewriteRule ^dtb/(.*)$ /wp/index.php?rest_route=/dtb/$1 [QSA,L]
+
+	# Woo/diagnostic rest_route probes should resolve through WordPress.
+	RewriteCond %{QUERY_STRING} (^|&)rest_route= [NC]
+	RewriteRule ^(?:index\.php)?$ /wp/index.php [QSA,L]
+
+	# Checkout order-pay endpoints are WordPress/WooCommerce endpoints, not SPA
+	# routes. Pass the order id explicitly so WooCommerce resolves the
+	# order-pay query var deterministically instead of relying on the
+	# PaymentRuntime mu-plugin's URI-regex fallback alone. This MUST stay
+	# ahead of, and excluded from, the SPA catch-all below — a bare "checkout"
+	# entry in that alternation also matches "checkout/order-pay/*", which
+	# previously caused order-pay links to be served the static SPA shell
+	# instead of the native WooCommerce payment runtime.
+	RewriteRule ^checkout/order-pay/([0-9]+)/?$ /wp/index.php?pagename=checkout&order-pay=$1 [QSA,L]
+	RewriteRule ^order-pay/([0-9]+)/?$ /wp/index.php?pagename=checkout&order-pay=$1 [QSA,L]
+
+	# Reduced/query-string order-pay shape — e.g. checkout/?pay_for_order=true&key=wc_order_xxx
+	# or checkout/?order-pay=123&key=wc_order_xxx. WooCommerce (and DTB checkout-confirm
+	# "next" links) can legitimately emit this shape with no /order-pay/{id}/ path segment
+	# at all. Without this rule the request falls through to the SPA catch-all below (a
+	# bare "checkout" entry in that alternation) and is served the static React shell
+	# instead of the native WooCommerce payment runtime, with no error of any kind.
+	RewriteCond %{QUERY_STRING} (^|&)(pay_for_order=true|order-pay=[0-9]+)(&|$) [NC]
+	RewriteCond %{QUERY_STRING} (^|&)key=wc_order_ [NC]
+	RewriteRule ^checkout/?$ /wp/index.php?pagename=checkout [QSA,L]
+
+	# Bypass the Endurance/nginx full-page cache for order-pay so a stale
+	# cached SPA shell can never be replayed for a live payment link again.
+	<IfModule mod_headers.c>
+		<If "%{REQUEST_URI} =~ m#/(?:checkout/order-pay|order-pay)/#i || %{QUERY_STRING} =~ m#(pay_for_order=true|order-pay=[0-9]+).*key=wc_order_#i">
+			Header always set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+			Header always set Set-Cookie "endurance-no-cache=1; Path=/; Max-Age=60; SameSite=Strict"
+		</If>
+	</IfModule>
+
+	# Serve the React shell for app deep links before WordPress receives them.
+	# Order-pay/order-pay-key paths are explicitly excluded; they are handled
+	# by the WordPress rewrite above and must never fall through here.
+	RewriteCond %{REQUEST_URI} !^/staging/2972/checkout/order-pay/ [NC]
+	RewriteCond %{REQUEST_URI} !^/staging/2972/order-pay/ [NC]
+	RewriteRule ^(?:products|all-products|parts|product|category|schematics|repairs|faq|calculators|shipping-policy|returns|policies|preview|cart|checkout|order|order-tracking|contact|support|settings|login|register|forgot-password|reset-password|dashboard|orders|rewards|account-settings|addresses|notifications)(?:/.*)?$ index.html [QSA,L]
+</IfModule>
+# END Drywall Toolbox Staging SPA
+
+# BEGIN Newfold Skip 404 Handling for Static Files
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_URI} !(robots\.txt|ads\.txt|[a-z0-9_\-]*sitemap[a-z0-9_\.\-]*\.(xml|xsl|html)(\.gz)?)
+	RewriteCond %{REQUEST_URI} \.(css|htc|less|js|js2|js3|js4|html|htm|rtf|rtx|txt|xsd|xsl|xml|asf|asx|wax|wmv|wmx|avi|avif|avifs|bmp|class|divx|doc|docx|eot|exe|gif|gz|gzip|ico|jpg|jpeg|jpe|webp|json|mdb|mid|midi|mov|qt|mp3|m4a|mp4|m4v|mpeg|mpg|mpe|webm|mpp|otf|_otf|odb|odc|odf|odg|odp|ods|odt|ogg|ogv|pdf|png|pot|pps|ppt|pptx|ra|ram|svg|svgz|swf|tar|tif|tiff|ttf|ttc|_ttf|wav|wma|wri|woff|woff2|xla|xls|xlsx|xlt|xlw|zip)$ [NC]
+	RewriteRule .* - [L]
+</IfModule>
+# END Newfold Skip 404 Handling for Static Files
+# END NFD Htaccess
+
+# BEGIN WordPress
+# The directives (lines) between "BEGIN WordPress" and "END WordPress" are
+# dynamically generated, and should only be modified via WordPress filters.
+# Any changes to the directives between these markers will be overwritten.
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /staging/2972/
+RewriteRule ^index\.php$ - [L]
+# NFD PATCH nfd.skip404.static BEGIN
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !(robots\.txt|ads\.txt|[a-z0-9_\-]*sitemap[a-z0-9_\.\-]*\.(xml|xsl|html)(\.gz)?)
+RewriteCond %{REQUEST_URI} \.(css|htc|less|js|js2|js3|js4|html|htm|rtf|rtx|txt|xsd|xsl|xml|asf|asx|wax|wmv|wmx|avi|avif|avifs|bmp|class|divx|doc|docx|eot|exe|gif|gz|gzip|ico|jpg|jpeg|jpe|webp|json|mdb|mid|midi|mov|qt|mp3|m4a|mp4|m4v|mpeg|mpg|mpe|webm|mpp|otf|_otf|odb|odc|odf|odg|odp|ods|odt|ogg|ogv|pdf|png|pot|pps|ppt|pptx|ra|ram|svg|svgz|swf|tar|tif|tiff|ttf|ttc|_ttf|wav|wma|wri|woff|woff2|xla|xls|xlsx|xlt|xlw|zip)$ [NC]
+RewriteRule .* - [L]
+# NFD PATCH nfd.skip404.static END
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /staging/2972/index.php [L]
+</IfModule>
+
+# END WordPress

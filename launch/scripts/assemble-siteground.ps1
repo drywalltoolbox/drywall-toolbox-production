@@ -6,11 +6,11 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$repositoryRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+$repositoryRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $frontendRoot   = Join-Path $repositoryRoot 'frontend'
 $distRoot       = Join-Path $repositoryRoot 'dist'
-$liveRoot       = Join-Path $PSScriptRoot 'live'
-$launchUserIni  = Join-Path $PSScriptRoot 'user.ini'
+$canonicalRoot  = Join-Path $repositoryRoot 'drywalltoolbox'
+$liveRoot       = Join-Path $repositoryRoot 'launch/live'
 
 function Assert-ChildPath {
     param(
@@ -103,6 +103,13 @@ Get-ChildItem -LiteralPath $distRoot -File | ForEach-Object {
     Copy-ManagedFile -Source $_.FullName -Destination (Join-Path $liveRoot $_.Name) -AllowedParent $liveRoot
 }
 
-Copy-ManagedFile -Source $launchUserIni -Destination (Join-Path $liveRoot '.user.ini') -AllowedParent $liveRoot
+Copy-ManagedFile -Source (Join-Path $canonicalRoot '.htaccess') -Destination (Join-Path $liveRoot '.htaccess') -AllowedParent $liveRoot
+Copy-ManagedFile -Source (Join-Path $canonicalRoot '.user.ini') -Destination (Join-Path $liveRoot '.user.ini') -AllowedParent $liveRoot
+Sync-ManagedDirectory -Source (Join-Path $canonicalRoot 'logos') -Destination (Join-Path $liveRoot 'logos') -AllowedParent $liveRoot
+
+Copy-ManagedFile -Source (Join-Path $canonicalRoot 'wp/.htaccess') -Destination (Join-Path $liveRoot 'wp/.htaccess') -AllowedParent $liveRoot
+Copy-ManagedFile -Source (Join-Path $canonicalRoot 'wp/index.php') -Destination (Join-Path $liveRoot 'wp/index.php') -AllowedParent $liveRoot
+Sync-ManagedDirectory -Source (Join-Path $canonicalRoot 'wp/wp-content/mu-plugins') -Destination (Join-Path $liveRoot 'wp/wp-content/mu-plugins') -AllowedParent $liveRoot
+Sync-ManagedDirectory -Source (Join-Path $canonicalRoot 'wp/wp-content/themes') -Destination (Join-Path $liveRoot 'wp/wp-content/themes') -AllowedParent $liveRoot
 
 Write-Output "SiteGround launch overlay assembled at $liveRoot"
