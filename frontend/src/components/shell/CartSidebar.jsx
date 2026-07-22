@@ -13,7 +13,7 @@ function sleep(ms) {
 }
 
 export default function CartSidebar({ isOpen, onClose }) {
-  const { cartItems, removeFromCart, updateQuantity, getCartTotal, isMutating } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, clearCart, getCartTotal, isMutating } = useCart();
   const isMutatingRef = useRef(isMutating);
   const checkoutPendingRef = useRef(false);
 
@@ -88,6 +88,7 @@ export default function CartSidebar({ isOpen, onClose }) {
       cartItems={cartItems}
       removeFromCart={removeFromCart}
       updateQuantity={updateQuantity}
+      clearCart={clearCart}
       getCartTotal={getCartTotal}
       isMutating={isMutating}
     />

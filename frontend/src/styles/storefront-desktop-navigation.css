@@ -40,15 +40,39 @@
   }
 
   .site-header .header-center--desktop-search {
+    grid-column: 2 / 4;
+    grid-row: 1;
+    display: flex;
+    justify-content: flex-end;
     width: 100%;
     min-width: 0;
     justify-self: stretch;
+    pointer-events: none;
+    z-index: 2;
   }
 
-  .site-header .dtb-desktop-search--header,
+  .site-header .dtb-desktop-search--header {
+    width: clamp(240px, 20vw, 390px);
+    max-width: 100%;
+    pointer-events: auto;
+    transition: width 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
   .site-header .dtb-desktop-search--header .dtb-desktop-search-pill {
     width: 100%;
     max-width: none;
+  }
+
+  .site-header .header-desktop-layout.is-desktop-search-open .dtb-desktop-search--header {
+    width: 100%;
+  }
+
+  .site-header .dtb-desktop-search--header[data-results-open="false"] .dtb-desktop-search-input:focus {
+    border-radius: 10px;
+  }
+
+  .site-header .dtb-desktop-search--header[data-results-open="true"] .dtb-desktop-search-input:focus {
+    border-radius: 10px 10px 0 0;
   }
 
   .site-header .header-right {
@@ -73,6 +97,8 @@
   }
 
   .site-header .header-desktop-nav-row {
+    grid-column: 2;
+    grid-row: 1;
     position: relative;
     display: flex;
     align-items: center;
@@ -81,12 +107,26 @@
     width: 100%;
     padding: 0;
     border: 0;
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 190ms ease,
+      visibility 0s linear 0s;
+  }
+
+  .site-header .header-desktop-layout.is-desktop-search-open .header-desktop-nav-row {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 150ms ease,
+      visibility 0s linear 150ms;
   }
 
   .dtb-desktop-nav {
     display: flex;
     align-items: stretch;
-    justify-content: center;
+    justify-content: flex-start;
     gap: clamp(0px, 0.18vw, 4px);
     width: 100%;
     height: 100%;
@@ -113,8 +153,8 @@
     background: transparent;
     color: rgba(241, 245, 249, 0.92);
     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: clamp(0.75rem, 0.74vw, 0.88rem);
-    font-weight: 500;
+    font-size: clamp(0.85rem, 0.76vw, 0.95rem);
+    font-weight: 600;
     line-height: 1;
     letter-spacing: -0.01em;
     text-decoration: none;
@@ -316,7 +356,7 @@
     grid-template-columns:
       clamp(150px, 14vw, 174px)
       minmax(0, 1fr)
-      clamp(210px, 20vw, 250px)
+      clamp(200px, 18vw, 230px)
       auto;
     gap: 10px;
   }
@@ -330,7 +370,7 @@
   .dtb-desktop-nav-tab {
     padding-right: 4px;
     padding-left: 4px;
-    font-size: 0.7rem;
+    font-size: 0.72rem;
   }
 
   .dtb-desktop-nav-tab svg {
@@ -341,7 +381,7 @@
 
 @media (min-width: 1025px) and (max-width: 1220px) {
   .site-header .header-desktop-layout {
-    grid-template-columns: 128px minmax(0, 1fr) clamp(175px, 18vw, 215px) auto;
+    grid-template-columns: 128px minmax(0, 1fr) clamp(168px, 16vw, 195px) auto;
     gap: 8px;
   }
 
@@ -357,12 +397,56 @@
     gap: 3px;
     padding-right: 3px;
     padding-left: 3px;
-    font-size: clamp(0.64rem, 0.9vw, 0.69rem);
+    font-size: clamp(0.67rem, 0.94vw, 0.72rem);
   }
 
   .dtb-desktop-nav-tab svg {
     width: 10px;
     height: 10px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .dtb-desktop-search-backdrop {
+    position: fixed;
+    inset: var(--header-height, 116px) 0 0;
+    z-index: 0;
+    display: block;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    border: 0;
+    background: rgba(3, 10, 23, 0.34);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    cursor: default;
+    transition:
+      opacity 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s linear 280ms;
+  }
+
+  .dtb-desktop-search-backdrop.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s;
+  }
+
+  #root > .main-content,
+  #root > .site-footer {
+    transition: filter 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  #root:has(.header-desktop-layout.is-desktop-search-open) > .main-content,
+  #root:has(.header-desktop-layout.is-desktop-search-open) > .site-footer {
+    filter: blur(7px) saturate(0.82);
+  }
+}
+
+@media (max-width: 1024px) {
+  .dtb-desktop-search-backdrop {
+    display: none;
   }
 }
 
@@ -373,6 +457,14 @@
   .dtb-desktop-nav-dropdown,
   .dtb-desktop-nav-dropdown__link,
   .dtb-desktop-nav-dropdown__footer {
+    transition-duration: 1ms !important;
+  }
+
+  .site-header .dtb-desktop-search--header,
+  .site-header .header-desktop-nav-row,
+  .dtb-desktop-search-backdrop,
+  #root > .main-content,
+  #root > .site-footer {
     transition-duration: 1ms !important;
   }
 }

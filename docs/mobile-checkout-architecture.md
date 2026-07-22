@@ -180,21 +180,23 @@ dtb-commerce/assets/woo-native-checkout-payment-sheet.js
   -> accessible dialog chrome, focus containment, authoritative Woo total
      projection, legacy chrome suppression, and visualViewport adaptation
 
-dtb-commerce/assets/woo-native-checkout-payment-sheet.css
-  -> bounded mobile dialog/chrome/provider-container polish only
+dtb-commerce/assets/woo-native-checkout.css
+  -> single authoritative checkout presentation bundle, including bounded
+     mobile dialog/chrome/provider-container and signed-in profile refinements
 
 dtb-commerce/Payment/CheckoutPerformance.php
   -> checkout-only resource hints, prewarm manifest, third-party policy,
-     telemetry permission/write boundary, and performance capability metadata
+     telemetry permission/write boundary, performance capability metadata, and
+     checkout-scoped SiteGround optimization exclusions for critical scripts
 
 dtb-commerce/assets/woo-native-checkout-performance.js
   -> scoped runtime diagnostics, image policy, CWV observation, third-party
      resource audit, rerender/state-loss signals, and provider timeout recovery
 ```
 
-The payment-sheet hardening assets are intentionally downstream of the canonical checkout UI asset. They may only refine DTB-owned shell presentation and safe outer provider containers. They must never duplicate provider fields, mutate payment state, or introduce another checkout/payment authority.
+The payment-sheet JavaScript is intentionally downstream of the canonical checkout UI asset. Its presentation rules live in the final bounded sections of `woo-native-checkout.css`. They may only refine DTB-owned shell presentation and safe outer provider containers. They must never duplicate provider fields, mutate payment state, or introduce another checkout/payment authority.
 
-`woo-native-checkout-profile-refinements.css/js` remain a separate profile/contact presentation companion loaded by the native checkout template. New payment-sheet behavior belongs in the bounded payment-sheet assets rather than in profile refinements.
+`woo-native-checkout-profile-refinements.js` remains a separate profile/contact behavior module loaded by the native checkout template. Its CSS lives in the authoritative checkout bundle after the payment-sheet section so the former enqueue cascade is preserved. New behavior belongs in the owning JavaScript module; new presentation belongs in a clearly labeled section of the single checkout stylesheet.
 
 ## Validation/error behavior
 

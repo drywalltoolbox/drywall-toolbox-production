@@ -95,6 +95,8 @@ export default function StorefrontCartSheet({
   cartItems = [],
   removeFromCart,
   updateQuantity,
+  clearCart,
+  isMutating = false,
 }) {
   const { addToCart } = useCart();
   const overlayRef = useRef(null);
@@ -105,6 +107,7 @@ export default function StorefrontCartSheet({
   const localQuantitiesRef = useRef({});
 
   const [removingKey, setRemovingKey] = useState(null);
+  const [isClearing, setIsClearing] = useState(false);
   const [syncingKeys, setSyncingKeys] = useState(() => new Set());
   const [localQuantities, setLocalQuantities] = useState({});
   const [productModalState, setProductModalState] = useState(null);
@@ -203,7 +206,7 @@ export default function StorefrontCartSheet({
   }, [productModalLoadingKey]);
 
   const handleRemove = useCallback(async (key) => {
-    if (!key || removingKey === key) return;
+    if (!key || removingKey === key || isClearing) return;
     clearQuantityTimer(key);
     setItemSyncing(key, false);
     setRemovingKey(key);
@@ -213,7 +216,25 @@ export default function StorefrontCartSheet({
     } finally {
       setRemovingKey((current) => (current === key ? null : current));
     }
-  }, [clearQuantityTimer, removeFromCart, removingKey, setItemSyncing]);
+  }, [clearQuantityTimer, isClearing, removeFromCart, removingKey, setItemSyncing]);
+
+  const handleClearCart = useCallback(async () => {
+    if (cartItems.length === 0 || isClearing || isMutating) return;
+
+    syncTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+    syncTimersRef.current.clear();
+    syncingKeysRef.current = new Set();
+    setSyncingKeys(new Set());
+    setIsClearing(true);
+
+    try {
+      await clearCart?.();
+    } catch {
+      // CartContext restores the optimistic snapshot and exposes the error.
+    } finally {
+      setIsClearing(false);
+    }
+  }, [cartItems.length, clearCart, isClearing, isMutating]);
 
   const scheduleQuantitySync = useCallback((key, quantity) => {
     clearQuantityTimer(key);
@@ -232,7 +253,7 @@ export default function StorefrontCartSheet({
   }, [clearQuantityTimer, setItemSyncing, updateQuantity]);
 
   const handleQtyChange = useCallback((key, delta, currentQty) => {
-    if (!key || removingKey === key) return;
+    if (!key || removingKey === key || isClearing) return;
 
     const baseQty = Number(localQuantitiesRef.current[key] ?? currentQty);
     const nextQuantity = (Number.isFinite(baseQty) ? baseQty : 1) + Number(delta || 0);
@@ -251,7 +272,7 @@ export default function StorefrontCartSheet({
     });
 
     scheduleQuantitySync(key, nextQuantity);
-  }, [handleRemove, removingKey, scheduleQuantitySync]);
+  }, [handleRemove, isClearing, removingKey, scheduleQuantitySync]);
 
   useEffect(() => {
     const next = {};
@@ -357,9 +378,24 @@ export default function StorefrontCartSheet({
               <span className="scs-count">{itemCount}</span>
             )}
           </div>
-          <button ref={closeButtonRef} type="button" onClick={handleClose} aria-label="Close cart" className="scs-close">
-            <X size={17} strokeWidth={2.5} />
-          </button>
+          <div className="scs-header-actions">
+            {cartItems.length > 0 ? (
+              <button
+                type="button"
+                className="scs-clear-cart"
+                onClick={handleClearCart}
+                disabled={isClearing || isMutating}
+                aria-label="Clear all items from cart"
+                aria-busy={isClearing ? 'true' : 'false'}
+              >
+                <Trash2 size={14} strokeWidth={2.2} aria-hidden="true" />
+                <span>{isClearing ? 'Clearing' : 'Clear cart'}</span>
+              </button>
+            ) : null}
+            <button ref={closeButtonRef} type="button" onClick={handleClose} aria-label="Close cart" className="scs-close">
+              <X size={17} strokeWidth={2.5} />
+            </button>
+          </div>
         </header>
 
         <div className="scs-body">
@@ -390,14 +426,14 @@ export default function StorefrontCartSheet({
                     key={key}
                     className={`scs-item${isSyncing ? ' scs-item--syncing' : ''}${isRemoving ? ' scs-item--removing' : ''}${isPreviewLoading ? ' scs-item--preview-loading' : ''}`}
                     role="listitem"
-                    aria-busy={isSyncing || isRemoving || isPreviewLoading ? 'true' : 'false'}
+                    aria-busy={isSyncing || isRemoving || isPreviewLoading || isClearing ? 'true' : 'false'}
                   >
                     <button
                       type="button"
                       className="scs-item-img scs-item-open-target"
                       onClick={() => handleOpenProduct(item)}
                       aria-label={`View ${item.name} details`}
-                      disabled={isRemoving || isPreviewLoading}
+                      disabled={isRemoving || isPreviewLoading || isClearing}
                     >
                       {item.image
                         ? <img src={item.image} alt="" loading="lazy" decoding="async" />
@@ -410,7 +446,7 @@ export default function StorefrontCartSheet({
                           type="button"
                           className="scs-item-name scs-item-name-button"
                           onClick={() => handleOpenProduct(item)}
-                          disabled={isRemoving || isPreviewLoading}
+                          disabled={isRemoving || isPreviewLoading || isClearing}
                           aria-label={`View ${item.name} details`}
                         >
                           {item.name}
@@ -420,7 +456,7 @@ export default function StorefrontCartSheet({
                           onClick={() => handleRemove(key)}
                           aria-label={`Remove ${item.name}`}
                           className="scs-item-remove"
-                          disabled={isRemoving}
+                          disabled={isRemoving || isClearing}
                         >
                           <X size={13} strokeWidth={2.5} />
                         </button>
@@ -435,7 +471,7 @@ export default function StorefrontCartSheet({
                             className="scs-qty-btn"
                             onClick={() => handleQtyChange(key, -1, quantity)}
                             aria-label={quantity === 1 ? `Remove ${item.name}` : 'Decrease quantity'}
-                            disabled={isRemoving}
+                            disabled={isRemoving || isClearing}
                           >
                             {quantity === 1
                               ? <Trash2 size={11} strokeWidth={2.2} />
@@ -447,7 +483,7 @@ export default function StorefrontCartSheet({
                             className="scs-qty-btn"
                             onClick={() => handleQtyChange(key, 1, quantity)}
                             aria-label="Increase quantity"
-                            disabled={isRemoving || quantity >= MAX_CART_QUANTITY}
+                            disabled={isRemoving || isClearing || quantity >= MAX_CART_QUANTITY}
                           >
                             <Plus size={11} strokeWidth={2.5} />
                           </button>

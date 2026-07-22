@@ -292,7 +292,14 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
   }, [location.pathname, closeSearchOverlay, resetDrawerExpansions]);
 
   useEffect(() => {
-    const handleKeyDown = (e) => { if (e.key === 'Escape') { closeMenus(); closeSearchOverlay(); resetDrawerExpansions(); } };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeMenus();
+        closeSearchOverlay();
+        resetDrawerExpansions();
+        desktopSearchInputRef.current?.blur();
+      }
+    };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [closeSearchOverlay, resetDrawerExpansions]);
@@ -321,6 +328,17 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (!desktopSearchOpen || !window.matchMedia('(min-width: 1025px)').matches) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [desktopSearchOpen]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -548,7 +566,7 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
             </div>
           </div>
 
-          <div className="header-desktop-layout" style={{ display: isTablet ? 'none' : undefined }}>
+          <div className={`header-desktop-layout${desktopSearchOpen ? ' is-desktop-search-open' : ''}`} style={{ display: isTablet ? 'none' : undefined }}>
             <div className="header-left"><Link to="/" className="header-logo-link" aria-label="Drywall Toolbox home"><img src={LogoWhite} alt="Drywall Toolbox Logo" className="logo-image" /></Link></div>
             <div className="header-desktop-nav-row">
               <StorefrontDesktopNavigation
@@ -561,10 +579,10 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
               />
             </div>
             <div className="header-center header-center--desktop-search">
-              <div ref={desktopSearchRef} className="dtb-desktop-search dtb-desktop-search--header">
+              <div ref={desktopSearchRef} className="dtb-desktop-search dtb-desktop-search--header" data-results-open={desktopSearchVisible ? 'true' : 'false'}>
                 <div className="dtb-desktop-search-pill">
                   <span className="dtb-desktop-search-icon-wrap" aria-hidden="true"><Search className="dtb-desktop-search-icon" /></span>
-                  <input ref={desktopSearchInputRef} type="search" value={desktopSearchQuery} onChange={(e) => setDesktopSearchQuery(e.target.value)} onFocus={() => setDesktopSearchOpen(true)} onKeyDown={(e) => { if (e.key === 'Enter') handleDesktopViewAll(); }} placeholder="Search products..." className="dtb-desktop-search-input" aria-label="Search products" aria-autocomplete="list" aria-controls="dtb-desktop-search-results" aria-expanded={desktopSearchVisible} autoComplete="off" />
+                  <input ref={desktopSearchInputRef} type="search" value={desktopSearchQuery} onChange={(e) => { setDesktopSearchQuery(e.target.value); setDesktopSearchOpen(true); }} onFocus={() => { setDesktopNavOpen(null); setDesktopSearchOpen(true); }} onKeyDown={(e) => { if (e.key === 'Enter') handleDesktopViewAll(); if (e.key === 'Escape') { e.preventDefault(); setDesktopSearchOpen(false); e.currentTarget.blur(); } }} placeholder="Search products..." className="dtb-desktop-search-input" aria-label="Search products" aria-autocomplete="list" aria-controls="dtb-desktop-search-results" aria-expanded={desktopSearchVisible} autoComplete="off" />
                 </div>
                 <div id="dtb-desktop-search-results" className="dtb-desktop-search-dropdown" data-open={desktopSearchVisible ? 'true' : 'false'} aria-hidden={!desktopSearchVisible}>
                   {desktopSearchLoading ? <StorefrontSearchLoading compact /> : desktopSearchResults.length > 0 ? <><div className="dtb-desktop-search-results">{desktopSearchResults.map((product, index) => <button key={product.id} className="dtb-desktop-search-item" style={{ '--search-result-index': index }} onClick={() => handleDesktopResultClick(product)}><div className="dtb-desktop-search-thumb">{product.image ? <img src={product.image} alt="" /> : null}</div><div className="dtb-desktop-search-meta"><span className="dtb-desktop-search-name">{product.name}</span><span className="dtb-desktop-search-price">{typeof product.price === 'number' ? `$${product.price.toFixed(2)}` : 'View product'}</span></div></button>)}</div><button className="dtb-desktop-search-view-all" onClick={handleDesktopViewAll}>View All Results</button></> : desktopSearchHasQuery ? <div className="dtb-desktop-search-state">No products found</div> : null}
@@ -636,6 +654,18 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
         </div>
 
       </header>
+
+      <button
+        type="button"
+        className={`dtb-desktop-search-backdrop${desktopSearchOpen ? ' is-open' : ''}`}
+        onClick={() => {
+          setDesktopSearchOpen(false);
+          desktopSearchInputRef.current?.blur();
+        }}
+        aria-label="Close product search"
+        tabIndex={desktopSearchOpen ? 0 : -1}
+        aria-hidden={!desktopSearchOpen}
+      />
 
       <StorefrontMobileDrawer isOpen={mobileMenuOpen} onClose={closeMobileMenu}>
         <nav className="storefront-mobile-drawer__nav" aria-label="Mobile navigation">
