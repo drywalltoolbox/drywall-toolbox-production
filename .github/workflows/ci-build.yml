@@ -1,4 +1,8 @@
-name: CI Build Validation
+name: CI Build Validation - No Deploy
+
+# This workflow is intentionally validation-only. Pushes to main must never write
+# to SiteGround; live file changes are owned by deploy.yml via workflow_dispatch
+# and the protected siteground-production environment.
 
 on:
   push:
@@ -115,5 +119,15 @@ jobs:
 
           if find deploy-root \( -name wp-config.php -o -name sgs_encrypt_key.php -o -name php_errorlog -o -path '*/wp-content/plugins/*' -o -path '*/wp-content/uploads/*' -o -path '*/wp-content/cache/*' -o -path '*/wp-admin/*' -o -path '*/wp-includes/*' \) -print -quit | grep -q .; then
             echo 'Refusing invalid payload shape.' >&2
+            exit 1
+          fi
+
+          if rg -n '/staging/[0-9]+/' deploy-root/index.html deploy-root/asset-manifest.json deploy-root/service-worker.js deploy-root/.htaccess; then
+            echo 'Refusing staging base path in root production payload.' >&2
+            exit 1
+          fi
+
+          if ! rg -n 'href="/assets/css/main\.css"|src="/assets/js/main\.js"|href="/site\.webmanifest"' deploy-root/index.html >/dev/null; then
+            echo 'Root production index.html does not reference root-relative assets.' >&2
             exit 1
           fi

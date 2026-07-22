@@ -9,9 +9,8 @@ $ErrorActionPreference = 'Stop'
 $repositoryRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $frontendRoot   = Join-Path $repositoryRoot 'frontend'
 $distRoot       = Join-Path $repositoryRoot 'dist'
-$canonicalRoot  = Join-Path $repositoryRoot 'drywalltoolbox'
 $liveRoot       = Join-Path $PSScriptRoot 'live'
-$liveWpRoot     = Join-Path $liveRoot 'wp'
+$launchUserIni  = Join-Path $PSScriptRoot 'user.ini'
 
 function Assert-ChildPath {
     param(
@@ -89,7 +88,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $distRoot 'index.html'))) {
     throw 'Production build output is missing dist/index.html.'
 }
 
-New-Item -ItemType Directory -Path $liveRoot, $liveWpRoot -Force | Out-Null
+New-Item -ItemType Directory -Path $liveRoot -Force | Out-Null
 
 # Synchronize each generated directory independently so the runtime-owned /wp
 # tree is never a target of a recursive delete.
@@ -104,15 +103,6 @@ Get-ChildItem -LiteralPath $distRoot -File | ForEach-Object {
     Copy-ManagedFile -Source $_.FullName -Destination (Join-Path $liveRoot $_.Name) -AllowedParent $liveRoot
 }
 
-Sync-ManagedDirectory -Source (Join-Path $canonicalRoot 'logos') -Destination (Join-Path $liveRoot 'logos') -AllowedParent $liveRoot
-Copy-ManagedFile -Source (Join-Path $canonicalRoot '.htaccess') -Destination (Join-Path $liveRoot '.htaccess') -AllowedParent $liveRoot
-Copy-ManagedFile -Source (Join-Path $canonicalRoot '.user.ini') -Destination (Join-Path $liveRoot '.user.ini') -AllowedParent $liveRoot
-Copy-ManagedFile -Source (Join-Path $canonicalRoot 'wp\.htaccess') -Destination (Join-Path $liveWpRoot '.htaccess') -AllowedParent $liveWpRoot
-Copy-ManagedFile -Source (Join-Path $canonicalRoot 'wp\index.php') -Destination (Join-Path $liveWpRoot 'index.php') -AllowedParent $liveWpRoot
-
-$liveContentRoot = Join-Path $liveWpRoot 'wp-content'
-New-Item -ItemType Directory -Path $liveContentRoot -Force | Out-Null
-Sync-ManagedDirectory -Source (Join-Path $canonicalRoot 'wp\wp-content\mu-plugins') -Destination (Join-Path $liveContentRoot 'mu-plugins') -AllowedParent $liveContentRoot
-Sync-ManagedDirectory -Source (Join-Path $canonicalRoot 'wp\wp-content\themes') -Destination (Join-Path $liveContentRoot 'themes') -AllowedParent $liveContentRoot
+Copy-ManagedFile -Source $launchUserIni -Destination (Join-Path $liveRoot '.user.ini') -AllowedParent $liveRoot
 
 Write-Output "SiteGround launch overlay assembled at $liveRoot"

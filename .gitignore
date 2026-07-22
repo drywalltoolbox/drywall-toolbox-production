@@ -102,20 +102,9 @@ drywalltoolbox/error_log
 drywalltoolbox/wp/wp-content/updraft/backup_*.gz
 drywalltoolbox/wp/wp-content/updraft/log*.txt
 
-# SiteGround launch/live is a deployment overlay, not a source copy of the
-# server. Keep only generated storefront payload plus canonical DTB-owned
-# routing, MU plugins, and themes. Runtime-owned WordPress/vendor/customer data
-# and host secrets must never enter Git or deployment artifacts.
-/launch/live/wp/wp-admin/
-/launch/live/wp/wp-includes/
-/launch/live/wp/wp-content/plugins/
-/launch/live/wp/wp-content/uploads/
-/launch/live/wp/wp-content/cache/
-/launch/live/wp/wp-content/upgrade/
-/launch/live/wp/wp-content/sgs_encrypt_key.php
-/launch/live/wp/wp-config.php
-/launch/live/wp/php_errorlog
-/launch/live/wp/Default.html
+# SiteGround launch/live is a generated deployment overlay, not source.
+# Rebuild it from canonical repo paths; never stage runtime files or secrets.
+/launch/live/
 
 # WordPress content tracked in this repo (wp/wp-content/):
 #   wp/wp-content/themes/drywall-toolbox/           — legacy theme (kept until headless-base validated)

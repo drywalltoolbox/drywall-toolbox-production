@@ -1,6 +1,6 @@
 # SiteGround launch overlay
 
-`launch/live/` is the assembled deployment overlay for `https://elliottm4.sg-host.com`. It is not an independent source tree and it is not a complete server backup.
+`launch/live/` is the assembled deployment overlay for `https://elliottm4.sg-host.com`. It is ignored by Git, rebuilt from canonical source paths, and is not an independent source tree or complete server backup.
 
 ## Ownership
 
@@ -31,10 +31,12 @@ From the repository root:
 cd frontend
 npm ci --include=dev
 npm run lint
-npm run build
+npm run build:siteground-root
 ```
 
 Then copy the contents of repository `dist/` to `launch/live/`, copy the canonical root/WordPress routing files, and synchronize the complete canonical MU-plugin and theme directories. Do not copy server secrets or runtime-owned WordPress trees into a deployment artifact.
+
+Do not upload `dist-staging/` to `public_html/`. The staging build is compiled for `/staging/2972/` and will produce 404s for root-deployed assets such as `/staging/2972/assets/js/main.js`.
 
 ## Required runtime actions
 

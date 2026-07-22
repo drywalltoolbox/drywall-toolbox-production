@@ -1,5 +1,7 @@
 name: Controlled SiteGround Release
 
+# SiteGround writes are intentionally manual-only. Do not add push,
+# pull_request, workflow_run, or schedule triggers to this workflow.
 on:
   workflow_dispatch:
     inputs:
@@ -59,6 +61,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          if [[ "${{ github.ref_name }}" != "main" ]]; then
+            echo 'SiteGround deploy/restore must be dispatched from main.' >&2
+            exit 1
+          fi
           if [[ "${{ inputs.action }}" == "deploy" ]]; then
             [[ "${{ inputs.confirm }}" == "DEPLOY" ]] || { echo 'Confirmation must be DEPLOY.' >&2; exit 1; }
           else
@@ -131,6 +137,16 @@ jobs:
           test -d deploy-root/wp/wp-content/themes
           if find deploy-root \( -name wp-config.php -o -name sgs_encrypt_key.php -o -name php_errorlog -o -path '*/wp-content/plugins/*' -o -path '*/wp-content/uploads/*' -o -path '*/wp-content/cache/*' -o -path '*/wp-admin/*' -o -path '*/wp-includes/*' \) -print -quit | grep -q .; then
             echo 'Forbidden runtime-owned or secret content entered the payload.' >&2
+            exit 1
+          fi
+
+          if rg -n '/staging/[0-9]+/' deploy-root/index.html deploy-root/asset-manifest.json deploy-root/service-worker.js deploy-root/.htaccess; then
+            echo 'Refusing staging base path in root SiteGround payload.' >&2
+            exit 1
+          fi
+
+          if ! rg -n 'href="/assets/css/main\.css"|src="/assets/js/main\.js"|href="/site\.webmanifest"' deploy-root/index.html >/dev/null; then
+            echo 'Root SiteGround index.html does not reference root-relative assets.' >&2
             exit 1
           fi
 

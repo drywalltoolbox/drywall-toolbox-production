@@ -39,6 +39,29 @@ ErrorDocument 511 __DTB_PUBLIC_URL__/errors/511.html
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  # WordPress is physically installed in /wp, while the React SPA owns the
+  # public document root. Route WordPress/WooCommerce entry points to /wp
+  # before the SPA fallback so admin, REST, checkout, and callbacks do not
+  # render the React 404 shell.
+  RewriteRule ^wp-json/?$ wp/index.php?rest_route=/ [QSA,L]
+  RewriteRule ^wp-json/(.*)$ wp/index.php?rest_route=/$1 [QSA,L]
+  RewriteRule ^wp-admin/?$ wp/wp-admin/ [R=302,L]
+  RewriteRule ^wp-admin/(.*)$ wp/wp-admin/$1 [QSA,L]
+  RewriteRule ^wp-includes/(.*)$ wp/wp-includes/$1 [QSA,L]
+  RewriteRule ^wp-content/(.*)$ wp/wp-content/$1 [QSA,L]
+  RewriteRule ^wp-login\.php$ wp/wp-login.php [QSA,L]
+  RewriteRule ^wp-cron\.php$ wp/wp-cron.php [QSA,L]
+  RewriteRule ^xmlrpc\.php$ wp/xmlrpc.php [QSA,L]
+  RewriteRule ^wp-comments-post\.php$ wp/wp-comments-post.php [QSA,L]
+
+  # Native WooCommerce/WordPress storefront routes must be served by WP.
+  RewriteRule ^checkout/?$ wp/index.php?pagename=checkout [QSA,L]
+  RewriteRule ^cart/?$ wp/index.php?pagename=cart [QSA,L]
+  RewriteRule ^my-account/?$ wp/index.php?pagename=my-account [QSA,L]
+  RewriteRule ^order-pay(/.*)?$ wp/index.php [QSA,L]
+  RewriteRule ^order-received(/.*)?$ wp/index.php [QSA,L]
+  RewriteRule ^wc-api(/.*)?$ wp/index.php [QSA,L]
+
   # Serve uploaded static assets directly.
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
@@ -51,7 +74,9 @@ ErrorDocument 511 __DTB_PUBLIC_URL__/errors/511.html
   # React Router deep-link fallback for cPanel/Apache subdirectory deploys.
   # Do NOT intercept WordPress REST, admin, or wp/ subdirectory paths — those
   # must reach Apache/PHP directly, never the SPA shell.
-  RewriteCond %{REQUEST_URI} !^.*/(wp-json|wp-admin|wp)/
+  RewriteCond %{REQUEST_URI} !^/(wp-json|wp-admin|wp)(/|$)
+  RewriteCond %{REQUEST_URI} !^/(wp-login\.php|wp-cron\.php|xmlrpc\.php|wp-comments-post\.php)$
+  RewriteCond %{REQUEST_URI} !^/(checkout|cart|my-account|order-pay|order-received|wc-api)(/|$)
   RewriteRule ^ index.html [QSA,L]
 </IfModule>
 
