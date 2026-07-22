@@ -8,6 +8,8 @@
  */
 
 import { apiClient } from '../api/client.js';
+import { fetchCatalogProducts } from './catalogPlatformCache.js';
+import { toLegacyProductCardDTO } from '../utils/catalogDtoAdapters.js';
 
 class WooCommerceService {
   constructor() {
@@ -43,16 +45,22 @@ class WooCommerceService {
 
   async testConnection() {
     try {
-      await apiClient('/wp-json/drywall/v1/products?per_page=1&status=publish');
-      return { success: true, message: 'Server-side WooCommerce proxy is reachable.' };
+      await fetchCatalogProducts({ perPage: 1 });
+      return { success: true, message: 'WooCommerce catalog is reachable.' };
     } catch (error) {
       return { success: false, message: error?.message || 'WooCommerce proxy is unavailable.' };
     }
   }
 
   async getProducts(params = {}) {
-    const query = new URLSearchParams(params).toString();
-    return apiClient(`/wp-json/drywall/v1/products${query ? `?${query}` : ''}`);
+    const payload = await fetchCatalogProducts({
+      page: Number(params.page || 1),
+      perPage: Number(params.per_page || 100),
+      ...(params.search ? { search: params.search } : {}),
+    });
+    return (Array.isArray(payload?.items) ? payload.items : [])
+      .map(toLegacyProductCardDTO)
+      .filter(Boolean);
   }
 
   async getProduct(productId) {

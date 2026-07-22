@@ -340,7 +340,7 @@ function AppShell({ cartOpen, toggleCart, closeCart }) {
       {!minimalChrome && <Footer />}
       {!minimalChrome && <CartSidebar isOpen={cartOpen} onClose={closeCart} />}
       <MobileInstallNudge />
-      {!minimalChrome && !user && <HomepageSignupCtaController />}
+      {!minimalChrome && isHome && !user && <HomepageSignupCtaController />}
     </>
   );
 }

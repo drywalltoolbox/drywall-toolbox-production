@@ -33,6 +33,8 @@ The return context is not an authority input. It must never affect customer iden
 
 The successful tracking URL retains the Woo order key and `checkout_complete=1` signal so guest tracking authorization and the existing post-checkout cart cleanup contract remain intact.
 
+Guest confirmation emails also include customer-safe tracking and order-detail URLs. Both URLs carry the WooCommerce `order_key` capability, and the corresponding single-order REST projections validate that key with a timing-safe comparison. Account order lists remain authentication-only.
+
 ## Authenticated customer identity convergence
 
 The React storefront issues the signed HttpOnly `dtb_auth` JWT after DTB login. Store API REST requests already resolve that verified JWT to the matching WordPress customer before WooCommerce initializes customer/session state.

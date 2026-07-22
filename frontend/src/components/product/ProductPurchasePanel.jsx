@@ -13,6 +13,7 @@ export default function ProductPurchasePanel({
   isOutOfStock,
   needsVariation,
   hasCompleteSelection,
+  addToCartState = 'idle',
 }) {
   const handleInputChange = (e) => {
     const val = parseInt(e.target.value, 10);
@@ -20,6 +21,13 @@ export default function ProductPurchasePanel({
       onQuantityChange?.(val);
     }
   };
+
+  const addToCartPending = addToCartState === 'adding' || addToCartState === 'added';
+  const addToCartLabel = isOutOfStock
+        ? 'Out of Stock'
+        : needsVariation && !hasCompleteSelection
+          ? 'Select Options'
+          : 'Add to Cart';
 
   return (
     <div className="product-detail-purchase-panel dtb-pdp-purchase-panel">
@@ -57,14 +65,27 @@ export default function ProductPurchasePanel({
         <button
           type="button"
           onClick={onAddToCart}
-          disabled={!canAddToCart}
-          className="dtb-pdp-add-to-cart"
+          disabled={!canAddToCart || addToCartPending}
+          className={`dtb-pdp-add-to-cart is-${addToCartState}`}
           data-dtb-cart-action="add"
+          data-dtb-cart-feedback-mode="controlled"
+          data-state={addToCartState}
+          aria-busy={addToCartState === 'adding'}
         >
-          <ShoppingCart size={16} />
-          <span aria-live="polite">
-            {isOutOfStock ? 'Out of Stock' : (needsVariation && !hasCompleteSelection ? 'Select Options' : 'Add to Cart')}
-          </span>
+          {addToCartState === 'added' ? (
+            <>
+              <svg className="dtb-pdp-add-to-cart__success-mark" viewBox="0 0 24 24" aria-hidden="true">
+                <circle className="dtb-pdp-add-to-cart__success-circle" cx="12" cy="12" r="9" fill="none" />
+                <path className="dtb-pdp-add-to-cart__success-check" fill="none" d="m7.5 12.2 3 3 6-6" />
+              </svg>
+              <span className="sr-only" aria-live="polite">Added to cart</span>
+            </>
+          ) : (
+            <>
+              <ShoppingCart className="dtb-pdp-add-to-cart__cart" size={16} aria-hidden="true" />
+              <span>{addToCartLabel}</span>
+            </>
+          )}
         </button>
       </div>
 

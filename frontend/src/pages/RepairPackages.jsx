@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
@@ -178,10 +178,20 @@ function PackageCard({ pkg, index, packageCount, resumeState }) {
 
 export default function RepairPackages() {
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const groups = useMemo(() => getRepairPackageGroups(), []);
-  const [activeGroupId, setActiveGroupId] = useState(groups[0]?.id || 'automatic_taper');
+  const requestedGroupId = searchParams.get('tool');
+  const activeGroupId = groups.some((group) => group.id === requestedGroupId)
+    ? requestedGroupId
+    : (groups[0]?.id || 'automatic_taper');
   const activeGroup = groups.find((group) => group.id === activeGroupId) || groups[0];
   const resumeState = location.state?.repairFormResume || null;
+
+  const handleGroupChange = useCallback((groupId) => {
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.set('tool', groupId);
+    setSearchParams(nextParams, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   return (
     <div className="page-wrapper repair-packages-page">
@@ -203,7 +213,7 @@ export default function RepairPackages() {
 
       <section className="repair-packages-tabs-section">
         <div className="repair-packages-shell">
-          <CategoryTabs groups={groups} activeGroupId={activeGroup.id} onChange={setActiveGroupId} />
+          <CategoryTabs groups={groups} activeGroupId={activeGroup.id} onChange={handleGroupChange} />
         </div>
       </section>
 

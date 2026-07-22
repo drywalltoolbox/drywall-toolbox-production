@@ -6,7 +6,7 @@
   background:
     radial-gradient(circle at center, rgba(37, 99, 235, 0.045), transparent 34%),
     linear-gradient(180deg, rgba(248, 250, 252, 0.92), rgba(255, 255, 255, 0.98));
-  animation: dtb-route-fallback-enter 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: dtb-route-fallback-enter var(--dtb-normal, 320ms) var(--dtb-ease, cubic-bezier(0.22, 1, 0.36, 1)) both;
 }
 
 .dtb-route-chunk-fallback__spinner {

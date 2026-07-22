@@ -1,6 +1,6 @@
 # Mobile Checkout Architecture
 
-Last verified against source: 2026-07-21.
+Last verified against source: 2026-07-22.
 
 ## Ownership
 
@@ -24,9 +24,8 @@ WooCommerce owns cart/session continuity, customer/address validation, shipping/
 ## Mobile customer flow
 
 ```text
-Contact
-  -> Shipping
-  -> Payment summary
+Guest: Contact -> Shipping -> Payment summary
+Signed in: Shipping -> Payment summary (Contact is already completed and skipped)
   -> Continue to payment
   -> same-page bottom payment sheet
   -> authoritative WooCommerce payment submission
@@ -37,9 +36,13 @@ Contact
 
 The official WooCommerce Stripe Express Checkout block appears first when the provider reports an eligible wallet or accelerated method, followed by WooCommerce-owned contact/account fields. DTB changes presentation only; it does not clone, reparent, or mirror authoritative customer controls.
 
+Authenticated checkout does not present an empty Contact page. The mobile state machine recognizes WordPress's server-rendered `logged-in` state, marks Contact complete, disables navigation back into that empty step, and opens Shipping first. Guest checkout continues to start on Contact and uses the existing client-side presentation checks before Shipping.
+
 ### Shipping
 
-Contains shipping address, billing relationship/address, delivery/shipping methods, and pickup controls when available.
+Contains shipping address, billing relationship/address, delivery/shipping methods, and pickup controls when available. WooCommerce remains responsible for hydrating saved customer shipping/billing values. When Woo renders its saved shipping-address card, DTB leaves it closed and visible and relabels Woo's native edit action to `Use a different shipping address`; clicking that same native action opens Woo's authoritative address controls.
+
+Checkout sections use a flat visual composition. DTB removes decorative outer panel borders, backgrounds, and shadows while preserving input boundaries, selected-state feedback, keyboard focus indication, and provider-owned button/payment surfaces.
 
 ### Payment
 
@@ -208,7 +211,7 @@ WooCommerce remains final validation authority.
 
 ## Responsive behavior
 
-The Contact/Shipping/Payment state contract applies on mobile, tablet, and desktop. Desktop keeps the canonical order summary beside the active step and renders official payment controls in normal document flow.
+The progressive Contact/Shipping/Payment step state applies below the mobile breakpoint. Desktop keeps WooCommerce's canonical document flow, the order summary beside the form, and official payment controls in normal document flow. Signed-in desktop checkout still uses Woo's saved-address card and the relabeled native shipping-address action.
 
 The bottom payment sheet and mobile `Pay now` label apply only below the mobile breakpoint. Crossing the breakpoint must not clone provider controls. If the enhancement fails to load, normal WooCommerce Checkout Block remains the fail-open document.
 
@@ -222,23 +225,24 @@ Manual/staging acceptance remains mandatory:
 
 1. Mobile Safari/iPhone with and without Apple Pay eligibility.
 2. Chrome/Android with and without Google Pay eligibility.
-3. Contact -> Shipping -> Payment -> payment sheet -> close -> reopen.
-4. Address, shipping method, selected payment method, and provider state remain intact across navigation/recalculation.
-5. Accordion payment methods remain vertically reachable and scrollable.
-6. Card success, decline, and 3DS challenge/cancel/failure.
-7. Exactly one visible canonical Order Summary; sheet total always matches Woo authoritative totals.
-8. Page behind the open sheet cannot scroll or receive interaction.
-9. Tab/Shift+Tab remain inside the modal; Escape/close restore focus without destroying checkout state.
-10. Software-keyboard open/close does not hide payment fields, provider errors, or the authoritative `Pay now` action.
-11. Mobile authoritative submit label is `Pay now`; desktop retains Woo default labeling; both use the same Woo action.
-12. Resize mobile -> desktop -> mobile without duplicated controls, fixed overlays, or hidden sections.
-13. Guest and authenticated checkout.
-14. Cart quantity change immediately followed by checkout handoff.
-15. First successful add-to-cart schedules one low-priority checkout asset prewarm without delaying cart state.
-16. Address/shipping updates do not replace the checkout root in a way that loses populated controls.
-17. Checkout runtime telemetry records bounded/redacted diagnostics and rejects invalid nonce/origin/rate-limit cases.
-18. No unexplained marketing/analytics/third-party resources load on checkout.
-19. Payment-provider load timeout shows provider-safe recovery UI; an eligible express fallback is shown only when actually rendered.
+3. Guest: Contact -> Shipping -> Payment -> payment sheet -> close -> reopen.
+4. Signed in: Shipping opens first; Contact is complete/disabled; saved address remains closed until `Use a different shipping address` is activated.
+5. Address, shipping method, selected payment method, and provider state remain intact across navigation/recalculation.
+6. Accordion payment methods remain vertically reachable and scrollable.
+7. Card success, decline, and 3DS challenge/cancel/failure.
+8. Exactly one visible canonical Order Summary; sheet total always matches Woo authoritative totals.
+9. Page behind the open sheet cannot scroll or receive interaction.
+10. Tab/Shift+Tab remain inside the modal; Escape/close restore focus without destroying checkout state.
+11. Software-keyboard open/close does not hide payment fields, provider errors, or the authoritative `Pay now` action.
+12. Mobile authoritative submit label is `Pay now`; desktop retains Woo default labeling; both use the same Woo action.
+13. Resize mobile -> desktop -> mobile without duplicated controls, fixed overlays, or hidden sections.
+14. Guest and authenticated checkout.
+15. Cart quantity change immediately followed by checkout handoff.
+16. First successful add-to-cart schedules one low-priority checkout asset prewarm without delaying cart state.
+17. Address/shipping updates do not replace the checkout root in a way that loses populated controls.
+18. Checkout runtime telemetry records bounded/redacted diagnostics and rejects invalid nonce/origin/rate-limit cases.
+19. No unexplained marketing/analytics/third-party resources load on checkout.
+20. Payment-provider load timeout shows provider-safe recovery UI; an eligible express fallback is shown only when actually rendered.
 20. Failed payment followed by retry through WooCommerce order-pay.
 21. Successful staging checkout returns to the staging storefront order-tracking path.
 22. Duplicate submit/reload/webhook replay does not duplicate orders or downstream jobs.

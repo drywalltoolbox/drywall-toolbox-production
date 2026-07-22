@@ -19,6 +19,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead';
+import AnimatedOrderSuccess from '../components/order/AnimatedOrderSuccess.jsx';
 import { useOrderStatus } from '../hooks/useOrderStatus.js';
 import { useOrderEventStream } from '../hooks/useOrderEventStream.js';
 import { useOrderItemImageFallbacks } from '../hooks/useOrderItemImageFallbacks.js';
@@ -505,6 +506,8 @@ export default function OrderTracking() {
   }
 
   const { order, items, tracking } = viewModel;
+  const showCheckoutSuccess = checkoutComplete && order && shouldClearCartForCompletedCheckout(order);
+  const trackingHref = `/order-tracking/${encodeURIComponent(order?.id || id)}${orderKey ? `?order_key=${encodeURIComponent(orderKey)}` : ''}`;
 
   return (
     <div className="dtb-order-page page-wrapper">
@@ -515,6 +518,17 @@ export default function OrderTracking() {
         transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
         className="dtb-order-tracking-shell"
       >
+        {showCheckoutSuccess ? (
+          <section className="dtb-order-hero" aria-labelledby="checkout-success-title">
+            <AnimatedOrderSuccess
+              orderId={order?.id || id}
+              title="Order confirmed"
+              titleId="checkout-success-title"
+              trackingHref={trackingHref}
+              message={`Your order #${order?.number || id} is confirmed. A receipt is on its way to your inbox.`}
+            />
+          </section>
+        ) : null}
         <section className="dtb-order-sheet dtb-order-sheet--tracking">
           <div className="dtb-order-sheet__content">
             {order ? <OrderStatusTracker order={order} streaming={streaming} loading={loading} onRefresh={refresh} /> : null}

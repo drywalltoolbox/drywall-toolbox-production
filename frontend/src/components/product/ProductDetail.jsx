@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Reviews from './Reviews';
@@ -540,7 +540,9 @@ export default function ProductDetail({
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState('description');
   const [addToCartError, setAddToCartError] = useState('');
+  const [addToCartState, setAddToCartState] = useState('idle');
   const [isExpressCheckoutPending, setIsExpressCheckoutPending] = useState(false);
+  const addToCartFeedbackTimerRef = useRef(null);
   const seededVariations = buildSeedVariations(initialVariations, initialResolvedVariation);
   const initialVariationSelection = buildInitialVariationSelection({
     autoSelectDefaultVariation,
@@ -552,6 +554,12 @@ export default function ProductDetail({
   const [variationsLoading, setVariationsLoading] = useState(false);
   const [selectedAttrs, setSelectedAttrs] = useState(initialVariationSelection);
   const [computedData, setComputedData] = useState(initialComputedData);
+
+  useEffect(() => () => {
+    if (addToCartFeedbackTimerRef.current) {
+      window.clearTimeout(addToCartFeedbackTimerRef.current);
+    }
+  }, []);
 
   const hasInitialVariations = Array.isArray(initialVariations) && initialVariations.length > 0;
   const hasSeedVariations = seededVariations.length > 0;
@@ -803,16 +811,28 @@ export default function ProductDetail({
   const canAddToCart = !isOutOfStock && (!needsVariation || Boolean(selectedVariation && hasCompleteSelection));
 
   const handleAddToCart = async () => {
-    if (!canAddToCart) return;
+    if (!canAddToCart || addToCartState !== 'idle') return;
     const productToAdd = selectedVariation ? effectiveProduct : product;
     try {
       setAddToCartError('');
+      setAddToCartState('adding');
       if (onAddToCart) await onAddToCart(productToAdd, quantity);
       else await addToCart(productToAdd, quantity);
+      setAddToCartState('added');
+
       if (typeof onClose === 'function') {
-        setTimeout(() => onClose(), 220);
+        addToCartFeedbackTimerRef.current = window.setTimeout(() => {
+          onClose();
+          addToCartFeedbackTimerRef.current = null;
+        }, 940);
+      } else {
+        addToCartFeedbackTimerRef.current = window.setTimeout(() => {
+          setAddToCartState('idle');
+          addToCartFeedbackTimerRef.current = null;
+        }, 1200);
       }
     } catch (err) {
+      setAddToCartState('idle');
       setAddToCartError(
         err?.message ||
         'Unable to add this item to cart. Please check your selection and try again. If this continues, contact support.'
@@ -968,6 +988,7 @@ export default function ProductDetail({
                   setQuantity(val);
                 }}
                 onAddToCart={handleAddToCart}
+                addToCartState={addToCartState}
                 onExpressCheckout={handleExpressCheckout}
                 isExpressCheckoutPending={isExpressCheckoutPending}
                 canExpressCheckout={canAddToCart}

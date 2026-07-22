@@ -6,8 +6,10 @@ import MotionDialog from '../motion/MotionDialog.jsx';
 import MotionDrawer from '../motion/MotionDrawer.jsx';
 import MotionPresence from '../motion/MotionPresence.jsx';
 import {
-  mobileSheetTransition,
-  panelTransition,
+  productModalBackdropTransition,
+  productModalDesktopVariants,
+  productModalMobileVariants,
+  productModalTransition,
   reducedTransition,
 } from '../../motion/dtbMotion.js';
 
@@ -115,7 +117,8 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
 
   if (typeof document === 'undefined') return null;
 
-  const transition = reduceMotion ? reducedTransition : (isMobile ? mobileSheetTransition : panelTransition);
+  const transition = reduceMotion ? reducedTransition : productModalTransition;
+  const variants = isMobile ? productModalMobileVariants : productModalDesktopVariants;
   const PanelComponent = isMobile ? MotionDrawer : MotionDialog;
 
   return createPortal(
@@ -126,6 +129,7 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
             className="fixed inset-0 bg-slate-950/55 product-modal-backdrop"
             style={{ zIndex: 10001 }}
             reduceMotion={reduceMotion}
+            transition={productModalBackdropTransition}
             onClick={onClose}
           />
 
@@ -140,6 +144,7 @@ export default function ProductModal({ isOpen, product, onClose, children }) {
             tabIndex={-1}
             reduceMotion={reduceMotion}
             transition={transition}
+            variants={variants}
             onScroll={() => {
               setIsScrollActive(true);
               if (scrollHideTimerRef.current) clearTimeout(scrollHideTimerRef.current);

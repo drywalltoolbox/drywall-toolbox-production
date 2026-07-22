@@ -19,6 +19,7 @@ import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { KeyRound, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 
 import { useAuthContext } from '../auth/AuthContext.js';
+import '../styles/password-recovery.css';
 
 // ─── Animation variants ───────────────────────────────────────────────────────
 
@@ -109,7 +110,7 @@ export default function ResetPassword() {
 
   return (
     <div
-      className="page-wrapper"
+      className="page-wrapper dtb-password-recovery"
       style={ {
         minHeight:       '100vh',
         display:         'flex',
@@ -120,6 +121,7 @@ export default function ResetPassword() {
       } }
     >
       <Motion.div
+        className="dtb-password-recovery__card"
         variants={ cardVariants }
         initial="hidden"
         animate="visible"

@@ -9,6 +9,11 @@ import ToolSelector from '../components/schematics/ToolSelector';
 import SchematicHotspotCard from '../components/schematics/SchematicHotspotCard';
 import { getProductBySku } from '../api/products';
 import { SCHEMATIC_DEFINITIONS } from '../data/schematicMappings';
+import {
+  SCHEMATIC_BRANDS,
+  SCHEMATIC_BRAND_TO_SLUG,
+  SCHEMATIC_SLUG_TO_BRAND,
+} from '../data/schematicBrands.js';
 import { useSchematicMedia } from '../hooks/useSchematicMedia';
 import '../styles/mobile-schematic.css';
 import SEOHead from '../components/shared/SEOHead';
@@ -742,18 +747,9 @@ const _fallbacks = {
 
 // Brand name ↔ URL slug maps so navigation produces readable URLs like
 // /schematics?brand=columbia-taping-tools&schematic=columbia-matrix
-const BRAND_TO_SLUG = {
-  'TapeTech':              'tapetech',
-  'Columbia Taping Tools': 'columbia-taping-tools',
-  'Asgard':                'asgard',
-  'SurPro':                'surpro',
-  'Platinum Drywall Tools': 'platinum',
-  'Dura-Stilts':           'dura-stilts',
-  'Level5':                'level5',
-};
-const SLUG_TO_BRAND = Object.fromEntries(
-  Object.entries(BRAND_TO_SLUG).map(([name, slug]) => [slug, name])
-);
+const BRAND_TO_SLUG = SCHEMATIC_BRAND_TO_SLUG;
+const SLUG_TO_BRAND = SCHEMATIC_SLUG_TO_BRAND;
+const ALLOWED_BRANDS = SCHEMATIC_BRANDS.map(({ name }) => name);
 
 // Build a static schematic-id → brand lookup from SCHEMATIC_DEFINITIONS so the
 // URL-param handler can resolve the correct brand without needing the full
@@ -1145,15 +1141,7 @@ const tapeTech81XXTTVariants = [
 
 export default function Parts() {
   // Allowed brands to display
-const ALLOWED_BRANDS = [
-  'TapeTech',
-  'Columbia Taping Tools',
-  'Asgard',
-  'SurPro',
-  'Platinum Drywall Tools',
-  'Dura-Stilts',
-  'Level5',
-];  const location = useLocation();
+  const location = useLocation();
   const navigate = useNavigate();
 
   // WP Media Library schematic manifest (WebP, preferred over static fallbacks)
@@ -1258,7 +1246,6 @@ const ALLOWED_BRANDS = [
   // should always be visible regardless of whether WC products are loaded.
   useEffect(() => {
     setBrands(ALLOWED_BRANDS);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Sync state → URL so the address bar always reflects where the user is.

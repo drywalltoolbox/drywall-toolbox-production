@@ -454,9 +454,9 @@ export default function ProductsCatalogPlatform({ forceProductGrid = false, titl
         },
         () => addToCart(product, quantity),
       );
-      setToast({ message: `${product.name} added to cart!`, type: 'cart' });
     } catch (err) {
       setToast({ message: err?.message || 'Could not add item to cart. Please try again.', type: 'error' });
+      throw err;
     }
   };
 

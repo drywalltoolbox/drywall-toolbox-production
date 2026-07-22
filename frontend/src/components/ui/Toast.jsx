@@ -99,9 +99,13 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
   const handleClose = useCallback(() => { onClose?.(); }, [onClose]);
 
   useEffect(() => {
+    if (isCartToast) {
+      handleClose();
+      return undefined;
+    }
     const timer = setTimeout(handleClose, duration);
     return () => clearTimeout(timer);
-  }, [duration, handleClose]);
+  }, [duration, handleClose, isCartToast]);
 
   useEffect(() => {
     if (!isCartToast) return undefined;
@@ -133,6 +137,11 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
         right: '16px',
         width: 'min(420px, calc(100vw - 24px))',
       };
+
+  // Add-to-cart success is communicated by the initiating button and the
+  // persistent header cart count. Error, warning, and informational toasts
+  // remain available for feedback that cannot live on the initiating control.
+  if (isCartToast) return null;
 
   const toastNode = (
     <Motion.div

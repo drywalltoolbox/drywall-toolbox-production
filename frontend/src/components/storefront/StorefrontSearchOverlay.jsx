@@ -4,9 +4,9 @@ import { brandToSlug } from '../../utils/catalogUrlState.js';
 import { buildDisplayCategoryUrl, normalizeCatalogCategoryEntry } from '../../utils/catalogFacets.js';
 import ProductModal from '../product/ProductModal.jsx';
 import ProductDetail from '../product/ProductDetail.jsx';
-import { ProductSkeletonGrid } from '../catalog/ProductShoppingCardSkeleton.jsx';
 import LoadingCardTransition from '../shared/LoadingCardTransition.jsx';
 import StorefrontProductTile from './StorefrontProductTile.jsx';
+import StorefrontSearchLoading from './StorefrontSearchLoading.jsx';
 import { useCart } from '../../context/CartContext.jsx';
 
 export default function StorefrontSearchOverlay({
@@ -31,6 +31,7 @@ export default function StorefrontSearchOverlay({
     if (primary.length > 0) return primary;
     return Array.isArray(results) ? results : [];
   }, [suggestions, results]);
+  const hasLoadedResults = !loading && resolvedSuggestions.length > 0;
   const normalizedCategories = useMemo(
     () => categories
       .map((category) => normalizeCatalogCategoryEntry(category))
@@ -50,7 +51,9 @@ export default function StorefrontSearchOverlay({
 
   useEffect(() => {
     if (!isOpen) return undefined;
+    const previousDocumentOverflow = document.documentElement.style.overflow;
     const previousOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     const onKeyDown = (event) => {
       if (event.key === 'Escape') {
@@ -60,6 +63,7 @@ export default function StorefrontSearchOverlay({
     };
     window.addEventListener('keydown', onKeyDown);
     return () => {
+      document.documentElement.style.overflow = previousDocumentOverflow;
       document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', onKeyDown);
     };
@@ -75,54 +79,52 @@ export default function StorefrontSearchOverlay({
     await addToCart(product, quantity);
   }, [addToCart]);
 
-  if (!isOpen) return null;
-
   const searchSkeleton = (
     <section className="storefront-search-overlay__results" aria-hidden="true">
-      <ProductSkeletonGrid count={4} variant="list" />
+      <StorefrontSearchLoading />
     </section>
   );
 
   const searchResults = resolvedSuggestions.length > 0 ? (
     <section className="storefront-search-overlay__results storefront-search-overlay__results--product-cards">
       {resolvedSuggestions.map((product, index) => (
-        <StorefrontProductTile
-          key={product.id || product.slug || product.sku || index}
-          product={product}
-          cardProduct={product?.cardProduct || null}
-          variant="list"
-          index={index}
-          onOpenModal={() => openQuickView(product)}
-          onAddToCart={() => handleAddToCart(product, 1)}
-        />
+        <div className="storefront-search-overlay__result-entry" style={{ '--search-result-index': index }} key={product.id || product.slug || product.sku || index}>
+          <StorefrontProductTile
+            product={product}
+            cardProduct={product?.cardProduct || null}
+            variant="list"
+            index={index}
+            onOpenModal={() => openQuickView(product)}
+            onAddToCart={() => handleAddToCart(product, 1)}
+          />
+        </div>
       ))}
-      <button type="button" onClick={onViewAll} className="storefront-search-overlay__view-all">
-        View all results
-      </button>
     </section>
   ) : (
     <section className="storefront-search-overlay__results">
       <div className="storefront-search-overlay__empty-message">
         No products matched &quot;{query.trim()}&quot;. Try a brand, SKU, or broader term.
       </div>
-      <button type="button" onClick={onViewAll} className="storefront-search-overlay__view-all">
-        Browse all products
-      </button>
     </section>
   );
 
   return (
     <>
-      <div className="storefront-search-overlay" data-open={isOpen ? 'true' : 'false'} role="dialog" aria-modal="true" aria-label="Search products">
-        <button type="button" className="storefront-mobile-drawer__backdrop" onClick={closeSearch} aria-label="Close search" />
+      <div id="storefront-search-results" className="storefront-search-overlay" data-open={isOpen ? 'true' : 'false'} data-has-query={hasQuery ? 'true' : 'false'} role="dialog" aria-modal={isOpen ? 'true' : undefined} aria-hidden={!isOpen} aria-label="Search products">
+        <button
+          type="button"
+          className="storefront-mobile-drawer__backdrop"
+          onClick={(event) => {
+            event.currentTarget.blur();
+            closeSearch();
+          }}
+          aria-label="Close search"
+        />
         <div className="storefront-search-overlay__sheet">
-          <div className="storefront-search-overlay__panel">
+          <div className="storefront-search-overlay__panel" onClick={(event) => event.stopPropagation()}>
             {hasQuery ? (
               <div className="storefront-search-overlay__topline">
                 <p className="storefront-search-overlay__panel-label">Search results</p>
-                <button type="button" className="storefront-search-overlay__view-all-inline" onClick={onViewAll}>
-                  View all results for &quot;{query.trim()}&quot;
-                </button>
               </div>
             ) : null}
 
@@ -175,11 +177,20 @@ export default function StorefrontSearchOverlay({
                   loading={loading}
                   skeleton={searchSkeleton}
                   label="Loading search results"
+                  className="storefront-search-overlay__transition"
                 >
                   {searchResults}
                 </LoadingCardTransition>
               ) : null}
             </div>
+
+            {hasQuery && hasLoadedResults ? (
+              <div className="storefront-search-overlay__footer">
+                <button type="button" onClick={onViewAll} className="storefront-search-overlay__view-all">
+                  View all results for &quot;{query.trim()}&quot;
+                </button>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

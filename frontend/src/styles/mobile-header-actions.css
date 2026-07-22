@@ -20,8 +20,8 @@
 
 @media (max-width: 767px) {
   .header-mobile-layout {
-    --mobile-header-action-size: 46px;
-    --mobile-header-action-icon-size: 24px;
+    --mobile-header-action-size: 44px;
+    --mobile-header-action-icon-size: 22px;
     --mobile-header-side-slot: clamp(92px, 25vw, 108px);
   }
 
@@ -32,12 +32,12 @@
   }
 
   .header-mobile-slot--right {
-    gap: clamp(4px, 1.6vw, 8px) !important;
-    padding-right: clamp(2px, 1.2vw, 6px) !important;
+    gap: 0 !important;
+    padding-right: 10px !important;
   }
 
   .header-mobile-slot--left {
-    padding-left: clamp(2px, 1.2vw, 6px) !important;
+    padding-left: 10px !important;
   }
 
   .header-mobile-logo {
@@ -91,7 +91,7 @@
 
 @media (max-width: 374px) {
   .header-mobile-layout {
-    --mobile-header-action-size: 42px;
+    --mobile-header-action-size: 44px;
     --mobile-header-action-icon-size: 22px;
     --mobile-header-side-slot: 88px;
   }

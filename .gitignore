@@ -106,6 +106,10 @@ drywalltoolbox/wp/wp-content/updraft/log*.txt
 # Rebuild it from canonical repo paths; never stage runtime files or secrets.
 /launch/live/
 
+# A local WordPress/site snapshot under launch is runtime-owned. It may contain
+# a nested repository, WordPress core, plugins, uploads, logs, and secrets.
+/launch/wp/
+
 # WordPress content tracked in this repo (wp/wp-content/):
 #   wp/wp-content/themes/drywall-toolbox/           — legacy theme (kept until headless-base validated)
 #   wp/wp-content/themes/headless-base/             — active minimal headless theme (zero frontend output)

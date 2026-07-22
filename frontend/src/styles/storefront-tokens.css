@@ -26,5 +26,5 @@
 
   --dtb-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --dtb-fast: 180ms;
-  --dtb-normal: 240ms;
+  --dtb-normal: 320ms;
 }

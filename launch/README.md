@@ -43,7 +43,19 @@ Do not upload `dist-staging/` to `public_html/`. The staging build is compiled f
 Code cannot safely perform these host/database/payment actions:
 
 1. Back up the SiteGround files and database.
-2. Set WordPress `home` to `https://elliottm4.sg-host.com` and `siteurl` to `https://elliottm4.sg-host.com/wp`; verify with `wp option get home` and `wp option get siteurl`.
+2. Set WordPress `home` to `https://elliottm4.sg-host.com` and `siteurl` to `https://elliottm4.sg-host.com/wp`; verify with `wp option get home` and `wp option get siteurl`. In the runtime-owned `/wp/wp-config.php`, before WordPress loads, define the matching root REST/auth-cookie topology:
+
+   ```php
+   define( 'WP_HOME', 'https://elliottm4.sg-host.com' );
+   define( 'WP_SITEURL', 'https://elliottm4.sg-host.com/wp' );
+   define( 'COOKIEPATH', '/' );
+   define( 'SITECOOKIEPATH', '/' );
+   define( 'ADMIN_COOKIE_PATH', '/' );
+   define( 'DTB_ENABLE_WOO_ADMIN_REST_NONCE_COMPAT', true );
+   define( 'DTB_ENABLE_ROOT_AUTH_COOKIE_MIGRATION', true );
+   ```
+
+   The nonce compatibility flag restores only verified same-site, cookie-authenticated admin reads after an expired `wp_rest` nonce. Its only allowed non-GET request is WooCommerce's read-only payment-provider discovery action; payment-setting mutations remain protected. The root-cookie migration flag reissues the current valid WordPress session token once at `/` when wp-admin is still running from an older `/wp` cookie. After changing cookie paths, clear SiteGround caches, remove existing browser cookies for the host, and sign in again.
 3. Dry-run a serialized-data-aware old-origin replacement, then apply only after reviewing counts:
 
    ```text

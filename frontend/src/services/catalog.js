@@ -22,6 +22,7 @@ import {
   searchProductsByVariationSku as proxySearchProductsByVariationSku,
 } from '../api/products.js';
 import { normalizeProduct } from '../services/api.js';
+import { toLegacyProductCardDTO } from '../utils/catalogDtoAdapters.js';
 import { readCache, writeCache, bustCache, isCacheAvailable } from './productCache.js';
 import { fetchCatalogProducts as fetchPlatformProducts } from './catalogPlatformCache.js';
 
@@ -36,12 +37,13 @@ export function getCatalogSource() { return _source; }
 // ─── Fetchers ─────────────────────────────────────────────────────────────────
 
 /**
- * Fetch all products from the WooCommerce REST API (all pages).
+ * Fetch all products from the canonical DTB catalog endpoint (all pages).
  * Throws on network or auth error.
  */
 async function fetchFromApi() {
-  // Use the server-side drywall/v1 proxy for WooCommerce product loading.
-  // This avoids relying on client-side WC auth credentials in the browser.
+  // Public storefront reads use the same canonical catalog endpoint as the PLP.
+  // The legacy drywall/v1 proxy requires server credentials and is not a
+  // storefront product authority.
 
   let all   = [];
   let page  = 1;
@@ -57,15 +59,19 @@ async function fetchFromApi() {
     const controller = new AbortController();
     const timeoutId  = setTimeout(() => controller.abort(), PAGE_TIMEOUT_MS);
     let batch;
+    let result;
     try {
-      const result = await proxyFetchProducts(
-        { per_page: PER, page, status: 'publish' },
-        { signal: controller.signal },
-      );
+      result = await Promise.race([
+        fetchPlatformProducts({ perPage: PER, page, sort: 'popular' }),
+        new Promise((_, reject) => {
+          controller.signal.addEventListener('abort', () => {
+            reject(Object.assign(new Error('Catalog request timed out.'), { name: 'AbortError' }));
+          }, { once: true });
+        }),
+      ]);
       clearTimeout(timeoutId);
-      batch = Array.isArray(result) ? result : result?.products || [];
-      batch = batch
-        .map(normalizeProduct)
+      batch = (Array.isArray(result?.items) ? result.items : [])
+        .map(toLegacyProductCardDTO)
         .filter(Boolean)
         // WooCommerce /wc/v3/products should never return 'variation' type
         // products in the main list, but guard against misconfigured imports
@@ -83,7 +89,8 @@ async function fetchFromApi() {
       throw err;
     }
     all = all.concat(batch);
-    if (batch.length < PER) { done = true; break; }
+    const totalPages = Number(result?.pagination?.totalPages || 0);
+    if ((totalPages > 0 && page >= totalPages) || batch.length < PER) { done = true; break; }
     page++;
   }
 

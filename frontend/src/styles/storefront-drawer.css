@@ -9,8 +9,8 @@
   transform: translateY(-8px);
   pointer-events: none;
   transition:
-    opacity 180ms var(--dtb-ease),
-    transform 220ms var(--dtb-ease);
+    opacity 220ms var(--dtb-ease),
+    transform var(--dtb-normal, 320ms) var(--dtb-ease);
 }
 
 .storefront-mobile-drawer[data-open="true"] {
@@ -407,17 +407,20 @@
   left: 0;
   z-index: 9998;
   opacity: 0;
-  transform: translateY(-8px);
   pointer-events: none;
   transition:
-    opacity 180ms var(--dtb-ease),
-    transform 220ms var(--dtb-ease);
+    opacity 220ms var(--dtb-ease),
+    visibility 0s linear var(--dtb-normal, 320ms);
+  visibility: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
 }
 
 .storefront-search-overlay[data-open="true"] {
   opacity: 1;
-  transform: translateY(0);
   pointer-events: auto;
+  visibility: visible;
+  transition-delay: 0s;
 }
 
 .storefront-search-overlay__sheet {
@@ -427,6 +430,7 @@
   justify-content: center;
   align-items: flex-start;
   padding: 0 12px 24px;
+  pointer-events: none;
 }
 
 .storefront-search-overlay .storefront-mobile-drawer__backdrop {
@@ -446,6 +450,22 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-12px) scale(0.99);
+  transform-origin: top center;
+  transition:
+    opacity 220ms var(--dtb-ease),
+    transform var(--dtb-normal, 320ms) var(--dtb-ease);
+  touch-action: pan-y;
+}
+
+.storefront-search-overlay[data-open="true"][data-has-query="true"] .storefront-search-overlay__panel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .storefront-search-overlay__topline {
@@ -466,27 +486,156 @@
   color: rgba(226, 232, 240, 0.86);
 }
 
-.storefront-search-overlay__view-all-inline {
-  min-height: 32px;
-  padding: 6px 10px;
-  border: 1px solid rgba(96, 165, 250, 0.16);
-  border-radius: 999px;
-  background: rgba(37, 99, 235, 0.1);
-  color: #dbeafe;
-  font-size: 0.76rem;
-  font-weight: 800;
-  text-align: center;
-  white-space: nowrap;
-}
-
 .storefront-search-overlay__body {
   display: grid;
+  flex: 1 1 auto;
   gap: 14px;
   padding: 16px;
   overflow-y: auto;
   min-height: 240px;
   background:
     linear-gradient(180deg, rgba(8, 16, 33, 0.92), rgba(5, 11, 24, 0.96));
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+}
+
+.storefront-search-overlay__footer {
+  flex: 0 0 auto;
+  padding: 10px 16px 14px;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(5, 11, 24, 0.98);
+}
+
+.storefront-search-overlay__footer .storefront-search-overlay__view-all {
+  width: 100%;
+  min-height: 42px;
+  justify-content: center;
+  padding: 10px 14px;
+  border-color: rgba(96, 165, 250, 0.22);
+  background: rgba(37, 99, 235, 0.12);
+  color: #dbeafe;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.storefront-search-overlay__body::-webkit-scrollbar,
+.storefront-search-overlay__results::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.storefront-search-overlay__transition .dtb-card-loading-transition__skeleton,
+.storefront-search-overlay__transition .dtb-card-loading-transition__content {
+  transition:
+    opacity var(--dtb-normal, 320ms) var(--dtb-ease),
+    transform var(--dtb-normal, 320ms) var(--dtb-ease);
+}
+
+.storefront-search-overlay__transition.dtb-card-loading-transition--layered:not(.ready) .dtb-card-loading-transition__content {
+  transform: translateY(5px);
+}
+
+.storefront-search-overlay__transition.ready .dtb-card-loading-transition__skeleton {
+  transform: translateY(-3px);
+}
+
+.storefront-search-loading {
+  display: grid;
+  gap: 10px;
+  padding: 2px 0;
+}
+
+.storefront-search-loading__row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: center;
+  gap: 13px;
+  min-height: 76px;
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.storefront-search-loading__thumb,
+.storefront-search-loading__line {
+  position: relative;
+  overflow: hidden;
+  background: rgba(148, 163, 184, 0.16);
+}
+
+.storefront-search-loading__thumb::after,
+.storefront-search-loading__line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.18) 48%, transparent 76%);
+  transform: translateX(-110%);
+  animation: dtb-search-loading-sweep 1.35s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.storefront-search-loading__thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+}
+
+.storefront-search-loading__copy {
+  display: grid;
+  gap: 10px;
+}
+
+.storefront-search-loading__line {
+  display: block;
+  height: 9px;
+  border-radius: 5px;
+}
+
+.storefront-search-loading__line--title {
+  width: min(72%, 280px);
+}
+
+.storefront-search-loading__line--meta {
+  width: min(38%, 140px);
+}
+
+.storefront-search-loading--compact {
+  gap: 0;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 7px;
+  overflow: hidden;
+}
+
+.storefront-search-loading--compact .storefront-search-loading__row {
+  grid-template-columns: 42px minmax(0, 1fr);
+  min-height: 62px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 9px;
+  border-radius: 9px;
+  background: transparent;
+}
+
+.storefront-search-loading--compact .storefront-search-loading__row + .storefront-search-loading__row {
+  border-top: 1px solid #e8edf4;
+}
+
+.storefront-search-loading--compact .storefront-search-loading__thumb {
+  width: 42px;
+  height: 42px;
+  border-radius: 7px;
+  border: 1px solid #e4eaf2;
+  background: #e9eef5;
+}
+
+.storefront-search-loading--compact .storefront-search-loading__line {
+  background: #e1e8f1;
+}
+
+@keyframes dtb-search-loading-sweep {
+  to { transform: translateX(110%); }
 }
 
 .storefront-search-overlay__body.is-browsing {
@@ -497,6 +646,9 @@
 .storefront-search-overlay__results {
   display: grid;
   gap: 12px;
+  min-width: 0;
+  overflow-x: hidden;
+  scrollbar-width: none;
 }
 
 .storefront-search-overlay__section {
@@ -620,8 +772,13 @@
 /* Mobile optimizations */
 @media (max-width: 640px) {
   .storefront-search-overlay__panel {
-    max-height: calc(100dvh - var(--header-height, 0px) - 8px);
+    height: min(58dvh, 500px);
+    max-height: min(58dvh, 500px);
     border-radius: 0 0 var(--dtb-radius-lg) var(--dtb-radius-lg);
+  }
+
+  .storefront-search-overlay__body {
+    min-height: 0;
   }
 
   .storefront-search-overlay__result {

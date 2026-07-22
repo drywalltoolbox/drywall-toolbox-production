@@ -176,7 +176,12 @@ export default function StorefrontProductTile({
   const handleAddButtonClick = useCallback((event) => {
     event.stopPropagation();
     closeOverlay();
-    onAddToCart?.();
+    try {
+      const result = onAddToCart?.();
+      result?.catch?.(() => {});
+    } catch {
+      // The owning surface renders the actionable cart error state.
+    }
   }, [closeOverlay, onAddToCart]);
 
   const handleQuickView = useCallback((e) => {
@@ -335,6 +340,7 @@ export default function StorefrontProductTile({
               className={`dtb-product-card__action${isMobile ? ' dtb-product-card__action--hidden-mobile' : ''}`}
               data-dtb-card-action="add"
               data-dtb-cart-action="add"
+              data-dtb-cart-product-id={displayProduct.id}
               aria-label={`Add ${name} to cart`}
             >
               <ShoppingCart size={14} />

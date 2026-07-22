@@ -27,6 +27,9 @@ export default function StorefrontSearchDock({
         onKeyDown={onKeyDown}
         placeholder={placeholder}
         aria-label="Search for products"
+        aria-autocomplete="list"
+        aria-controls="storefront-search-results"
+        aria-expanded={active}
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="none"

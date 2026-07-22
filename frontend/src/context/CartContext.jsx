@@ -9,7 +9,6 @@ import {
 } from '../api/cart.js';
 import { trackAddToCart, trackRemoveFromCart } from '../analytics/ecommerceEvents.js';
 import { decodeHtmlEntities } from '../utils/string.js';
-import Toast from '../components/ui/Toast.jsx';
 import CartInteractionFeedback from '../components/cart/CartInteractionFeedback.jsx';
 
 const CART_SNAPSHOT_KEY = 'drywall-cart-snapshot';
@@ -268,7 +267,6 @@ export function CartProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isMutating, setIsMutating] = useState(false);
   const [error, setError] = useState(null);
-  const [optimisticNotice, setOptimisticNotice] = useState(null);
   const [lastSyncedAt, setLastSyncedAt] = useState(null);
   const cartItemsRef = useRef(cartItems);
   const serverCartRef = useRef(null);
@@ -383,7 +381,7 @@ export function CartProvider({ children }) {
     return () => { mounted = false; };
   }, [applyServerCart]);
 
-  const addToCart = useCallback(async (product, quantity = 1, options = {}) => {
+  const addToCart = useCallback(async (product, quantity = 1) => {
     if (!product?.id) return null;
     const mutationId = beginMutation();
     setError(null);
@@ -393,12 +391,6 @@ export function CartProvider({ children }) {
     setCart(null);
     setCartItems(optimisticItems);
     cartItemsRef.current = optimisticItems;
-    if (options.announce !== false) {
-      setOptimisticNotice({
-        id: mutationId,
-        message: `Adding ${decodeHtmlEntities(product.name || 'item')} to your cart…`,
-      });
-    }
     try {
       const variation = buildStoreApiVariation(product.variation_attribute_values);
       const extensions = buildStoreApiExtensions(product);
@@ -408,15 +400,24 @@ export function CartProvider({ children }) {
       const normalizedItems = await applyOrRefreshServerCart(nextCart, mutationId);
       const addedItem = normalizedItems.find((item) => String(item.id) === String(product.id)) || normalizeCartSnapshotItem({ ...product, quantity });
       trackAddToCart({ ...addedItem, quantity });
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('dtb:cart-add-success', {
+          detail: { productId: String(product.id) },
+        }));
+      }
       return nextCart;
     } catch (err) {
       if (isLatestMutation(mutationId)) {
         restoreAfterMutationFailure(previousCart, previousItems, mutationId, err);
         setError(err?.message || 'Could not add item to cart.');
       }
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('dtb:cart-add-failure', {
+          detail: { productId: String(product.id) },
+        }));
+      }
       throw err;
     } finally {
-      setOptimisticNotice((current) => current?.id === mutationId ? null : current);
       finishMutation();
     }
   }, [applyOrRefreshServerCart, beginMutation, cart, enqueueMutation, finishMutation, isLatestMutation, restoreAfterMutationFailure]);
@@ -584,15 +585,6 @@ export function CartProvider({ children }) {
     <CartContext.Provider value={value}>
       {children}
       <CartInteractionFeedback />
-      {optimisticNotice ? (
-        <Toast
-          key={optimisticNotice.id}
-          message={optimisticNotice.message}
-          type="cart"
-          duration={8000}
-          onClose={() => setOptimisticNotice(null)}
-        />
-      ) : null}
     </CartContext.Provider>
   );
 }

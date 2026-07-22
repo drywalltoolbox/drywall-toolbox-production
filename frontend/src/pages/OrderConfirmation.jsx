@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { getOrder } from '../api/orders.js';
 import {
   CheckCircle,
@@ -21,6 +21,7 @@ import {
   User,
 } from 'lucide-react';
 import SEOHead from '../components/shared/SEOHead';
+import AnimatedOrderSuccess from '../components/order/AnimatedOrderSuccess.jsx';
 import { useOrderItemImageFallbacks } from '../hooks/useOrderItemImageFallbacks.js';
 import { getOrderItemKey, resolveOrderItemImage } from '../utils/orderItemImages.js';
 import '../styles/order-pages.css';
@@ -120,6 +121,8 @@ function DetailRow({ icon: Icon, label, children }) {
 
 export default function OrderConfirmation() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const orderKey = searchParams.get('order_key') || '';
   const navigate = useNavigate();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -130,14 +133,14 @@ export default function OrderConfirmation() {
 
     let cancelled = false;
 
-    getOrder(id)
+    getOrder(id, orderKey)
       .then((data) => {
         if (!cancelled) setOrder(data);
       })
       .catch((err) => {
         if (!cancelled) {
-          if (err.status === 401) {
-            setError('Please log in to view order details.');
+          if (err.status === 401 || err.status === 403) {
+            setError('Please sign in or use the secure order link from your confirmation email.');
           } else {
             setError(err.message || 'Unable to load order details.');
           }
@@ -148,7 +151,7 @@ export default function OrderConfirmation() {
       });
 
     return () => { cancelled = true; };
-  }, [id]);
+  }, [id, orderKey]);
 
   const lineItems = Array.isArray(order?.line_items) ? order.line_items : [];
   const itemImageFallbacks = useOrderItemImageFallbacks(lineItems);
@@ -201,9 +204,11 @@ export default function OrderConfirmation() {
   const billingName = [billing.first_name, billing.last_name].filter(Boolean).join(' ');
   const billingAddress = buildAddress(billing);
   const shippingTotal = parseMoney(order?.shipping_total);
-  const trackingUrl = order?.id ? `/order-tracking/${encodeURIComponent(order.id)}` : `/order-tracking/${encodeURIComponent(id)}`;
+  const trackingOrderId = order?.id || id;
+  const trackingUrl = `/order-tracking/${encodeURIComponent(trackingOrderId)}${orderKey ? `?order_key=${encodeURIComponent(orderKey)}` : ''}`;
   const placedLabel = order?.date_created ? new Date(order.date_created).toLocaleDateString() : '';
   const orderTotal = order?.total ? money(order.total) : '';
+  const paymentConfirmed = ['processing', 'completed', 'shipped'].includes(order?.status);
 
   return (
     <div className="dtb-order-page page-wrapper">
@@ -211,14 +216,26 @@ export default function OrderConfirmation() {
       <div className="dtb-order-shell">
         <section className="dtb-order-sheet" aria-labelledby="order-title">
           <header className="dtb-order-sheet__hero">
-            <span className="dtb-order-success-icon">
-              <CheckCircle size={54} strokeWidth={1.7} />
-            </span>
-            <p className="dtb-order-eyebrow">Order summary</p>
-            <h1 id="order-title" className="dtb-order-title">Order #{id}</h1>
-            <p className="dtb-order-subtitle">
-              Your order has been received. Use this page to review your order details and track status updates.
-            </p>
+            {paymentConfirmed ? (
+              <AnimatedOrderSuccess
+                orderId={order?.id || id}
+                title="Order confirmed"
+                titleId="order-title"
+                trackingHref={trackingUrl}
+                message={`Your order #${id} is confirmed. A receipt is on its way to your inbox.`}
+              />
+            ) : (
+              <>
+                <span className="dtb-order-status-icon dtb-order-status-icon--neutral">
+                  <Package size={42} strokeWidth={1.8} />
+                </span>
+                <p className="dtb-order-eyebrow">Order summary</p>
+                <h1 id="order-title" className="dtb-order-title">Order #{id}</h1>
+                <p className="dtb-order-subtitle">
+                  Review your order details and current payment or fulfillment status below.
+                </p>
+              </>
+            )}
             <div className="dtb-order-hero__metrics" aria-label="Order summary">
               <div>
                 <span>Status</span>
@@ -331,14 +348,6 @@ export default function OrderConfirmation() {
           </div>
         </section>
 
-        <div className="dtb-order-actions">
-          <Link to="/products" className="dtb-order-button dtb-order-button--primary">
-            Continue Shopping
-          </Link>
-          <Link to="/" className="dtb-order-button dtb-order-button--secondary">
-            Back to Home
-          </Link>
-        </div>
       </div>
     </div>
   );

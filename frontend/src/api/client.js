@@ -118,8 +118,12 @@ async function parseSuccessfulJsonResponse(response, url) {
 
 function canRetryWpJsonCandidate(method, status, errorCode = '') {
   if (IDEMPOTENT_HTTP_METHODS.has(method)) {
-    return [404, 405, 500, 502, 503, 504].includes(status)
-      || ['non_json_response', 'invalid_json_response'].includes(errorCode);
+    if ([404, 405].includes(status)) return true;
+    if (['non_json_response', 'invalid_json_response'].includes(errorCode)) return true;
+    // A generic error means the response had no usable JSON envelope, so an
+    // alternate WordPress base may still be valid. Named JSON errors came from
+    // the canonical route and must be returned without retrying a rewrite path.
+    return 'api_error' === errorCode && [500, 502, 503, 504].includes(status);
   }
 
   // Mutating requests may create orders, sessions, coupons, or payment state.

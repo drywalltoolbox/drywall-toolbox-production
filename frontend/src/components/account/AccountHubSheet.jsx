@@ -345,7 +345,7 @@ export default function AccountHubSheet({ isOpen, onClose, user, onLogout, onUnr
       aria-modal="true"
       aria-label="Account hub"
       aria-hidden={!isOpen}
-      inert={!isOpen ? '' : undefined}
+      inert={!isOpen ? true : undefined}
     >
       <button type="button" className="account-hub__backdrop" onClick={closeSheet} aria-label="Close account hub" tabIndex={-1} />
 

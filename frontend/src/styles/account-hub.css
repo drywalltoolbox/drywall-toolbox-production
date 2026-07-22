@@ -21,7 +21,7 @@
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 220ms var(--dtb-ease, cubic-bezier(0.22, 1, 0.36, 1));
   pointer-events: none;
   cursor: pointer;
 }
@@ -44,7 +44,7 @@
   flex-direction: column;
   overflow: hidden;
   transform: translateY(100%);
-  transition: transform 0.36s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform var(--dtb-normal, 320ms) var(--dtb-ease, cubic-bezier(0.22, 1, 0.36, 1));
   box-shadow: 0 -8px 40px rgba(2, 6, 23, 0.18);
   will-change: transform;
 }

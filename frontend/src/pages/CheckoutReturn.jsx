@@ -1,14 +1,35 @@
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { CheckCircle, ShoppingBag } from 'lucide-react';
 
 import SEOHead from '../components/shared/SEOHead.jsx';
+import AnimatedOrderSuccess from '../components/order/AnimatedOrderSuccess.jsx';
+import '../styles/order-pages.css';
 
 export default function CheckoutReturn({ fallbackState = 'complete' }) {
+	const { id } = useParams();
 	const failed = fallbackState === 'failed' || fallbackState === 'cancelled';
 	const title = failed ? 'Checkout was not completed' : 'Checkout status';
 	const description = failed
 		? 'Return to the WooCommerce checkout page to retry with the official Stripe payment form.'
 		: 'WooCommerce handles checkout confirmation and order-received pages. Use your account dashboard or order email for final order details.';
+
+	if (!failed) {
+		return (
+			<div className="dtb-order-page page-wrapper">
+				<SEOHead noindex title="Order confirmed" />
+				<div className="dtb-order-shell" style={{ maxWidth: 720 }}>
+					<section className="dtb-order-hero" aria-labelledby="checkout-return-title">
+						<AnimatedOrderSuccess
+							orderId={id}
+							title="Order confirmed"
+							titleId="checkout-return-title"
+							message="Your order is confirmed. A receipt is on its way to your inbox."
+						/>
+					</section>
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-16 page-wrapper">

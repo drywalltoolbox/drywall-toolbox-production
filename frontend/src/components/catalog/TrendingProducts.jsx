@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getProducts } from '../../services/catalog';
-import { getProductVariations } from '../../services/api';
 import { useCart } from '../../context/CartContext';
 import ProductDetail from '../product/ProductDetail';
 import ProductModal from '../product/ProductModal';
@@ -10,12 +9,10 @@ import StorefrontSection from '../storefront/StorefrontSection';
 import StorefrontRail from '../storefront/StorefrontRail';
 import StorefrontSkeletons from '../storefront/StorefrontSkeletons.jsx';
 import Toast from '../ui/Toast';
-import { PLACEHOLDER_IMAGE } from '../../constants/images.js';
-import { fetchVariationsBatched, getVariationSelectionMap } from '../../utils/variationSelection';
+import { getVariationSelectionMap } from '../../utils/variationSelection';
 
 export default function TrendingProducts() {
   const [products, setProducts] = useState([]);
-  const [variationMap, setVariationMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [modalProduct, setModalProduct] = useState(null);
@@ -56,9 +53,9 @@ export default function TrendingProducts() {
   const handleAddToCart = useCallback(async (product, quantity = 1) => {
     try {
       await addToCart(product, quantity);
-      showToast(`${product.name} added to cart!`, 'cart');
     } catch (error) {
       showToast(error?.message || 'Could not add item to cart. Please try again.', 'error');
+      throw error;
     }
   }, [addToCart]);
 
@@ -109,30 +106,6 @@ export default function TrendingProducts() {
     return () => { mounted = false; };
   }, []);
 
-  const trendingVariableIdsKey = products
-    .filter((product) => product.is_variable && product.id)
-    .map((product) => String(product.id))
-    .join(',');
-
-  useEffect(() => {
-    const variableIds = products
-      .filter((product) => product.is_variable && product.id && !variationMap[product.id])
-      .map((product) => product.id);
-    if (variableIds.length === 0) return undefined;
-
-    let mounted = true;
-    fetchVariationsBatched(variableIds, getProductVariations)
-      .then((pairs) => {
-        if (!mounted) return;
-        const next = {};
-        pairs.forEach(([id, vars]) => { next[id] = vars; });
-        setVariationMap((prev) => ({ ...prev, ...next }));
-      })
-      .catch(() => {});
-
-    return () => { mounted = false; };
-  }, [trendingVariableIdsKey]); // eslint-disable-line react-hooks/exhaustive-deps
-
   if (!loading && products.length === 0) return null;
 
   return (
@@ -148,22 +121,7 @@ export default function TrendingProducts() {
       >
         <StorefrontRail label="Trending products" className="storefront-rail--fixed-tiles">
           {products.map((product, index) => {
-            const variations = variationMap[product.id] || [];
-            const bestVariation = variations.find((variation) => variation.stock_status !== 'outofstock') || variations[0] || null;
-            const cardProduct = bestVariation
-              ? {
-                  ...bestVariation,
-                  image: bestVariation.image && bestVariation.image !== PLACEHOLDER_IMAGE
-                    ? bestVariation.image
-                    : product.image,
-                  images: bestVariation.image && bestVariation.image !== PLACEHOLDER_IMAGE
-                    ? bestVariation.images
-                    : product.images,
-                  image_thumbnail: bestVariation.image_thumbnail || bestVariation.image || product.image_thumbnail,
-                  image_srcset: bestVariation.image_srcset || product.image_srcset,
-                  image_sizes: bestVariation.image_sizes || product.image_sizes,
-                }
-              : product;
+            const cardProduct = product.cardProduct || product;
 
             return (
               <StorefrontProductTile
@@ -189,7 +147,7 @@ export default function TrendingProducts() {
             product={modalProduct.product || modalProduct}
             onAddToCart={handleAddToCart}
             onClose={closeModal}
-            initialVariations={variationMap[modalProduct.product?.id || modalProduct.id] || []}
+            initialVariations={[]}
             initialResolvedVariation={modalProduct.initialResolvedVariation}
             initialSelectedAttrs={modalProduct.initialSelectedAttrs}
           />

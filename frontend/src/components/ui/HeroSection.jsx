@@ -10,12 +10,12 @@ import NavigationCarousel from './NavigationCarousel';
 
 const HERO_TITLE_AURORA_COLORS = [
   '#ffffff',
-  '#d7dde8',
+  '#e9eef6',
   '#ffffff',
-  '#bfc8d6',
-  '#6f7887',
-  '#f8fafc',
-  '#cfd7e4',
+  '#d8e0ec',
+  '#bac5d4',
+  '#ffffff',
+  '#e6ebf3',
   '#ffffff',
 ];
 
@@ -183,11 +183,11 @@ export default function HeroSection({
           background-clip: text;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
-          text-shadow: 0 1px 0 rgba(255,255,255,0.62), 0 -1px 0 rgba(15,23,42,0.48), 0 18px 42px rgba(226,232,240,0.18);
+          text-shadow: 0 1px 0 rgba(255,255,255,0.72), 0 -1px 0 rgba(15,23,42,0.36), 0 0 18px rgba(248,250,252,0.18), 0 10px 34px rgba(147,197,253,0.15);
         }
         .dtb-hero-title-gradient {
           color: transparent;
-          text-shadow: 0 1px 0 rgba(255,255,255,0.42), 0 -1px 0 rgba(2,6,23,0.58), 0 14px 38px rgba(226,232,240,0.22), 0 0 48px rgba(191,219,254,0.14);
+          text-shadow: 0 1px 0 rgba(255,255,255,0.5), 0 -1px 0 rgba(2,6,23,0.5), 0 0 28px rgba(248,250,252,0.18), 0 12px 38px rgba(147,197,253,0.14);
           filter: drop-shadow(0 1px 0 rgba(255,255,255,0.28)) drop-shadow(0 12px 24px rgba(2,6,23,0.28));
         }
         .dtb-hero-cta { padding: 13px 30px; border-radius: 999px; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease; letter-spacing: 0.01em; }

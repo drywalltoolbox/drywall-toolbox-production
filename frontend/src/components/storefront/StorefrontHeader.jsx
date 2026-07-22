@@ -1,16 +1,19 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { startTransition, useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useAuthContext } from '../../auth/AuthContext.js';
-import { ShoppingCart, X, ChevronRight, User, LogIn, UserPlus, LogOut, Phone } from 'lucide-react';
+import { ShoppingCart, X, ChevronRight, User, LogIn, UserPlus, LogOut, Search } from 'lucide-react';
 import LogoWhite from '/logo-white.svg';
 import StorefrontSearchOverlay from './StorefrontSearchOverlay';
 import StorefrontMobileDrawer from './StorefrontMobileDrawer';
 import AccountHubSheet from '../account/AccountHubSheet.jsx';
 import { searchProducts } from '../../services/catalog';
 import StorefrontSearchDock from './StorefrontSearchDock';
-import StorefrontShopMegaMenu from './StorefrontShopMegaMenu.jsx';
+import StorefrontSearchLoading from './StorefrontSearchLoading.jsx';
+import StorefrontDesktopNavigation from './StorefrontDesktopNavigation.jsx';
 import { useCatalogFacets } from '../../hooks/useCatalogFacets.js';
+import { getRepairPackageGroups } from '../../data/repairPackages.js';
+import { SCHEMATIC_BRANDS } from '../../data/schematicBrands.js';
 import '../../styles/mobile-hamburger.css';
 import '../../styles/mobile-header-actions.css';
 import {
@@ -20,13 +23,7 @@ import {
   normalizeDisplayCategorySlug,
 } from '../../utils/catalogFacets.js';
 
-const PRIMARY_NAV_LINKS = [
-  { to: '/schematics', label: 'Schematics' },
-  { to: '/calculators', label: 'Calculators' },
-  { to: '/repairs', label: 'Repair Services' },
-];
-
-const MAX_DRAWER_CATEGORIES = 12;
+const SEARCH_OVERLAY_EXIT_MS = 360;
 
 const DRAWER_NAV_ROWS = [
   { to: '/products?sort=newest', label: 'New Arrivals' },
@@ -85,7 +82,7 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
   const [brandsExpanded, setBrandsExpanded] = useState(false);
   const [partsExpanded, setPartsExpanded] = useState(false);
   const [schematicsExpanded, setSchematicsExpanded] = useState(false);
-  const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
+  const [desktopNavOpen, setDesktopNavOpen] = useState(null);
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const [accountHubOpen, setAccountHubOpen] = useState(false);
   const [accountUnreadCount, setAccountUnreadCount] = useState(0);
@@ -98,13 +95,14 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const { facets } = useCatalogFacets();
+  const { facets: partsFacets } = useCatalogFacets({ isParts: 1 });
   const accountDropdownRef = useRef(null);
   const desktopSearchRef = useRef(null);
   const desktopSearchInputRef = useRef(null);
   const mobileSearchInputRef = useRef(null);
   const desktopSearchRequestIdRef = useRef(0);
   const searchOverlayRequestIdRef = useRef(0);
-  const dropdownCloseTimerRef = useRef(null);
+  const searchOverlayResetTimerRef = useRef(null);
   const prevPathnameRef = useRef(location.pathname);
   const [isTablet, setIsTablet] = useState(() => {
     try { return typeof window !== 'undefined' && window.matchMedia('(min-width: 641px) and (max-width: 1024px)').matches; }
@@ -112,8 +110,8 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
   });
 
   const isActive = (path) => location.pathname === path;
-  const shopActive = location.pathname.startsWith('/products') || isActive('/parts');
   const drawerBrands = useMemo(() => mapCatalogBrands(facets?.brands), [facets]);
+  const partsBrands = useMemo(() => mapCatalogBrands(partsFacets?.brands), [partsFacets]);
   const drawerCategoryLinks = useMemo(() => {
     const displayCategories = mergeCatalogDisplayCategories(facets?.displayCategoriesByBrand || {})
       .filter((category) => category?.slug)
@@ -141,27 +139,122 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
       .filter((category) => category.slug && category.label && category.count > 0)
       .sort((a, b) => String(a.label).localeCompare(String(b.label)));
   }, [facets]);
-  const desktopCategoryLinks = useMemo(
-    () => drawerCategoryLinks.slice(0, MAX_DRAWER_CATEGORIES),
-    [drawerCategoryLinks]
-  );
-  const desktopBrandLinks = useMemo(
-    () => drawerBrands.slice(0, 8).map((brand) => ({ ...brand, to: buildProductsBrandRoute(brand.slug) })),
-    [drawerBrands]
-  );
+  const desktopNavItems = useMemo(() => [
+    {
+      id: 'products',
+      label: 'All Products',
+      landingTo: '/products',
+      landingLabel: 'View all products',
+      description: 'Browse the complete catalog by tool category.',
+      size: 'wide',
+      columns: 2,
+      activePrefixes: ['/products'],
+      items: drawerCategoryLinks.map(({ label, to }) => ({ label, to })),
+    },
+    {
+      id: 'brands',
+      label: 'Brands',
+      landingTo: '/products/brands',
+      landingLabel: 'View all brands',
+      description: 'Shop every professional brand in the catalog.',
+      size: 'wide',
+      columns: 2,
+      activePrefixes: ['/products/brands'],
+      items: drawerBrands.map(({ name, slug }) => ({ label: name, to: buildProductsBrandRoute(slug) })),
+    },
+    {
+      id: 'parts',
+      label: 'Parts',
+      landingTo: '/parts',
+      landingLabel: 'View all replacement parts',
+      description: 'Choose a brand with available replacement parts.',
+      columns: 2,
+      activePrefixes: ['/parts'],
+      items: partsBrands.map(({ name, slug }) => ({ label: name, to: buildPartsBrandRoute(slug) })),
+    },
+    {
+      id: 'new-arrivals',
+      label: 'New Arrivals',
+      landingTo: '/products?sort=newest',
+      activePrefixes: [],
+      items: [],
+    },
+    {
+      id: 'repairs',
+      label: 'Repair Services',
+      landingTo: '/repairs',
+      landingLabel: 'View all repair services',
+      description: 'Compare repair packages for your tool type.',
+      activePrefixes: ['/repairs'],
+      items: getRepairPackageGroups()
+        .filter(({ id }) => id !== 'diagnostic')
+        .map(({ id, label }) => ({
+          label,
+          to: `/repairs/packages?tool=${encodeURIComponent(id)}`,
+        })),
+    },
+    {
+      id: 'schematics',
+      label: 'Schematics',
+      landingTo: '/schematics',
+      landingLabel: 'Open schematic selector',
+      description: 'Open the schematic selector for a supported brand.',
+      activePrefixes: ['/schematics'],
+      items: SCHEMATIC_BRANDS.map(({ name, slug }) => ({
+        label: name,
+        to: buildSchematicsBrandRoute(slug),
+      })),
+    },
+    {
+      id: 'calculators',
+      label: 'Calculators',
+      landingTo: '/calculators',
+      activePrefixes: ['/calculators'],
+      items: [],
+    },
+    {
+      id: 'support',
+      label: 'Support',
+      landingTo: '/contact',
+      activePrefixes: ['/contact'],
+      items: [],
+    },
+  ], [drawerBrands, drawerCategoryLinks, partsBrands]);
 
   const closeMobileMenu = () => setMobileMenuOpen(false);
   const closeMenus = () => {
-    setShopDropdownOpen(false);
+    setDesktopNavOpen(null);
     setMobileMenuOpen(false);
     setAccountDropdownOpen(false);
     setDesktopSearchOpen(false);
   };
 
   const closeSearchOverlay = useCallback(() => {
+    if (searchOverlayResetTimerRef.current) {
+      window.clearTimeout(searchOverlayResetTimerRef.current);
+    }
+    searchOverlayRequestIdRef.current += 1;
     setSearchOverlayOpen(false);
-    setMobileSearchQuery('');
-    setSearchSuggestions([]);
+    searchOverlayResetTimerRef.current = window.setTimeout(() => {
+      setMobileSearchQuery('');
+      setSearchSuggestions([]);
+      setSearchLoading(false);
+      searchOverlayResetTimerRef.current = null;
+    }, SEARCH_OVERLAY_EXIT_MS);
+  }, []);
+
+  const openSearchOverlay = useCallback(() => {
+    if (searchOverlayResetTimerRef.current) {
+      window.clearTimeout(searchOverlayResetTimerRef.current);
+      searchOverlayResetTimerRef.current = null;
+    }
+    setSearchOverlayOpen(true);
+  }, []);
+
+  useEffect(() => () => {
+    if (searchOverlayResetTimerRef.current) {
+      window.clearTimeout(searchOverlayResetTimerRef.current);
+    }
   }, []);
 
   const handleMobileMenuCheckedChange = useCallback((checked) => {
@@ -184,23 +277,6 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
     setBrandsExpanded(false);
     setPartsExpanded(false);
     setSchematicsExpanded(false);
-  }, []);
-
-  const handleDropdownMouseLeave = () => {
-    if (dropdownCloseTimerRef.current) clearTimeout(dropdownCloseTimerRef.current);
-    dropdownCloseTimerRef.current = setTimeout(() => setShopDropdownOpen(false), 50);
-  };
-
-  const handleDropdownMouseEnter = () => {
-    if (dropdownCloseTimerRef.current) {
-      clearTimeout(dropdownCloseTimerRef.current);
-      dropdownCloseTimerRef.current = null;
-    }
-    setShopDropdownOpen(true);
-  };
-
-  useEffect(() => () => {
-    if (dropdownCloseTimerRef.current) clearTimeout(dropdownCloseTimerRef.current);
   }, []);
 
   useEffect(() => {
@@ -236,7 +312,7 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
     const handleClickOutside = (e) => {
       const header = document.querySelector('.site-header');
       if (header && !header.contains(e.target)) {
-        setShopDropdownOpen(false);
+        setDesktopNavOpen(null);
         setDesktopSearchOpen(false);
       }
       if (accountDropdownRef.current && !accountDropdownRef.current.contains(e.target)) setAccountDropdownOpen(false);
@@ -284,11 +360,13 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
       setDesktopSearchLoading(false);
       return undefined;
     }
+    setDesktopSearchLoading(true);
     const t = setTimeout(async () => {
-      setDesktopSearchLoading(true);
       try {
         const found = (await searchProducts(query)).slice(0, 6);
-        if (desktopSearchRequestIdRef.current === requestId) setDesktopSearchResults(found);
+        if (desktopSearchRequestIdRef.current === requestId) {
+          startTransition(() => setDesktopSearchResults(found));
+        }
       } catch (err) {
         if (desktopSearchRequestIdRef.current === requestId) console.error('Desktop search error:', err);
       } finally {
@@ -307,11 +385,13 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
       setSearchLoading(false);
       return undefined;
     }
+    setSearchLoading(true);
     const t = setTimeout(async () => {
-      setSearchLoading(true);
       try {
         const found = (await searchProducts(query)).slice(0, 6);
-        if (searchOverlayRequestIdRef.current === requestId) setSearchSuggestions(found);
+        if (searchOverlayRequestIdRef.current === requestId) {
+          startTransition(() => setSearchSuggestions(found));
+        }
       } catch (err) {
         if (searchOverlayRequestIdRef.current === requestId) console.error('Search overlay error:', err);
       } finally {
@@ -346,7 +426,7 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
 
   const navigateShopDestination = useCallback((to, { closeMobile = false } = {}) => {
     resetDrawerExpansions();
-    setShopDropdownOpen(false);
+    setDesktopNavOpen(null);
     if (closeMobile) setMobileMenuOpen(false);
     navigate(to);
   }, [navigate, resetDrawerExpansions]);
@@ -367,6 +447,20 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
     navigate(`/products${q ? `?search=${encodeURIComponent(q)}` : ''}`);
     closeSearchOverlay();
   }, [mobileSearchQuery, navigate, closeSearchOverlay]);
+
+  const desktopSearchHasQuery = desktopSearchQuery.trim().length > 0;
+  const desktopSearchVisible = desktopSearchOpen && desktopSearchHasQuery;
+  const isDesktopNavItemActive = useCallback((item) => {
+    if (item.id === 'new-arrivals') {
+      return location.pathname === '/products' && new URLSearchParams(location.search).get('sort') === 'newest';
+    }
+    if (item.id === 'products') {
+      return location.pathname.startsWith('/products')
+        && !location.pathname.startsWith('/products/brands')
+        && new URLSearchParams(location.search).get('sort') !== 'newest';
+    }
+    return item.activePrefixes?.some((prefix) => location.pathname.startsWith(prefix)) || false;
+  }, [location.pathname, location.search]);
 
   const renderDrawerListSection = ({ id, label, expanded, onToggle, onLanding, items, onItemNavigate }) => (
     <div className="storefront-mobile-drawer__row-wrap" key={id}>
@@ -456,31 +550,28 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
 
           <div className="header-desktop-layout" style={{ display: isTablet ? 'none' : undefined }}>
             <div className="header-left"><Link to="/" className="header-logo-link" aria-label="Drywall Toolbox home"><img src={LogoWhite} alt="Drywall Toolbox Logo" className="logo-image" /></Link></div>
-            <div className="header-center">
-              <nav className="nav-links header-desktop-nav" aria-label="Primary">
-                <StorefrontShopMegaMenu
-                  isOpen={shopDropdownOpen}
-                  isActive={shopActive}
-                  onOpen={() => setShopDropdownOpen(true)}
-                  onClose={() => setShopDropdownOpen(false)}
-                  onMouseEnter={handleDropdownMouseEnter}
-                  onMouseLeave={handleDropdownMouseLeave}
-                  onNavigate={() => setShopDropdownOpen(false)}
-                  categoryLinks={desktopCategoryLinks}
-                  brandLinks={desktopBrandLinks}
-                />
-                {PRIMARY_NAV_LINKS.map(({ to, label }) => <Link key={to} to={to} className={`nav-link ${isActive(to) ? 'active' : ''}`}>{label}</Link>)}
-              </nav>
+            <div className="header-desktop-nav-row">
+              <StorefrontDesktopNavigation
+                items={desktopNavItems}
+                openMenuId={desktopNavOpen}
+                onOpen={(id) => setDesktopNavOpen(id)}
+                onClose={() => setDesktopNavOpen(null)}
+                onNavigate={() => setDesktopNavOpen(null)}
+                isItemActive={isDesktopNavItemActive}
+              />
+            </div>
+            <div className="header-center header-center--desktop-search">
+              <div ref={desktopSearchRef} className="dtb-desktop-search dtb-desktop-search--header">
+                <div className="dtb-desktop-search-pill">
+                  <span className="dtb-desktop-search-icon-wrap" aria-hidden="true"><Search className="dtb-desktop-search-icon" /></span>
+                  <input ref={desktopSearchInputRef} type="search" value={desktopSearchQuery} onChange={(e) => setDesktopSearchQuery(e.target.value)} onFocus={() => setDesktopSearchOpen(true)} onKeyDown={(e) => { if (e.key === 'Enter') handleDesktopViewAll(); }} placeholder="Search products..." className="dtb-desktop-search-input" aria-label="Search products" aria-autocomplete="list" aria-controls="dtb-desktop-search-results" aria-expanded={desktopSearchVisible} autoComplete="off" />
+                </div>
+                <div id="dtb-desktop-search-results" className="dtb-desktop-search-dropdown" data-open={desktopSearchVisible ? 'true' : 'false'} aria-hidden={!desktopSearchVisible}>
+                  {desktopSearchLoading ? <StorefrontSearchLoading compact /> : desktopSearchResults.length > 0 ? <><div className="dtb-desktop-search-results">{desktopSearchResults.map((product, index) => <button key={product.id} className="dtb-desktop-search-item" style={{ '--search-result-index': index }} onClick={() => handleDesktopResultClick(product)}><div className="dtb-desktop-search-thumb">{product.image ? <img src={product.image} alt="" /> : null}</div><div className="dtb-desktop-search-meta"><span className="dtb-desktop-search-name">{product.name}</span><span className="dtb-desktop-search-price">{typeof product.price === 'number' ? `$${product.price.toFixed(2)}` : 'View product'}</span></div></button>)}</div><button className="dtb-desktop-search-view-all" onClick={handleDesktopViewAll}>View All Results</button></> : desktopSearchHasQuery ? <div className="dtb-desktop-search-state">No products found</div> : null}
+                </div>
+              </div>
             </div>
             <div className="header-right header-desktop-actions">
-              <div ref={desktopSearchRef} className="dtb-desktop-search">
-                <div className="dtb-desktop-search-pill"><input ref={desktopSearchInputRef} type="text" value={desktopSearchQuery} onChange={(e) => setDesktopSearchQuery(e.target.value)} onFocus={() => setDesktopSearchOpen(true)} onKeyDown={(e) => { if (e.key === 'Enter') handleDesktopViewAll(); }} placeholder="Search products..." className="dtb-desktop-search-input" aria-label="Search products" autoComplete="off" /></div>
-                {desktopSearchOpen && (desktopSearchLoading || desktopSearchResults.length > 0 || desktopSearchQuery.trim()) && (
-                  <div className="dtb-desktop-search-dropdown">
-                    {desktopSearchLoading ? <div className="dtb-desktop-search-state">Loading...</div> : desktopSearchResults.length > 0 ? <><div className="dtb-desktop-search-results">{desktopSearchResults.map((product) => <button key={product.id} className="dtb-desktop-search-item" onClick={() => handleDesktopResultClick(product)}><div className="dtb-desktop-search-thumb">{product.image ? <img src={product.image} alt={product.name} /> : null}</div><div className="dtb-desktop-search-meta"><span className="dtb-desktop-search-name">{product.name}</span><span className="dtb-desktop-search-price">{typeof product.price === 'number' ? `$${product.price.toFixed(2)}` : 'View product'}</span></div></button>)}</div><button className="dtb-desktop-search-view-all" onClick={handleDesktopViewAll}>View All Results</button></> : desktopSearchQuery.trim() ? <div className="dtb-desktop-search-state">No products found</div> : null}
-                  </div>
-                )}
-              </div>
               <div ref={accountDropdownRef} className="header-account">
                 <button
                   type="button"
@@ -495,13 +586,12 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
                   disabled={isLoading}
                   className={`header-account-toggle header-icon${isLoading ? ' is-loading' : ''}`}
                 >
-                  <span className="header-account-toggle__icon" aria-hidden="true"><User size={20} /></span>
+                  <span className="header-account-toggle__icon" aria-hidden="true"><User size={24} strokeWidth={1.9} /></span>
                   {isAuthenticated && accountUnreadCount > 0 ? <span className="account-alert-badge">{accountUnreadCount > 99 ? '99+' : accountUnreadCount}</span> : null}
                 </button>
                 {!isLoading && !isAuthenticated ? <div className={`header-account-panel${accountDropdownOpen ? ' is-open' : ''}`}><div className="header-account-guest-header"><p className="header-account-guest-title">My Account</p></div><Link to="/login" onClick={() => setAccountDropdownOpen(false)} className="header-account-link header-account-link--strong"><LogIn size={14} />Sign In</Link><div className="header-account-divider header-account-divider--inset" /><div className="header-account-guest-body"><Link to="/register" onClick={() => setAccountDropdownOpen(false)} className="header-account-cta"><UserPlus size={13} />Create Account</Link><p className="header-account-note">No account needed to browse or checkout.</p></div></div> : null}
               </div>
-              <div className="cart-area"><button onClick={handleCartToggle} className="cart-toggle header-icon" aria-label="Toggle cart"><ShoppingCart size={20} />{getCartCount() > 0 && <span className="cart-badge">{getCartCount()}</span>}</button></div>
-              <Link to="/contact" className="header-icon header-contact-icon" aria-label="Contact support" title="Contact Support" onClick={() => setShopDropdownOpen(false)}><Phone size={19} /></Link>
+              <div className="cart-area"><button onClick={handleCartToggle} className="cart-toggle header-icon" aria-label="Toggle cart"><ShoppingCart size={24} strokeWidth={1.9} />{getCartCount() > 0 && <span className="cart-badge">{getCartCount()}</span>}</button></div>
             </div>
           </div>
         </div>
@@ -512,12 +602,15 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
             value={mobileSearchQuery}
             active={searchOverlayOpen}
             onChange={(event) => {
-              if (!searchOverlayOpen) setSearchOverlayOpen(true);
-              setMobileSearchQuery(event.target.value);
+              const nextQuery = event.target.value;
+              setMobileSearchQuery(nextQuery);
+              if (nextQuery.trim()) {
+                if (!searchOverlayOpen) openSearchOverlay();
+              }
             }}
             onFocus={() => {
               setMobileMenuOpen(false);
-              setSearchOverlayOpen(true);
+              openSearchOverlay();
             }}
             onKeyDown={(event) => {
               if (event.key === 'Enter') {
@@ -525,7 +618,7 @@ export default function Header({ onCartToggle, onMobileMenuOpen, hasTopTicker = 
                 handleMobileViewAll();
               }
             }}
-            endAdornment={searchOverlayOpen ? (
+            endAdornment={searchOverlayOpen && mobileSearchQuery.trim() ? (
               <button
                 type="button"
                 className="storefront-search-dock__clear"

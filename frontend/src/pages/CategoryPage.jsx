@@ -36,9 +36,9 @@ export default function CategoryPage() {
         },
         () => addToCart(product, quantity),
       );
-      showToast(`${product.name} added to cart!`, 'cart');
     } catch (err) {
       showToast(err?.message || 'Could not add item to cart. Please try again.', 'error');
+      throw err;
     }
   };
 

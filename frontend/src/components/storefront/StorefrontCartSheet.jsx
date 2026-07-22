@@ -338,7 +338,7 @@ export default function StorefrontCartSheet({
       className={`cart-overlay${isOpen ? ' active' : ''}`}
       onClick={handleClose}
       aria-hidden={!isOpen}
-      inert={!isOpen ? '' : undefined}
+      inert={!isOpen ? true : undefined}
     >
       <aside
         className="cart-panel storefront-cart-sheet"

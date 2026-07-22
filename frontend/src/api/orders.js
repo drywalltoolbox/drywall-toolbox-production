@@ -3,10 +3,8 @@
  *
  * DTB product-order API client — wraps the dtb/v1/orders/* endpoints.
  *
- * All routes are JWT-gated — a valid Bearer token must be in the in-memory
- * token store (see src/auth/tokenStore.js) before calling authenticated functions.
- *
- * Guest customers may access tracking via the order_key query param without a JWT.
+ * Customer order lists require authentication. A guest may access one specific
+ * order detail or tracking projection with that order's WooCommerce order_key.
  */
 
 import { apiClient } from './client.js';
@@ -79,10 +77,12 @@ export async function getOrders( page = 1, perPage = 20 ) {
  * Retrieve a single order's customer-safe detail.
  *
  * @param {number|string} orderId
+ * @param {string}        [orderKey] WooCommerce order_key for guest access
  * @returns {Promise<Object>}
  */
-export async function getOrder( orderId ) {
-  return apiClient( `/wp-json/dtb/v1/orders/${ encodeURIComponent( orderId ) }` );
+export async function getOrder( orderId, orderKey = '' ) {
+  const params = orderKey ? `?order_key=${ encodeURIComponent( orderKey ) }` : '';
+  return apiClient( `/wp-json/dtb/v1/orders/${ encodeURIComponent( orderId ) }${ params }` );
 }
 
 /**

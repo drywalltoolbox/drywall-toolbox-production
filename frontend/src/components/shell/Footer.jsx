@@ -1,233 +1,112 @@
-/**
- * components/Footer.jsx — FuturisticGradientFooter (IndoUI-style)
- *
- * Dark gradient footer with glowing blue accents, animated hover effects,
- * and responsive mobile accordion sections.
- */
-
+import { Facebook, Instagram, Twitter } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
-import { Instagram, Facebook, Twitter, ChevronDown, Mail, Phone } from 'lucide-react';
-import { motion as Motion } from 'framer-motion';
+
 import LogoWhite from '/logo-white.svg';
+import '../../styles/storefront-footer-template.css';
 
-const FOOTER_LINK_STYLE = {
-  textDecoration: 'none',
-  fontSize: '0.875rem',
-  color: 'rgba(255,255,255,0.90)',
-  transition: 'color 0.18s',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '6px',
-};
+const FOOTER_GROUPS = [
+  {
+    title: 'Shop',
+    links: [
+      { label: 'All Products', to: '/products' },
+      { label: 'Brands', to: '/products/brands' },
+      { label: 'Parts', to: '/parts' },
+      { label: 'New Arrivals', to: '/products?sort=newest' },
+    ],
+  },
+  {
+    title: 'Tools & Services',
+    links: [
+      { label: 'Repair Services', to: '/repairs' },
+      { label: 'Repair Packages', to: '/repairs/packages' },
+      { label: 'Schematics', to: '/schematics' },
+      { label: 'Calculators', to: '/calculators' },
+    ],
+  },
+  {
+    title: 'Support',
+    links: [
+      { label: 'Contact Us', to: '/contact' },
+      { label: 'Frequently Asked Questions', to: '/faq' },
+      { label: 'Shipping', to: '/shipping-policy' },
+      { label: 'Returns', to: '/returns' },
+    ],
+  },
+  {
+    title: 'Account',
+    links: [
+      { label: 'Sign In', to: '/login' },
+      { label: 'Create Account', to: '/register' },
+      { label: 'My Account', to: '/dashboard' },
+      { label: 'Store Policies', to: '/policies' },
+    ],
+  },
+];
 
-function FooterLink({ to, children }) {
-  const [hovered, setHovered] = useState(false);
+const SOCIAL_LINKS = [
+  { label: 'Instagram', href: 'https://www.instagram.com/drywalltoolbox', Icon: Instagram },
+  { label: 'Facebook', href: 'https://facebook.com', Icon: Facebook },
+  { label: 'Twitter / X', href: 'https://twitter.com', Icon: Twitter },
+];
+
+function FooterLinkGroup({ title, links }) {
   return (
-    <Link
-      to={to}
-      style={{
-        ...FOOTER_LINK_STYLE,
-        color: hovered ? '#93c5fd' : 'rgba(255,255,255,0.90)',
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {hovered && (
-        <span style={{ display: 'inline-block', width: '4px', height: '4px', borderRadius: '50%', background: '#93c5fd', flexShrink: 0 }} />
-      )}
-      {children}
-    </Link>
+    <section aria-labelledby={`footer-${title.toLowerCase().replace(/[^a-z]+/g, '-')}`}>
+      <h2 id={`footer-${title.toLowerCase().replace(/[^a-z]+/g, '-')}`} className="dtb-footer-template__heading">
+        {title}
+      </h2>
+      <ul className="dtb-footer-template__links">
+        {links.map(({ label, to }) => (
+          <li key={to}>
+            <Link className="dtb-footer-template__link" to={to}>{label}</Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
 export default function Footer() {
-  const [expandedMobile, setExpandedMobile] = useState({
-    shop: true,
-    support: true,
-  });
-
-  const toggleMobileSection = (section) => {
-    setExpandedMobile((current) => ({
-      ...current,
-      [section]: !current[section],
-    }));
-  };
-
   return (
-    <footer
-      className="site-footer"
-      style={{
-        background: 'linear-gradient(160deg, #0b1120 0%, #0f2150 50%, #1a3a8a 100%)',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      <div style={{
-        position: 'absolute', inset: 0,
-        backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.04) 1px, transparent 0)',
-        backgroundSize: '36px 36px',
-        pointerEvents: 'none', zIndex: 0,
-      }} />
-      <div style={{ position: 'absolute', top: '-80px', left: '-80px', width: '320px', height: '320px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
-      <div style={{ position: 'absolute', bottom: '-60px', right: '-60px', width: '280px', height: '280px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.10) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+    <footer className="site-footer dtb-footer-template">
+      <div className="dtb-footer-template__inner">
+        <div className="dtb-footer-template__grid">
+          <section className="dtb-footer-template__brand" aria-label="Drywall Toolbox">
+            <Link to="/" aria-label="Drywall Toolbox home">
+              <img className="dtb-footer-template__logo" src={LogoWhite} alt="Drywall Toolbox" />
+            </Link>
+            <p className="dtb-footer-template__summary">
+              The New Standard in Drywall.
+            </p>
+            <Link className="dtb-footer-template__contact" to="/contact">Contact us</Link>
+          </section>
 
-      <div style={{
-        position: 'relative', zIndex: 1,
-        padding: 'clamp(40px, 6vw, 72px) clamp(20px, 5vw, 40px)',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: '48px',
-        maxWidth: '1400px',
-        margin: '0 auto',
-        width: '100%',
-      }} className="footer-grid">
+          {FOOTER_GROUPS.map((group) => <FooterLinkGroup key={group.title} {...group} />)}
+        </div>
 
-        <div className="footer-brand-col" style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center', width: '100%' }}>
-          <Link to="/" style={{ display: 'inline-block' }}>
-            <img src={LogoWhite} alt="Drywall Toolbox" className="footer-logo" style={{ display: 'block' }} />
-          </Link>
-          <div className="footer-social-links" style={{ display: 'flex', gap: '18px', justifyContent: 'center', alignItems: 'center' }}>
-            {[
-              { href: 'https://www.instagram.com/drywalltoolbox', Icon: Instagram, label: 'Instagram' },
-              { href: 'https://facebook.com', Icon: Facebook, label: 'Facebook' },
-              { href: 'https://twitter.com', Icon: Twitter, label: 'Twitter / X' },
-            ].map(({ href, Icon, label }) => (
-              <Motion.a
+        <div className="dtb-footer-template__bottom">
+          <div>
+            <p className="dtb-footer-template__copyright">© 2026 Drywall Toolbox. All rights reserved.</p>
+            <nav className="dtb-footer-template__legal" aria-label="Legal">
+              <Link className="dtb-footer-template__link" to="/policies">Privacy</Link>
+              <Link className="dtb-footer-template__link" to="/policies">Terms</Link>
+            </nav>
+          </div>
+
+          <div className="dtb-footer-template__socials" aria-label="Social media">
+            {SOCIAL_LINKS.map(({ label, href, Icon }) => (
+              <a
                 key={label}
+                className="dtb-footer-template__social"
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                whileHover={{ y: -2, color: '#93c5fd' }}
-                transition={{ duration: 0.15 }}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#ffffff',
-                  textDecoration: 'none',
-                  lineHeight: 1,
-                }}
               >
-                <Icon size={22} strokeWidth={1.9} />
-              </Motion.a>
+                <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
+              </a>
             ))}
           </div>
-        </div>
-
-        <div className="footer-col footer-col--shop" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-          <h5 style={{ display: 'none', textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', margin: '0 0 16px 0', fontWeight: 800, color: '#ffffff' }}>
-            Shop
-          </h5>
-          <button
-            onClick={() => toggleMobileSection('shop')}
-            className="footer-header-mobile"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: 0, textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', fontWeight: 800, color: '#ffffff', width: '100%' }}
-          >
-            Shop
-            <ChevronDown size={14} style={{ transition: 'transform 0.25s', transform: expandedMobile.shop ? 'rotate(180deg)' : 'rotate(0deg)', color: '#ffffff' }} />
-          </button>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: expandedMobile.shop ? 'flex' : 'none', flexDirection: 'column', gap: '10px', alignItems: 'center' }} className="footer-list-shop">
-            {[
-              { to: '/all-products', label: 'All Products' },
-              { to: '/products?category=taping', label: 'Taping Tools' },
-              { to: '/products?category=finishing', label: 'Finishing Tools' },
-              { to: '/parts', label: 'Parts' },
-              { to: '/schematics', label: 'Schematics' },
-            ].map(({ to, label }) => (
-              <li key={to}><FooterLink to={to}>{label}</FooterLink></li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="footer-col footer-col--support" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-          <h5 style={{ display: 'none', textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', margin: '0 0 16px 0', fontWeight: 800, color: '#ffffff' }}>
-            Support
-          </h5>
-          <button
-            onClick={() => toggleMobileSection('support')}
-            className="footer-header-mobile"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: 0, textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', fontWeight: 800, color: '#ffffff', width: '100%' }}
-          >
-            Support
-            <ChevronDown size={14} style={{ transition: 'transform 0.25s', transform: expandedMobile.support ? 'rotate(180deg)' : 'rotate(0deg)', color: '#ffffff' }} />
-          </button>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: expandedMobile.support ? 'flex' : 'none', flexDirection: 'column', gap: '10px', alignItems: 'center' }} className="footer-list-support">
-            {[
-              { to: '/contact', label: 'Contact Us' },
-              { to: '/repairs', label: 'Repair Services' },
-              { to: '/returns', label: 'Return Portal' },
-              { to: '/shipping-policy', label: 'Shipping' },
-              { to: '/policies', label: 'Store Policies' },
-            ].map(({ to, label }) => (
-              <li key={label}><FooterLink to={to}>{label}</FooterLink></li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="dtb-footer-contact-col" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <h5 style={{ textTransform: 'uppercase', fontSize: '0.67rem', letterSpacing: '0.12em', margin: '0 0 6px 0', fontWeight: 800, color: '#ffffff' }}>
-            Contact &amp; Support
-          </h5>
-          {[
-            { Icon: Mail, to: '/contact', text: 'Contact Us' },
-            { Icon: Phone, href: 'tel:+16098665269', text: '(609) 866-5269' },
-          ].map(({ Icon, href, to, text }) => {
-            const inner = (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: 'rgba(255,255,255,0.85)', transition: 'color 0.18s' }}>
-                <Icon size={13} style={{ flexShrink: 0, color: 'rgba(255,255,255,0.65)' }} />
-                {text}
-              </span>
-            );
-            if (href) return (
-              <a key={text} href={href} style={{ textDecoration: 'none' }}
-                onMouseEnter={(e) => { e.currentTarget.querySelector('span').style.color = '#93c5fd'; }}
-                onMouseLeave={(e) => { e.currentTarget.querySelector('span').style.color = 'rgba(255,255,255,0.85)'; }}>
-                {inner}
-              </a>
-            );
-            if (to) return (
-              <Link key={text} to={to} style={{ textDecoration: 'none' }}
-                onMouseEnter={(e) => { e.currentTarget.querySelector('span').style.color = '#93c5fd'; }}
-                onMouseLeave={(e) => { e.currentTarget.querySelector('span').style.color = 'rgba(255,255,255,0.85)'; }}>
-                {inner}
-              </Link>
-            );
-            return <div key={text}>{inner}</div>;
-          })}
-        </div>
-      </div>
-
-      <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', position: 'relative', zIndex: 1, margin: '0 clamp(20px, 5vw, 40px)' }} />
-
-      <div style={{
-        position: 'relative', zIndex: 1,
-        padding: '20px clamp(20px, 5vw, 40px)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '10px',
-        textAlign: 'center',
-      }}>
-        <p style={{ fontSize: '0.775rem', color: 'rgba(255,255,255,0.60)', margin: 0, fontWeight: 500 }}>
-          © 2026 Drywall Toolbox. All rights reserved.
-        </p>
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          {['Privacy Policy', 'Terms of Service'].map((item) => (
-            <Link
-              key={item}
-              to="#"
-              style={{ fontSize: '0.775rem', color: 'rgba(255,255,255,0.60)', textDecoration: 'none', transition: 'color 0.18s' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#93c5fd'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.60)'; }}
-            >
-              {item}
-            </Link>
-          ))}
         </div>
       </div>
     </footer>

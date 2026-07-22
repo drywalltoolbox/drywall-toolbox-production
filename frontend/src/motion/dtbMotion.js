@@ -9,26 +9,32 @@ export const dtbEase = {
 export const dtbDuration = {
   instant: 0.1,
   fast: 0.18,
-  normal: 0.3,
-  elevated: 0.38,
+  normal: 0.32,
+  elevated: 0.32,
 };
 
 export const routeVariants = {
   initial: {
     opacity: 0,
+    y: 8,
+    scale: 0.998,
   },
   animate: {
     opacity: 1,
+    y: 0,
+    scale: 1,
     transition: {
-      duration: 0.36,
-      ease: dtbEase.fade,
+      duration: dtbDuration.normal,
+      ease: dtbEase.standard,
     },
   },
   exit: {
     opacity: 0,
+    y: -3,
+    scale: 0.999,
     transition: {
-      duration: 0.28,
-      ease: dtbEase.fade,
+      duration: 0.18,
+      ease: dtbEase.exit,
     },
   },
 };
@@ -45,7 +51,7 @@ export const surfaceVariants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: dtbDuration.normal, ease: dtbEase.emphasized },
+    transition: { duration: dtbDuration.normal, ease: dtbEase.standard },
   },
   exit: {
     opacity: 0,
@@ -74,18 +80,50 @@ export const reducedBackdropVariants = {
 };
 
 export const backdropTransition = { duration: 0.2, ease: [0.32, 0.72, 0, 1] };
-export const panelTransition = { duration: dtbDuration.normal, ease: dtbEase.emphasized };
+export const panelTransition = { duration: dtbDuration.normal, ease: dtbEase.standard };
 export const reducedTransition = { duration: dtbDuration.instant, ease: 'linear' };
 
 export const mobileSheetTransition = {
-  type: 'spring',
-  stiffness: 420,
-  damping: 38,
-  mass: 0.9,
+  type: 'tween',
+  duration: dtbDuration.normal,
+  ease: dtbEase.standard,
 };
 
 export const mobileSheetVariants = {
   hidden: { opacity: 0, y: '12%', scale: 0.992 },
   visible: { opacity: 1, y: 0, scale: 1 },
   exit: { opacity: 0, y: '8%', scale: 0.995 },
+};
+
+export const productModalTransition = {
+  type: 'tween',
+  duration: 0.38,
+  ease: dtbEase.emphasized,
+};
+
+export const productModalBackdropTransition = {
+  duration: 0.32,
+  ease: dtbEase.exit,
+};
+
+export const productModalDesktopVariants = {
+  hidden: { opacity: 0, y: 16, scale: 0.985 },
+  visible: { opacity: 1, y: 0, scale: 1 },
+  exit: {
+    opacity: 0,
+    y: 12,
+    scale: 0.988,
+    transition: { duration: 0.32, ease: dtbEase.exit },
+  },
+};
+
+export const productModalMobileVariants = {
+  hidden: { opacity: 0, y: '14%', scale: 0.992 },
+  visible: { opacity: 1, y: 0, scale: 1 },
+  exit: {
+    opacity: 0,
+    y: '10%',
+    scale: 0.994,
+    transition: { duration: 0.34, ease: dtbEase.exit },
+  },
 };

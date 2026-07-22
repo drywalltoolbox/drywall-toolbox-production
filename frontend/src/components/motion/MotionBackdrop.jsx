@@ -12,6 +12,7 @@ export default function MotionBackdrop({
   onClick,
   style,
   zIndex,
+  transition,
 }) {
   return (
     <Motion.div
@@ -21,7 +22,7 @@ export default function MotionBackdrop({
       initial="hidden"
       animate="visible"
       exit="exit"
-      transition={reduceMotion ? reducedTransition : backdropTransition}
+      transition={reduceMotion ? reducedTransition : (transition || backdropTransition)}
       onClick={onClick}
       aria-hidden="true"
     />
